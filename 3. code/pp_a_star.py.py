@@ -3,6 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import os
 import random
+import time
 from a_star_cost import AStarPlanner
 
 # ==========================================
@@ -16,22 +17,20 @@ mx = 0
 # Thông số Động lực học Robot (Mô hình chống lật LTR)
 TRACK_WIDTH_T = 0.8   # Chiều rộng cơ sở bánh xe (m)
 COG_HEIGHT_H = 0.4    # Chiều cao trọng tâm (m)
-SSF = TRACK_WIDTH_T / (2 * COG_HEIGHT_H) # Chỉ số ổn định tĩnh = 1.2
+SSF = TRACK_WIDTH_T / (2 * COG_HEIGHT_H) # Chỉ số ổn định tĩnh 
 
-# Lấy xu hướng độ dốc & đất trong bán kính 3 ô
+# Lấy xu hướng độ dốc & đất trong bán kính 2 ô
 SMOOTH_RADIUS = 2
 
-# === CẤU HÌNH THUẬT TOÁN WEIGHTED A* ===
+# CẤU HÌNH THUẬT TOÁN A* CÓ TRỌNG SỐ
 HEURISTIC_WEIGHT = 3.0 
 MIN_STEP_COST = 2.0 
 
-MANUAL_TEST = False
-START_MANUAL = (26, 2)
-GOAL_MANUAL = (14, 57)
+MANUAL_TEST = True
+START_MANUAL = (33, 8)
+GOAL_MANUAL = (40, 58)
 
-# ==========================================
-# 1. THƯ MỤC CHỨA BẢN ĐỒ
-# ==========================================
+# THƯ MỤC CHỨA BẢN ĐỒ
 base_dir = "/home/ali/ros2_ws/src/benchnav/datasets/dataset01/train/"
 
 def clean_tensor(tensors, name):
@@ -52,12 +51,11 @@ def get_filename():
         print("\n--- Đã duyệt qua 1000 map ---")
         return None
         
-    filename = f"{t_idx:03d}_{m_idx:03d}.pt"
+    # filename = f"{t_idx:03d}_{m_idx:03d}.pt"
+    filename = "000_025.pt"
     return filename
 
-# ==========================================
-# 2. VÒNG LẶP AUTO TÌM BẢN ĐỒ VÀ CHẠY
-# ==========================================
+# VÒNG LẶP TÌM BẢN ĐỒ VÀ CHẠY
 if __name__ == "__main__":
     map_found = False
     while not map_found:
@@ -138,12 +136,20 @@ if __name__ == "__main__":
         for trial_idx, (start_node, goal_node) in enumerate(trials):
             print(f"  -> Thử lần {trial_idx+1} | Start: {start_node} | Goal: {goal_node}")
             
-            # ==== GỌI HÀM PLAN TỪ FILE a_star_cost.py ====
+            # --- Đo đạc hiệu năng ---
+            start_time = time.perf_counter()
             path, total_cost = planner.plan(start_node, goal_node)
+            end_time = time.perf_counter()
+
+            exec_time = (end_time - start_time) * 1000 
             
             if path:
-                print(f"=> THÀNH CÔNG! Đã tìm thấy tuyến đường tối ưu Vật lý.")
-                print(f"=> Tổng chi phí tiêu hao: {total_cost:.2f} / Max: {ROBOT_MAX_TOTAL_COST}")
+                print("=" * 50)
+                print(f"🎉 TÌM ĐƯỜNG THÀNH CÔNG: {filename} (A*)")
+                print(f"  ⏱ Thời gian xử lý : {exec_time:.2f} ms")
+                print(f"  ⚡ Tổng năng lượng : {total_cost:.2f}")
+                print(f"  📍 Số lượng điểm   : {len(path)} node")
+                print("=" * 50)
                 
                 path = np.array(path)
                 plt.figure(figsize=(16, 6))
@@ -155,7 +161,7 @@ if __name__ == "__main__":
                 plt.plot(path[:, 1], path[:, 0], color='red', linewidth=2.5, label='Safe & Energy-Optimal Path')
                 plt.scatter([start_node[1]], [start_node[0]], color='yellow', s=100, label='Start', edgecolors='black', zorder=5)
                 plt.scatter([goal_node[1]], [goal_node[0]], color='blue', s=100, label='Goal', edgecolors='white', zorder=5)
-                plt.title(f"Terrain Heights\nTotal Energy Cost: {total_cost:.1f}")
+                plt.title(f"2.5D A* Planning (Heights)\nExecution: {exec_time:.1f}ms | Energy Cost: {total_cost:.1f}")
                 plt.legend()
                 
                 # BIỂU ĐỒ 2: LOẠI ĐẤT
