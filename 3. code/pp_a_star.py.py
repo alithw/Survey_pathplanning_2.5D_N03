@@ -26,7 +26,8 @@ SMOOTH_RADIUS = 2
 HEURISTIC_WEIGHT = 3.0 
 MIN_STEP_COST = 2.0 
 
-MANUAL_TEST = True
+# Thiết lập chế độ MANUAL_TEST = False để tự động random map và điểm Start/Goal
+MANUAL_TEST = False
 START_MANUAL = (33, 8)
 GOAL_MANUAL = (40, 58)
 
@@ -51,12 +52,21 @@ def get_filename():
         print("\n--- Đã duyệt qua 1000 map ---")
         return None
         
-    # filename = f"{t_idx:03d}_{m_idx:03d}.pt"
-    filename = "000_025.pt"
+    filename = f"{t_idx:03d}_{m_idx:03d}.pt"
     return filename
 
 # VÒNG LẶP TÌM BẢN ĐỒ VÀ CHẠY
 if __name__ == "__main__":
+    print("="*60)
+    print(" KHỞI ĐỘNG HỆ THỐNG MÔ PHỎNG QUY HOẠCH A* 2.5D")
+    print("="*60)
+    print(f"[THÔNG SỐ ROBOT] Chiều rộng bánh (T): {TRACK_WIDTH_T}m")
+    print(f"[THÔNG SỐ ROBOT] Chiều cao trọng tâm (h): {COG_HEIGHT_H}m")
+    print(f"[THÔNG SỐ ROBOT] Chỉ số Ổn định Tĩnh (SSF): {SSF:.2f}")
+    print(f"[THÔNG SỐ ROBOT] Năng lượng hoạt động tối đa: {ROBOT_MAX_TOTAL_COST} J")
+    print(f"[THUẬT TOÁN] Trọng số Heuristic (W): {HEURISTIC_WEIGHT}")
+    print("="*60)
+
     map_found = False
     while not map_found:
         try:
@@ -99,8 +109,6 @@ if __name__ == "__main__":
             heuristic_weight=HEURISTIC_WEIGHT, 
             min_step_cost=MIN_STEP_COST
         )
-
-        print(f"\n[{filename}] Bắt đầu phân tích map với SSF={SSF:.2f} | Size={GRID_SIZE}x{GRID_SIZE}")
         
         # Thiết lập các điểm Start/Goal
         if MANUAL_TEST:
@@ -116,7 +124,6 @@ if __name__ == "__main__":
             goal_spots = [tuple(pt) for pt in safe_spots if pt[1] >= right_bound]
             
             if not start_spots or not goal_spots: 
-                print("     -> Map có địa hình 2 bên quá gắt. Bỏ qua...")
                 continue
             
             trials = []
@@ -134,7 +141,6 @@ if __name__ == "__main__":
                 
         # Chạy các thử nghiệm Pathfinding
         for trial_idx, (start_node, goal_node) in enumerate(trials):
-            print(f"  -> Thử lần {trial_idx+1} | Start: {start_node} | Goal: {goal_node}")
             
             # --- Đo đạc hiệu năng ---
             start_time = time.perf_counter()
@@ -144,11 +150,13 @@ if __name__ == "__main__":
             exec_time = (end_time - start_time) * 1000 
             
             if path:
+                print(f"\n[PHÂN TÍCH BẢN ĐỒ] Đang nạp file: {filename} | Kích thước lưới: {GRID_SIZE}x{GRID_SIZE}")
+                print(f"  -> Thử nghiệm ngẫu nhiên điểm Start: {start_node} | Goal: {goal_node}")
                 print("=" * 50)
-                print(f"🎉 TÌM ĐƯỜNG THÀNH CÔNG: {filename} (A*)")
+                print(f"🎉 TÌM ĐƯỜNG THÀNH CÔNG (Thuật toán Weighted A*)")
                 print(f"  ⏱ Thời gian xử lý : {exec_time:.2f} ms")
-                print(f"  ⚡ Tổng năng lượng : {total_cost:.2f}")
-                print(f"  📍 Số lượng điểm   : {len(path)} node")
+                print(f"  ⚡ Tổng năng lượng : {total_cost:.2f} J")
+                print(f"  📍 Số lượng Waypoints: {len(path)} điểm")
                 print("=" * 50)
                 
                 path = np.array(path)
@@ -161,7 +169,7 @@ if __name__ == "__main__":
                 plt.plot(path[:, 1], path[:, 0], color='red', linewidth=2.5, label='Safe & Energy-Optimal Path')
                 plt.scatter([start_node[1]], [start_node[0]], color='yellow', s=100, label='Start', edgecolors='black', zorder=5)
                 plt.scatter([goal_node[1]], [goal_node[0]], color='blue', s=100, label='Goal', edgecolors='white', zorder=5)
-                plt.title(f"2.5D A* Planning (Heights)\nExecution: {exec_time:.1f}ms | Energy Cost: {total_cost:.1f}")
+                plt.title(f"2.5D A* Planning on Map {filename}\nExecution: {exec_time:.1f}ms | Energy Cost: {total_cost:.1f} J")
                 plt.legend()
                 
                 # BIỂU ĐỒ 2: LOẠI ĐẤT
@@ -188,8 +196,6 @@ if __name__ == "__main__":
                 plt.show()
                 map_found = True
                 break
-            else:
-                print("     Thất bại: Tuyến đường vượt ngưỡng lật xe LTR hoặc kẹt vật cản.")
                 
         if not map_found and MANUAL_TEST:
              print("     => Tọa độ ghim cứng không có đường đi an toàn trên map này. Chuyển map kế tiếp...")
