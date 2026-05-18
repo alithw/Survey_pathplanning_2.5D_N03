@@ -1,4 +1,4 @@
-This is LuaHBTeX, Version 1.14.0 (TeX Live 2022/dev/Debian)  (format=lualatex 2026.3.29)  18 MAY 2026 22:13
+This is LuaHBTeX, Version 1.14.0 (TeX Live 2022/dev/Debian)  (format=lualatex 2026.3.29)  18 MAY 2026 22:24
  restricted system commands enabled.
 **report2.tex
 (./report2.tex
@@ -965,7 +965,7 @@ LaTeX Info: Redefining \sffamily on input line 21.
 LaTeX Info: Redefining \ttfamily on input line 21.
 )
 Package rerunfilecheck Info: File `report2.out' has not changed.
-(rerunfilecheck)             Checksum: 06A6B840179903F7B1721762A46A7BED;3790.
+(rerunfilecheck)             Checksum: DF261B81AD1C6E5A9678B8B0375AF518;3814.
 )
 
 Here is how much of LuaTeX's memory you used:
@@ -990,7 +990,7 @@ sfonts/cm/cmr10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/c
 m/cmr12.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr8.p
 fb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></us
 r/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy8.pfb>
-Output written on report2.pdf (8 pages, 1366892 bytes).
+Output written on report2.pdf (8 pages, 1366902 bytes).
 
 PDF statistics: 226 PDF objects out of 1000 (max. 8388607)
  177 compressed objects within 2 object streams
