@@ -1,4 +1,4 @@
-This is LuaHBTeX, Version 1.14.0 (TeX Live 2022/dev/Debian)  (format=lualatex 2026.3.29)  12 APR 2026 23:55
+This is LuaHBTeX, Version 1.14.0 (TeX Live 2022/dev/Debian)  (format=lualatex 2026.3.29)  18 MAY 2026 21:56
  restricted system commands enabled.
 **main.tex
 (./main.tex
@@ -801,7 +801,7 @@ File: lstlang1.sty 2020/03/24 1.8d listings language file
 Package hyperref Info: bookmark level for unknown lstlisting defaults to 0 on i
 nput line 190.
  [4]
-<figures/compare_a_star_rrt.png, id=126, 1211.27531pt x 1017.8025pt>
+<figures/compare_a_star_rrt.png, id=182, 1211.27531pt x 1017.8025pt>
 File: figures/compare_a_star_rrt.png Graphic file (type png)
 <use figures/compare_a_star_rrt.png>
 Package luatex.def Info: figures/compare_a_star_rrt.png  used on input line 233
@@ -811,64 +811,90 @@ Package luatex.def Info: figures/compare_a_star_rrt.png  used on input line 233
 
 LaTeX Warning: `h' float specifier changed to `ht'.
 
-[5] [6<./figures/compare_a_star_rrt.png>]
-<figures/nmpc_tracking_result.png, id=160, 1149.093pt x 570.4512pt>
+(./tables/experiment_table.tex
+Overfull \hbox (3.98315pt too wide) in paragraph at lines 11--27
+ [][] 
+ []
+
+
+Overfull \hbox (75.19116pt too wide) in paragraph at lines 34--51
+ [][] 
+ []
+
+) [5] [6
+Missing character: There is no ✓ (U+2713) in font NotoSans/B:mode=node;script=
+latn;language=dflt;+tlig;!
+Missing character: There is no ✓ (U+2713) in font NotoSans/B:mode=node;script=
+latn;language=dflt;+tlig;!
+] [7<./figures/compare_a_star_rrt.png>]
+<figures/nmpc_tracking_result.png, id=230, 1149.093pt x 570.4512pt>
 File: figures/nmpc_tracking_result.png Graphic file (type png)
 <use figures/nmpc_tracking_result.png>
 Package luatex.def Info: figures/nmpc_tracking_result.png  used on input line 3
-04.
+06.
 (luatex.def)             Requested size: 435.32422pt x 216.11217pt.
 
 
 LaTeX Warning: `h' float specifier changed to `ht'.
 
-[7] [8<./figures/nmpc_tracking_result.png>] (./main.aux)
+[8] [9<./figures/nmpc_tracking_result.png>]
+<figures/traversability_analysis.png, id=259, 1288.93546pt x 711.8595pt>
+File: figures/traversability_analysis.png Graphic file (type png)
+<use figures/traversability_analysis.png>
+Package luatex.def Info: figures/traversability_analysis.png  used on input lin
+e 361.
+(luatex.def)             Requested size: 445.00023pt x 245.76558pt.
 
-LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right.
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+[10] (./main.bbl [11<./figures/traversability_analysis.png>]
+Underfull \hbox (badness 1348) in paragraph at lines 23--27
+[]\TU/NotoSans(1)/m/n/12 Masa-fumi Endo, Ko-hei Honda, and Genya Ishigami.  Benc
+h-Nav: Sim-u-la-tion
+ []
 
 
-Package rerunfilecheck Warning: File `main.out' has changed.
-(rerunfilecheck)                Rerun to get outlines right
-(rerunfilecheck)                or use package `bookmark'.
+Underfull \hbox (badness 1546) in paragraph at lines 23--27
+\TU/NotoSans(1)/m/n/12 plat-form for bench-mark-ing off-road nav-i-ga-tion al-go
+-rithms with prob-a-bilis-tic
+ []
 
-Package rerunfilecheck Info: Checksums for `main.out':
-(rerunfilecheck)             Before: 3D933873E3A99ABC9B6BBCA80CB06177;4826
-(rerunfilecheck)             After:  FC6000526D70DCCCA29E75908ADB82FD;4697.
+[12]) [13] (./main.aux)
+Package rerunfilecheck Info: File `main.out' has not changed.
+(rerunfilecheck)             Checksum: B8547DE83E5E068FC4974B8809A5853C;6696.
 )
 
 Here is how much of LuaTeX's memory you used:
- 17503 strings out of 477805
- 244178,953878 words of node,token memory allocated
- 799 words of node memory still in use:
-   7 hlist, 2 vlist, 2 rule, 5 dir, 2 glue, 4 kern, 1 glyph, 111 attribute, 53 g
-lue_spec, 39 attribute_list, 1 write nodes
-   avail lists: 2:13688,3:332,4:3926,5:3803,6:96,7:9725,8:71,9:10846,10:35,11:57
-7
- 37486 multiletter control sequences out of 65536+600000
- 82 fonts using 17829711 bytes
- 68i,10n,95p,747b,1055s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 17607 strings out of 477805
+ 305238,953878 words of node,token memory allocated
+ 887 words of node memory still in use:
+   7 hlist, 2 vlist, 2 rule, 5 dir, 2 glue, 4 kern, 1 glyph, 144 attribute, 53 g
+lue_spec, 50 attribute_list, 1 write nodes
+   avail lists: 1:2,2:17995,3:332,4:3926,5:3807,6:96,7:11290,8:73,9:10846,10:35,
+11:577
+ 37534 multiletter control sequences out of 65536+600000
+ 91 fonts using 19393919 bytes
+ 68i,11n,95p,1095b,1055s stack positions out of 5000i,500n,10000p,200000b,80000s
+</usr/share/fonts/truetype/noto/NotoSans-Italic.ttf></usr/share/texmf/fonts/open
+type/public/lm/lmmono10-regular.otf></usr/share/texmf/fonts/opentype/public/lm/l
+mmono12-regular.otf></usr/share/fonts/truetype/noto/NotoSans-Regular.ttf></usr/s
+hare/fonts/truetype/noto/NotoSans-Bold.ttf></usr/share/texlive/texmf-dist/fonts/
+type1/public/amsfonts/cm/cmex10.pfb></usr/share/texlive/texmf-dist/fonts/type1/p
+ublic/amsfonts/cm/cmmi10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/a
+msfonts/cm/cmmi12.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts
+/cm/cmmi6.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi
+8.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></
+usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb></usr/shar
+e/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr6.pfb></usr/share/texlive
+/texmf-dist/fonts/type1/public/amsfonts/cm/cmr8.pfb></usr/share/texlive/texmf-di
+st/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/share/texlive/texmf-dist/font
+s/type1/public/amsfonts/cm/cmsy6.pfb></usr/share/texlive/texmf-dist/fonts/type1/
+public/amsfonts/cm/cmsy8.pfb>
+Output written on main.pdf (13 pages, 1155646 bytes).
 
-warning  (pdf backend): unreferenced destination with name 'subsection.3.6'
-
-warning  (pdf backend): unreferenced destination with name 'subsection.3.5'
-
-warning  (pdf backend): unreferenced destination with name 'subsection.3.4'
-</usr/share/texmf/fonts/opentype/public/lm/lmmono10-regular.otf></usr/share/texm
-f/fonts/opentype/public/lm/lmmono12-regular.otf></usr/share/fonts/truetype/noto/
-NotoSans-Regular.ttf></usr/share/fonts/truetype/noto/NotoSans-Bold.ttf></usr/sha
-re/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb></usr/share/texl
-ive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi12.pfb></usr/share/texlive/tex
-mf-dist/fonts/type1/public/amsfonts/cm/cmmi6.pfb></usr/share/texlive/texmf-dist/
-fonts/type1/public/amsfonts/cm/cmmi8.pfb></usr/share/texlive/texmf-dist/fonts/ty
-pe1/public/amsfonts/cm/cmr12.pfb></usr/share/texlive/texmf-dist/fonts/type1/publ
-ic/amsfonts/cm/cmr6.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfon
-ts/cm/cmr8.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cms
-y10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy6.pfb>
-</usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy8.pfb>
-Output written on main.pdf (8 pages, 819579 bytes).
-
-PDF statistics: 243 PDF objects out of 1000 (max. 8388607)
- 204 compressed objects within 3 object streams
- 80 named destinations out of 1000 (max. 131072)
- 137 words of extra memory for PDF output out of 10000 (max. 100000000)
+PDF statistics: 378 PDF objects out of 1000 (max. 8388607)
+ 326 compressed objects within 4 object streams
+ 114 named destinations out of 1000 (max. 131072)
+ 201 words of extra memory for PDF output out of 10000 (max. 100000000)
 

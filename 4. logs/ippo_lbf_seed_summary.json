@@ -1,0 +1,12 @@
+{
+    "algorithm": "IPPO",
+    "environment": "LBF-8x8",
+    "seeds": [
+        1,
+        2,
+        3
+    ],
+    "avg_reward_mean": 12.3,
+    "reward_variance": 4.8,
+    "convergence_step_mean": 1200000
+}

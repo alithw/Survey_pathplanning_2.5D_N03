@@ -64,12 +64,12 @@ Nghiên cứu này (thuộc khuôn khổ nhiệm vụ Động lực học \& Đi
 \end{abstract}
 
 \section{Giới thiệu}
-Trong môi trường Field Robotics (nông nghiệp, khai khoáng, hành tinh), không gian 2.5D đặt ra thách thức lớn khi bề mặt di chuyển không bằng phẳng và loại đất thay đổi liên tục. Nghiên cứu này tập trung vào việc cải tiến các thuật toán Path Planning bằng cách thay đổi hàm chi phí (cost function) từ khoảng cách Euclidean đơn thuần sang tổng năng lượng tiêu thụ vật lý, đồng thời phát triển hệ thống điều khiển bám quỹ đạo có xét đến đặc tính trượt của nền đất.
+Trong môi trường Field Robotics (nông nghiệp, khai khoáng, hành tinh), không gian 2.5D đặt ra thách thức lớn khi bề mặt di chuyển không bằng phẳng và loại đất thay đổi liên tục \cite{liu2023}. Các thuật toán quy hoạch đường đi truyền thống như A* \cite{hart1968} và RRT* \cite{karaman2011} chỉ tối ưu hóa dựa trên khoảng cách hình học mà bỏ qua chi phí năng lượng thực tế và rủi ro mất ổn định động lực học. Nghiên cứu này, thực hiện trên nền tảng dữ liệu địa hình BenchNav \cite{endo2024}, tập trung vào việc cải tiến các thuật toán đó bằng cách thay đổi hàm chi phí (cost function) từ khoảng cách Euclidean đơn thuần sang tổng năng lượng tiêu thụ vật lý dựa trên mô hình Bekker-Wong \cite{bekker1956} và Minetti \cite{minetti2002}, đồng thời phát triển hệ thống điều khiển bám quỹ đạo NMPC \cite{grandia2023} có xét đến đặc tính trượt của nền đất.
 
 \section{Mô hình toán học về năng lượng và Động lực học}
 
 \subsection{Mô hình Bekker-Wong (Tương tác bánh xe - nền đất)}
-Lực cản lăn ($R_c$) do biến dạng của nền đất mềm được tính toán qua độ lún $z$. Áp suất tiếp xúc $p$ ($Pa$ hoặc $N/m^2$) được mô tả bởi phương trình:
+Lực cản lăn ($R_c$) do biến dạng của nền đất mềm được tính toán qua độ lún $z$. Mô hình Bekker-Wong \cite{bekker1956} mô tả áp suất tiếp xúc $p$ ($Pa$ hoặc $N/m^2$) qua phương trình:
 \begin{equation}
     p = \left( \frac{k_c}{b} + k_{\phi} \right) z^n
 \end{equation}
@@ -86,7 +86,7 @@ Công thực hiện để thắng lực cản $R_c$ ($N$) trên quãng đường
 \end{equation}
 
 \subsection{Mô hình Minetti (Chi phí theo độ dốc)}
-Chi phí năng lượng chuyển hóa cơ năng $C$ được tính toán dựa trên độ dốc $s\_pitch$ (không thứ nguyên, thường biểu diễn bằng $m/m$ hoặc $\%$):
+Minetti et al. \cite{minetti2002, minetti1993} đã xác định thực nghiệm rằng chi phí năng lượng chuyển hóa cơ năng $C$ phụ thuộc phi tuyến vào độ dốc $s\_pitch$ (không thứ nguyên, biểu diễn bằng $m/m$):
 \begin{equation}
     C(s\_pitch) = 155.4 s^5 - 30.4 s^4 - 43.3 s^3 + 46.3 s^2 + 19.5 s + 3.6 \quad \left(\frac{J}{kg \cdot m}\right)
 \end{equation}
@@ -96,7 +96,7 @@ Tổng năng lượng tiêu hao cho robot có khối lượng $m$ ($kg$) di chuy
 \end{equation}
 
 \subsection{Đánh giá rủi ro lật xe tĩnh (LTR và SSF)}
-Tính an toàn động lực học được giới hạn bởi Chỉ số Ổn định Tĩnh (Static Stability Factor - SSF):
+Tính an toàn động lực học được giới hạn bởi Chỉ số Ổn định Tĩnh (Static Stability Factor - SSF) \cite{chen2012ltr}:
 \begin{equation}
     SSF = \frac{T}{2h}
 \end{equation}
@@ -226,7 +226,7 @@ def get_edge_cost(self, node_a, node_b):
 \end{lstlisting}
 
 \subsection{Thực nghiệm và So sánh Hiệu năng A* vs RRT*}
-Nhóm nghiên cứu đã tiến hành thực nghiệm trên bộ dữ liệu \texttt{BenchNav} (Map \texttt{000\_025.pt}). Cả hai thuật toán được cấu hình với cùng mức rủi ro an toàn ($SSF = 1.0$). 
+Nhóm nghiên cứu đã tiến hành thực nghiệm trên bộ dữ liệu địa hình \texttt{BenchNav} \cite{endo2024} (Map \texttt{000\_025.pt}), một nền tảng chuẩn hóa đánh giá thuật toán điều hướng ngoài trời với xác suất khả năng vượt qua địa hình (probabilistic traversability) \cite{jiang2021rellis}. Cả hai thuật toán được cấu hình với cùng mức rủi ro an toàn ($SSF = 1.0$).
 
 \begin{figure}[h]
   \centering
@@ -236,11 +236,13 @@ Nhóm nghiên cứu đã tiến hành thực nghiệm trên bộ dữ liệu \te
   \label{fig:compare}
 \end{figure}
 
-Bảng \ref{tab:performance} thống kê các chỉ số đo đạc hiệu năng:
+Bảng \ref{tab:algo_compare} thống kê các chỉ số đo đạc hiệu năng:
+
+\input{tables/experiment_table.tex}
 
 \begin{table}[htbp]
     \centering
-    \caption{Bảng so sánh hiệu năng thuật toán trên Map 000\_025.pt}
+    \caption{Bảng so sánh chi tiết A* vs RRT* trên Map 000\_025.pt (BenchNav \cite{endo2024})}
     \label{tab:performance}
     \begin{tabular}{lcc}
         \toprule
@@ -278,7 +280,7 @@ Trong môi trường thực tế trên nền đất nông nghiệp/địa hình,
 \end{equation}
 
 \subsection{Xây dựng Bài toán NMPC với CasADi}
-Thư viện toán học \texttt{CasADi} và bộ giải \texttt{IPOPT} được sử dụng để thiết lập bài toán. Hàm mục tiêu $J$ (không thứ nguyên) được thiết kế nhằm cân bằng giữa việc giảm sai lệch quỹ đạo (Tracking Error) và tiết kiệm công suất (Control Effort):
+Thư viện toán học \texttt{CasADi} \cite{andersson2019} kết hợp bộ giải tối ưu \texttt{IPOPT} \cite{wachter2006} được sử dụng để thiết lập và giải bài toán NMPC. Hàm mục tiêu $J$ (không thứ nguyên) được thiết kế nhằm cân bằng giữa việc giảm sai lệch quỹ đạo (Tracking Error) và tiết kiệm công suất (Control Effort):
 \begin{equation}
     \min_{u_{0 \dots N-1}} J = \sum_{k=0}^{N-1} \left( \|x_k - x_{ref,k}\|_Q^2 + \|u_k\|_R^2 \right) + \|x_N - x_{ref,N}\|_{Q_{term}}^2
 \end{equation}
@@ -313,14 +315,73 @@ Dựa vào dữ liệu từ thực nghiệm mô phỏng bằng Python, hiệu n�
     \item \textbf{Thích ứng tín hiệu và Bảo toàn Giới hạn (Constraint Satisfaction):} Để bù đắp lượng quãng đường bị hụt do trượt, NMPC tự động tăng tín hiệu vận tốc tịnh tiến $v$ dao động ở mức $1.04$ $m/s$ đến $1.12$ $m/s$ (chủ động vượt mức vận tốc tham chiếu ban đầu là $1.0$ $m/s$). Tuyệt vời hơn, các lệnh $v$ và $\omega$ xuất ra \textbf{tuyệt đối tuân thủ} đường biên vật lý thiết kế ($V_{max} = 2.0$ $m/s$ và $\omega \in [-1.0, 1.0]$ $rad/s$).
 \end{itemize}
 
+\section{Đánh giá Traversability Đa phương pháp}
+
+\subsection{Phân tầng phương pháp Traversability}
+Đánh giá khả năng vượt qua địa hình (Traversability) là bài toán cốt lõi trong Field Robotics \cite{triebel2006}. Chúng tôi phân tích và tích hợp ba lớp phương pháp bổ sung lẫn nhau:
+
+\subsubsection{Phương pháp Hình học (Geometric)}
+Sử dụng các đặc trưng hình học thuần túy trích xuất từ dữ liệu LiDAR/Stereo Camera:
+\begin{itemize}
+    \item \textbf{Slope} ($|\nabla h|$): Độ dốc địa hình --- ngưỡng an toàn $< 30^\circ$
+    \item \textbf{Roughness}: Độ lệch chuẩn độ cao trong cửa sổ $5\times5$ ô
+    \item \textbf{Step hazard}: Chênh lệch độ cao cực đại trong cửa sổ $3\times3$
+\end{itemize}
+\begin{equation}
+    T_{\text{geo}} = 1 - (w_s \cdot s_{\text{norm}} + w_r \cdot r_{\text{norm}} + w_h \cdot h_{\text{norm}})
+\end{equation}
+với trọng số thực nghiệm $w_s = 0.5$, $w_r = 0.3$, $w_h = 0.2$.
+
+\subsubsection{Phương pháp Vật lý (Physical)}
+Dựa trên mô hình Terramechanics Bekker-Wong \cite{bekker1956} và ma sát Coulomb \cite{higa2019}:
+\begin{itemize}
+    \item \textbf{Friction margin}: $\mu - \tan(\theta_{\text{slope}}) \geq 0$ (không trượt)
+    \item \textbf{Sinkage estimation}: $z = (F / ((k_c/b + k_\phi)))^{1/n}$ theo loại đất
+\end{itemize}
+\begin{equation}
+    T_{\text{phys}} = \text{clip}\left(\frac{\mu(\text{class}) - \tan(\theta)}{\mu(\text{class})},\, 0,\, 1\right)
+\end{equation}
+
+\subsubsection{Phương pháp Ngữ nghĩa (Semantic)}
+Mạng CNN phân loại loại đất từ ảnh RGB + LiDAR \cite{jiang2021rellis}, gán điểm traversability theo lớp đất:
+\begin{itemize}
+    \item Class 0 (Cỏ/Grass): $T = 0.90$ --- Class 1 (Bùn/Mud): $T = 0.20$
+    \item Class 2 (Đá/Rock): $T = 0.60$ --- Class 3 (Cát/Sand): $T = 0.55$
+\end{itemize}
+
+\subsection{Fusion đa phương pháp}
+Ba phương pháp được kết hợp bằng weighted fusion:
+\begin{equation}
+    T_{\text{fused}} = 0.35\,T_{\text{geo}} + 0.35\,T_{\text{phys}} + 0.30\,T_{\text{sem}}
+\end{equation}
+Bảng \ref{tab:traversability} tổng hợp kết quả trên địa hình tổng hợp $64\times64$ ô.
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.92\textwidth]{figures/traversability_analysis.png}
+  \caption{Phân tích Traversability đa phương pháp: (1) Geometric, (2) Physical (Bekker-Wong + Friction), (3) Semantic (CNN), và kết quả Fused.}
+  \label{fig:traversability}
+\end{figure}
+
 \section{Thực thi và Tích hợp hệ thống trên nền tảng ROS}
 Giai đoạn cuối cùng của nghiên cứu tập trung vào việc đóng gói các thuật toán thành các plugin trong hệ sinh thái Nav2.
 \begin{itemize}
-    \item \textbf{Global Planner (A*):} Sử dụng cấu trúc \texttt{Layered Costmap} kết hợp dữ liệu độ cao và loại đất từ cảm biến để tính toán nhanh hành lang di chuyển khả thi.
-    \item \textbf{Local Controller (NMPC):} Sử dụng solver \texttt{CasADi/IPOPT} chạy ở tần số $10-20$ Hz để xuất lệnh \texttt{cmd\_vel} thời gian thực bám theo hành lang đó.
+    \item \textbf{Global Planner (A*):} Sử dụng cấu trúc \texttt{Layered Costmap} kết hợp dữ liệu độ cao và loại đất từ cảm biến để tính toán nhanh hành lang di chuyển khả thi. Node subscribe topic \texttt{/grid\_map} (dữ liệu 2.5D đa lớp) và publish quỹ đạo dưới dạng \texttt{nav\_msgs/Path} ra topic \texttt{/global\_path}.
+    \item \textbf{Local Controller (NMPC):} Sử dụng solver \texttt{CasADi/IPOPT} \cite{andersson2019, wachter2006} chạy ở tần số $10$--$20$ Hz để xuất lệnh \texttt{cmd\_vel} thời gian thực bám theo hành lang đó. Node subscribe \texttt{/global\_path} và \texttt{/odom}, sau đó publish \texttt{geometry\_msgs/Twist} ra \texttt{/cmd\_vel}.
 \end{itemize}
 
-\section{Kết luận và Hướng phát triển}
-Việc kết hợp A* và NMPC với các mô hình vật lý chuyên sâu cung cấp một hệ thống Path Planning hoàn chỉnh. Sự kết hợp giữa quy hoạch toàn cục quét lưới mạnh mẽ, nhanh chóng (A*) và khả năng dự báo kiểm soát trượt chủ động (NMPC) giúp robot không chỉ né tránh được các khu vực nguy hiểm về mặt động lực học mà còn tối ưu hóa năng lượng truyền động. Hướng nghiên cứu tiếp theo sẽ tập trung vào việc ước lượng trực tuyến (online estimation) hệ số trượt $\alpha$ dựa trên cảm biến thực tế để liên tục cập nhật mô hình NMPC.
+\section{Định hướng Nâng cao}
+
+\subsection{Chuyển đổi NMPC sang ACADOS}
+Nhược điểm chính của bộ giải CasADi/IPOPT hiện tại là thời gian giải tương đối cao khi chạy trong Python. Hướng phát triển tiếp theo là chuyển sang thư viện ACADOS, vốn tự động sinh mã C/C++ tối ưu được biên dịch sẵn. Điều này cho phép giải bài toán phi tuyến trong phạm vi $1$--$5$ ms, phù hợp với yêu cầu điều khiển nhúng thời gian thực trên phần cứng thực của robot.
+
+\subsection{Tích hợp Diffusion Planning với MCTD}
+Để giải quyết hạn chế ``kẹt hành lang hẹp'' của các thuật toán lấy mẫu, hướng tiếp cận tiên tiến là Monte Carlo Tree Diffusion (MCTD) \cite{yoon2025}. MCTD cấu trúc lại quá trình khử nhiễu (denoising) của Diffusion Model thành cây tìm kiếm MCTS, cho phép cắt tỉa sớm các hành động vi phạm ràng buộc LTR hoặc năng lượng và tăng hiệu năng theo inference budget.
+
+\section{Kết luận}
+Việc kết hợp A* \cite{hart1968} và NMPC với các mô hình vật lý chuyên sâu (Bekker-Wong \cite{bekker1956}, Minetti \cite{minetti2002}) và đánh giá Traversability đa phương pháp (Geometric, Physical, Semantic) \cite{triebel2006} cung cấp một hệ thống Path Planning 2.5D hoàn chỉnh cho Field Robotics. Thực nghiệm trên BenchNav \cite{endo2024} cho thấy A* hoàn thành trong 89 ms (so với 223 ms của RRT* \cite{karaman2011}), trong khi NMPC \cite{grandia2023, andersson2019} duy trì sai số bám đường dưới 0.22 m dưới nhiễu trượt 10\%. Hướng tiếp theo: (1) online estimation hệ số trượt $\alpha$; (2) nâng cấp lên ACADOS; (3) tích hợp MCTD \cite{yoon2025}.
+
+\bibliographystyle{plain}
+\bibliography{refs}
 
 \end{document}
