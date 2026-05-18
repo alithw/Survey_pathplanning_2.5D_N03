@@ -1,0 +1,95 @@
+\begin{thebibliography}{10}
+
+\bibitem{andersson2019}
+Joel A.~E. Andersson, Joris Gillis, Greg Horn, James~B. Rawlings, and Moritz
+  Diehl.
+\newblock {CasADi}: a software framework for nonlinear optimization and optimal
+  control.
+\newblock {\em Mathematical Programming Computation}, 11(1):1--37, 2019.
+
+\bibitem{bekker1956}
+M.~G. Bekker.
+\newblock {\em Theory of Land Locomotion: The Mechanics of Vehicle Mobility}.
+\newblock University of Michigan Press, Ann Arbor, MI, 1956.
+
+\bibitem{chen2012ltr}
+Bo-Chiuan Chen and Huei Peng.
+\newblock A new predictive lateral load transfer ratio for rollover prevention
+  systems.
+\newblock {\em Journal of Dynamic Systems, Measurement, and Control},
+  123(1):33--40, 2001.
+
+\bibitem{endo2024}
+Masafumi Endo, Kohei Honda, and Genya Ishigami.
+\newblock {BenchNav}: Simulation platform for benchmarking off-road navigation
+  algorithms with probabilistic traversability.
+\newblock {\em arXiv preprint arXiv:2405.13318}, 2024.
+
+\bibitem{grandia2023}
+Ruben Grandia, Fabian Jenelten, Shaohui Yang, Farbod Farshidian, and Marco
+  Hutter.
+\newblock Perceptive locomotion through nonlinear model-predictive control.
+\newblock {\em IEEE Transactions on Robotics}, 39(5):3402--3421, 2023.
+
+\bibitem{hart1968}
+Peter~E. Hart, Nils~J. Nilsson, and Bertram Raphael.
+\newblock A formal basis for the heuristic determination of minimum cost paths.
+\newblock {\em IEEE Transactions on Systems Science and Cybernetics},
+  4(2):100--107, 1968.
+
+\bibitem{higa2019}
+Shoya Higa, Yumi Iwashita, Kyohei Otsu, Masahiro Ono, Olivier Lamarre, Arnaud
+  Gingold, Manoranjan Bhatt, Yoichi Kunii, Keiji Nakamura, and Takashi Kubota.
+\newblock Vision-based estimation of driving energy for planetary rovers using
+  deep learning and terramechanics.
+\newblock {\em IEEE Robotics and Automation Letters}, 4(4):3876--3883, 2019.
+
+\bibitem{jiang2021rellis}
+Peng Jiang, Philip Osteen, Maggie Wigness, and Srikanth Saripalli.
+\newblock {RELLIS-3D} dataset: Data, benchmarks and analysis.
+\newblock In {\em IEEE International Conference on Robotics and Automation
+  (ICRA)}, pages 1110--1116, 2021.
+
+\bibitem{karaman2011}
+Sertac Karaman and Emilio Frazzoli.
+\newblock Sampling-based algorithms for optimal motion planning.
+\newblock {\em The International Journal of Robotics Research}, 30(7):846--894,
+  2011.
+
+\bibitem{liu2023}
+Lixing Liu, Xu~Wang, Xin Yang, Hongjie Liu, Jianping Li, and Pengfei Wang.
+\newblock Path planning techniques for mobile robots: Review and prospect.
+\newblock {\em Expert Systems with Applications}, 227:120254, 2023.
+
+\bibitem{minetti1993}
+Alberto~E. Minetti, Luca~P. Ardigo, and Fausto Saibene.
+\newblock Mechanical determinants of gradient walking in man: an experimental
+  and mathematical model.
+\newblock {\em Journal of Physiology}, 472(1):725--735, 1993.
+
+\bibitem{minetti2002}
+Alberto~E. Minetti, Christian Moia, Giulio~S. Roi, Davide Susta, and Guido
+  Ferretti.
+\newblock Energy cost of walking and running at extreme uphill and downhill
+  slopes.
+\newblock {\em Journal of Applied Physiology}, 93(3):1039--1046, 2002.
+
+\bibitem{triebel2006}
+Rudolph Triebel, Patrick Pfaff, and Wolfram Burgard.
+\newblock Multi-level surface maps for outdoor terrain mapping and loop
+  closing.
+\newblock In {\em IEEE/RSJ International Conference on Intelligent Robots and
+  Systems (IROS)}, pages 2276--2282, 2006.
+
+\bibitem{wachter2006}
+Andreas W{\"a}chter and Lorenz~T. Biegler.
+\newblock On the implementation of an interior-point filter line-search
+  algorithm for large-scale nonlinear programming.
+\newblock {\em Mathematical Programming}, 106(1):25--57, 2006.
+
+\bibitem{yoon2025}
+Jaesik Yoon, Hyeonseo Cho, Doojin Baek, Yoshua Bengio, and Sungjin Ahn.
+\newblock Monte {Carlo} tree diffusion for system 2 planning.
+\newblock {\em arXiv preprint arXiv:2502.07202}, 2025.
+
+\end{thebibliography}

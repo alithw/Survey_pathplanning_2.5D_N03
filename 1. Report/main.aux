@@ -18,10 +18,21 @@
 \gdef\HyperFirstAtBeginDocument#1{#1}
 \providecommand\HyField@AuxAddToFields[1]{}
 \providecommand\HyField@AuxAddToCoFields[2]{}
+\citation{liu2023}
+\citation{hart1968}
+\citation{karaman2011}
+\citation{endo2024}
+\citation{bekker1956}
+\citation{minetti2002}
+\citation{grandia2023}
+\citation{bekker1956}
 \babel@aux{vietnamese}{}
 \@writefile{toc}{\contentsline {section}{\numberline {1}Giới thiệu}{1}{section.1}\protected@file@percent }
 \@writefile{toc}{\contentsline {section}{\numberline {2}Mô hình toán học về năng lượng và Động lực học}{1}{section.2}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {2.1}Mô hình Bekker-Wong (Tương tác bánh xe - nền đất)}{1}{subsection.2.1}\protected@file@percent }
+\citation{minetti2002}
+\citation{minetti1993}
+\citation{chen2012ltr}
 \@writefile{toc}{\contentsline {subsection}{\numberline {2.2}Mô hình Minetti (Chi phí theo độ dốc)}{2}{subsection.2.2}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {2.3}Đánh giá rủi ro lật xe tĩnh (LTR và SSF)}{2}{subsection.2.3}\protected@file@percent }
 \@writefile{toc}{\contentsline {section}{\numberline {3}Quy hoạch quỹ đạo toàn cục (Global Planning): A* và RRT*}{2}{section.3}\protected@file@percent }
@@ -32,18 +43,73 @@
 \newlabel{alg:rrtstar}{{2}{4}{Mã giả thuật toán (Pseudocode)}{algorithm.2}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {3.2}Cài đặt Hàm chi phí (Implementation)}{4}{subsection.3.2}\protected@file@percent }
 \@writefile{lol}{\contentsline {lstlisting}{\numberline {1}Hàm tính chi phí cạnh (Edge Cost)}{4}{lstlisting.1}\protected@file@percent }
+\citation{endo2024}
+\citation{jiang2021rellis}
+\citation{endo2024}
 \@writefile{toc}{\contentsline {subsection}{\numberline {3.3}Thực nghiệm và So sánh Hiệu năng A* vs RRT*}{5}{subsection.3.3}\protected@file@percent }
-\@writefile{lot}{\contentsline {table}{\numberline {1}{\ignorespaces Bảng so sánh hiệu năng thuật toán trên Map 000\_025.pt}}{5}{table.1}\protected@file@percent }
-\newlabel{tab:performance}{{1}{5}{Bảng so sánh hiệu năng thuật toán trên Map 000\_025.pt}{table.1}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces So sánh quỹ đạo tối ưu năng lượng giữa A* (vét cạn trên lưới) và RRT* (lấy mẫu liên tục).}}{6}{figure.1}\protected@file@percent }
-\newlabel{fig:compare}{{1}{6}{So sánh quỹ đạo tối ưu năng lượng giữa A* (vét cạn trên lưới) và RRT* (lấy mẫu liên tục)}{figure.1}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {4}Điều khiển nâng cao (Advanced Control): NMPC}{6}{section.4}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {4.1}Mô hình Động học (Kinematic Model) và Trượt (Slip)}{6}{subsection.4.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {4.2}Xây dựng Bài toán NMPC với CasADi}{7}{subsection.4.2}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {4.3}Ràng buộc phi tuyến (Constraints)}{7}{subsection.4.3}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {4.4}Kết quả Mô phỏng Điều khiển NMPC bám quỹ đạo A*}{7}{subsection.4.4}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces Kết quả mô phỏng điều khiển NMPC bám quỹ đạo A* dưới tác động của độ trượt đất $10\%$.}}{8}{figure.2}\protected@file@percent }
-\newlabel{fig:nmpc_result}{{2}{8}{Kết quả mô phỏng điều khiển NMPC bám quỹ đạo A* dưới tác động của độ trượt đất $10\%$}{figure.2}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {5}Thực thi và Tích hợp hệ thống trên nền tảng ROS}{8}{section.5}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {6}Kết luận và Hướng phát triển}{8}{section.6}\protected@file@percent }
-\gdef \@abspage@last{8}
+\@writefile{lot}{\contentsline {table}{\numberline {1}{\ignorespaces So sánh ba phương pháp đánh giá Traversability trên địa hình tổng hợp $64\times 64$ (Nhóm 3)}}{5}{table.1}\protected@file@percent }
+\newlabel{tab:traversability}{{1}{5}{So sánh ba phương pháp đánh giá Traversability trên địa hình tổng hợp $64\times 64$ (Nhóm 3)}{table.1}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {2}{\ignorespaces Kết quả thực nghiệm so sánh các thuật toán quy hoạch đường đi trên Map \texttt  {000\_025.pt} (BenchNav)}}{6}{table.2}\protected@file@percent }
+\newlabel{tab:algo_compare}{{2}{6}{Kết quả thực nghiệm so sánh các thuật toán quy hoạch đường đi trên Map \texttt {000\_025.pt} (BenchNav)}{table.2}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {3}{\ignorespaces Kết quả mô phỏng điều khiển NMPC bám quỹ đạo A* dưới nhiễu trượt $\alpha = 10\%$}}{6}{table.3}\protected@file@percent }
+\newlabel{tab:nmpc_results}{{3}{6}{Kết quả mô phỏng điều khiển NMPC bám quỹ đạo A* dưới nhiễu trượt $\alpha = 10\%$}{table.3}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {4}{\ignorespaces Bảng so sánh chi tiết A* vs RRT* trên Map 000\_025.pt (BenchNav \cite  {endo2024})}}{6}{table.4}\protected@file@percent }
+\newlabel{tab:performance}{{4}{6}{Bảng so sánh chi tiết A* vs RRT* trên Map 000\_025.pt (BenchNav \cite {endo2024})}{table.4}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces So sánh quỹ đạo tối ưu năng lượng giữa A* (vét cạn trên lưới) và RRT* (lấy mẫu liên tục).}}{7}{figure.1}\protected@file@percent }
+\newlabel{fig:compare}{{1}{7}{So sánh quỹ đạo tối ưu năng lượng giữa A* (vét cạn trên lưới) và RRT* (lấy mẫu liên tục)}{figure.1}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {4}Điều khiển nâng cao (Advanced Control): NMPC}{7}{section.4}\protected@file@percent }
+\citation{andersson2019}
+\citation{wachter2006}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.1}Mô hình Động học (Kinematic Model) và Trượt (Slip)}{8}{subsection.4.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.2}Xây dựng Bài toán NMPC với CasADi}{8}{subsection.4.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.3}Ràng buộc phi tuyến (Constraints)}{8}{subsection.4.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.4}Kết quả Mô phỏng Điều khiển NMPC bám quỹ đạo A*}{8}{subsection.4.4}\protected@file@percent }
+\citation{triebel2006}
+\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces Kết quả mô phỏng điều khiển NMPC bám quỹ đạo A* dưới tác động của độ trượt đất $10\%$.}}{9}{figure.2}\protected@file@percent }
+\newlabel{fig:nmpc_result}{{2}{9}{Kết quả mô phỏng điều khiển NMPC bám quỹ đạo A* dưới tác động của độ trượt đất $10\%$}{figure.2}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {5}Đánh giá Traversability Đa phương pháp}{9}{section.5}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.1}Phân tầng phương pháp Traversability}{9}{subsection.5.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.1.1}Phương pháp Hình học (Geometric)}{9}{subsubsection.5.1.1}\protected@file@percent }
+\citation{bekker1956}
+\citation{higa2019}
+\citation{jiang2021rellis}
+\citation{andersson2019}
+\citation{wachter2006}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.1.2}Phương pháp Vật lý (Physical)}{10}{subsubsection.5.1.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.1.3}Phương pháp Ngữ nghĩa (Semantic)}{10}{subsubsection.5.1.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.2}Fusion đa phương pháp}{10}{subsection.5.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {6}Thực thi và Tích hợp hệ thống trên nền tảng ROS}{10}{section.6}\protected@file@percent }
+\citation{yoon2025}
+\citation{hart1968}
+\citation{bekker1956}
+\citation{minetti2002}
+\citation{triebel2006}
+\citation{endo2024}
+\citation{karaman2011}
+\citation{grandia2023}
+\citation{andersson2019}
+\citation{yoon2025}
+\bibstyle{plain}
+\bibdata{refs}
+\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces Phân tích Traversability đa phương pháp: (1) Geometric, (2) Physical (Bekker-Wong + Friction), (3) Semantic (CNN), và kết quả Fused.}}{11}{figure.3}\protected@file@percent }
+\newlabel{fig:traversability}{{3}{11}{Phân tích Traversability đa phương pháp: (1) Geometric, (2) Physical (Bekker-Wong + Friction), (3) Semantic (CNN), và kết quả Fused}{figure.3}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {7}Định hướng Nâng cao}{11}{section.7}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.1}Chuyển đổi NMPC sang ACADOS}{11}{subsection.7.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.2}Tích hợp Diffusion Planning với MCTD}{11}{subsection.7.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {8}Kết luận}{11}{section.8}\protected@file@percent }
+\bibcite{andersson2019}{1}
+\bibcite{bekker1956}{2}
+\bibcite{chen2012ltr}{3}
+\bibcite{endo2024}{4}
+\bibcite{grandia2023}{5}
+\bibcite{hart1968}{6}
+\bibcite{higa2019}{7}
+\bibcite{jiang2021rellis}{8}
+\bibcite{karaman2011}{9}
+\bibcite{liu2023}{10}
+\bibcite{minetti1993}{11}
+\bibcite{minetti2002}{12}
+\bibcite{triebel2006}{13}
+\bibcite{wachter2006}{14}
+\bibcite{yoon2025}{15}
+\gdef \@abspage@last{13}
