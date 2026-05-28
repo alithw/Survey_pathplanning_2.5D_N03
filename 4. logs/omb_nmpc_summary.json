@@ -1,0 +1,21 @@
+{
+  "dataset": "OMB (Orthogonal Maze Benchmark)",
+  "maps_evaluated": 15,
+  "traditional_nmpc": {
+    "avg_rmse_m": 0.19988,
+    "std_rmse_m": 0.15216284134345773,
+    "avg_max_err_m": 0.3343466666666667,
+    "avg_energy": 219.02531333333334,
+    "success_rate_pct": 33.33333333333333,
+    "avg_time_s": 64.69973333333334
+  },
+  "hybrid_nmpc": {
+    "avg_rmse_m": 0.16594666666666666,
+    "std_rmse_m": 0.12086452195192213,
+    "avg_max_err_m": 0.3776133333333334,
+    "avg_energy": 543.3232733333333,
+    "success_rate_pct": 53.333333333333336,
+    "avg_time_s": 66.20186666666666
+  },
+  "avg_rmse_improvement_pct": 16.98
+}

@@ -1,0 +1,16 @@
+{
+  "total_maps_evaluated": 30,
+  "trad_avg_rmse_m": 0.09332283494751849,
+  "trad_std_rmse_m": 0.05595488307495535,
+  "trad_avg_max_err_m": 0.19030799005666457,
+  "trad_avg_energy": 77.06377732296865,
+  "trad_success_rate": 30.0,
+  "trad_avg_solve_time_s": 9.011812582666728,
+  "hyb_avg_rmse_m": 0.054616248736766834,
+  "hyb_std_rmse_m": 0.004733528436389824,
+  "hyb_avg_max_err_m": 0.19374376398426035,
+  "hyb_avg_energy": 123.42325164185422,
+  "hyb_success_rate": 90.0,
+  "hyb_avg_solve_time_s": 10.076609062233274,
+  "avg_rmse_improvement_pct": 41.47600770220803
+}
