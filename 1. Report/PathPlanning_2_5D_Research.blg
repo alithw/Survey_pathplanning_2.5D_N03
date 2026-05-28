@@ -1,0 +1,46 @@
+This is BibTeX, Version 0.99d (TeX Live 2022/dev/Debian)
+Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
+The top-level auxiliary file: PathPlanning_2_5D_Research.aux
+The style file: plain.bst
+Database file #1: refs.bib
+You've used 15 entries,
+            2118 wiz_defined-function locations,
+            596 strings with 7098 characters,
+and the built_in function-call counts, 5710 in all, are:
+= -- 549
+> -- 328
+< -- 2
++ -- 132
+- -- 114
+* -- 450
+:= -- 973
+add.period$ -- 46
+call.type$ -- 15
+change.case$ -- 100
+chr.to.int$ -- 0
+cite$ -- 15
+duplicate$ -- 186
+empty$ -- 400
+format.name$ -- 114
+if$ -- 1153
+int.to.chr$ -- 0
+int.to.str$ -- 15
+missing$ -- 16
+newline$ -- 78
+num.names$ -- 30
+pop$ -- 90
+preamble$ -- 1
+purify$ -- 86
+quote$ -- 0
+skip$ -- 128
+stack$ -- 0
+substring$ -- 360
+swap$ -- 33
+text.length$ -- 2
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 58
+warning$ -- 0
+while$ -- 53
+width$ -- 17
+write$ -- 166

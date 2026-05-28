@@ -1,0 +1,27 @@
+{
+  "dataset": "OMB (Orthogonal Maze Benchmark)",
+  "maps_evaluated": 50,
+  "a_star": {
+    "avg_time_ms": 1370.112142,
+    "std_time_ms": 3135.7374435895767,
+    "avg_cost": 392.467862,
+    "avg_length_px": 392.467862,
+    "avg_smooth": 44.59827492,
+    "avg_nodes": 46702.36
+  },
+  "mctd_a_star": {
+    "avg_time_ms": 21043.489506,
+    "std_time_ms": 91453.67128499362,
+    "avg_sys1_ms": 15.896024,
+    "avg_sys2_ms": 21027.593482000004,
+    "avg_cost": 392.467862,
+    "avg_length_px": 392.467862,
+    "avg_smooth": 44.62294892,
+    "avg_nodes": 477210.52,
+    "fallback_rate": 34.0
+  },
+  "time_improvement_pct": -1435.9,
+  "nodes_reduction_pct": -921.81,
+  "length_change_pct": 0.0,
+  "smoothness_improvement_pct": -0.06
+}

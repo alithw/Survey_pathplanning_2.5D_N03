@@ -1,0 +1,52 @@
+{
+  "benchmark_dataset": "OMB – Orthogonal Maze Benchmark",
+  "total_runtime_s": 3110.36,
+  "planning_benchmark": {
+    "dataset": "OMB (Orthogonal Maze Benchmark)",
+    "maps_evaluated": 50,
+    "a_star": {
+      "avg_time_ms": 1370.112142,
+      "std_time_ms": 3135.7374435895767,
+      "avg_cost": 392.467862,
+      "avg_length_px": 392.467862,
+      "avg_smooth": 44.59827492,
+      "avg_nodes": 46702.36
+    },
+    "mctd_a_star": {
+      "avg_time_ms": 21043.489506,
+      "std_time_ms": 91453.67128499362,
+      "avg_sys1_ms": 15.896024,
+      "avg_sys2_ms": 21027.593482000004,
+      "avg_cost": 392.467862,
+      "avg_length_px": 392.467862,
+      "avg_smooth": 44.62294892,
+      "avg_nodes": 477210.52,
+      "fallback_rate": 34.0
+    },
+    "time_improvement_pct": -1435.9,
+    "nodes_reduction_pct": -921.81,
+    "length_change_pct": 0.0,
+    "smoothness_improvement_pct": -0.06
+  },
+  "nmpc_benchmark": {
+    "dataset": "OMB (Orthogonal Maze Benchmark)",
+    "maps_evaluated": 15,
+    "traditional_nmpc": {
+      "avg_rmse_m": 0.19988,
+      "std_rmse_m": 0.15216284134345773,
+      "avg_max_err_m": 0.3343466666666667,
+      "avg_energy": 219.02531333333334,
+      "success_rate_pct": 33.33333333333333,
+      "avg_time_s": 64.69973333333334
+    },
+    "hybrid_nmpc": {
+      "avg_rmse_m": 0.16594666666666666,
+      "std_rmse_m": 0.12086452195192213,
+      "avg_max_err_m": 0.3776133333333334,
+      "avg_energy": 543.3232733333333,
+      "success_rate_pct": 53.333333333333336,
+      "avg_time_s": 66.20186666666666
+    },
+    "avg_rmse_improvement_pct": 16.98
+  }
+}

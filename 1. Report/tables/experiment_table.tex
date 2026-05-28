@@ -1,0 +1,74 @@
+% ================================================================
+% BẢNG KẾT QUẢ THỰC NGHIỆM - Nhóm 3
+% Sử dụng \input{tables/experiment_table.tex} trong main.tex
+% ================================================================
+
+% --- Bảng 1: Traversability Analysis (3 phương pháp) ---
+\begin{table}[htbp]
+\centering
+\caption{So sánh ba phương pháp đánh giá Traversability trên địa hình tổng hợp $64\times64$ (Nhóm 3)}
+\label{tab:traversability}
+\begin{tabular}{lcccc}
+    \toprule
+    \textbf{Phương pháp} & \textbf{Điểm TB} & \textbf{Vùng nguy hiểm} & \textbf{Thời gian} & \textbf{Yêu cầu} \\
+                         & ($\bar{T}$) & ($T < 0.3$) & tính toán & dữ liệu \\
+    \midrule
+    \textbf{Geometric}   & 0.612 & $\sim$18\% & $< 1$ ms & Lidar/Radar \\
+    (Slope + Roughness + Step) & & & & \\
+    \textbf{Physical}    & 0.573 & $\sim$22\% & $\sim$2 ms & Terrain class \\
+    (Bekker-Wong + Friction) & & & & \\
+    \textbf{Semantic}    & 0.643 & $\sim$15\% & $\sim$50 ms & Camera + DL \\
+    (CNN Soil Classification) & & & & \\
+    \midrule
+    \textbf{FUSED}       & \textbf{0.609} & $\sim$17\% & $\sim$55 ms & Đa cảm biến \\
+    (Weighted: 0.35/0.35/0.30) & & & & \\
+    \bottomrule
+\end{tabular}
+\end{table}
+
+% --- Bảng 2: So sánh chi tiết 5 thuật toán ---
+\begin{table}[htbp]
+\centering
+\caption{Kết quả thực nghiệm so sánh các thuật toán quy hoạch đường đi trên Map \texttt{000\_025.pt} (BenchNav)}
+\label{tab:algo_compare}
+\begin{tabular}{lccccl}
+    \toprule
+    \textbf{Thuật toán} & \textbf{Thời gian} & \textbf{Năng lượng} & \textbf{Waypoints} & \textbf{KG} & \textbf{Kết quả} \\
+                        & (ms)               & (J)                  & (điểm)             & tìm kiếm    & \\
+    \midrule
+    PRM              & ---    & ---      & ---  & Liên tục & \textbf{Thất bại} (kẹt hành lang) \\
+    BIT*             & ---    & ---      & ---  & Liên tục & \textbf{Thất bại} (hội tụ chậm) \\
+    ACO              & ---    & ---      & ---  & Rời rạc  & \textbf{Thất bại} (cục bộ tối) \\
+    \textbf{Weighted A*}  & \textbf{89.05}  & 7781.99  & 54   & Rời rạc  & \textbf{Thành công ✓} \\
+    Energy-Aware RRT* & 222.82 & \textbf{1121.10} & \textbf{20}  & Liên tục & \textbf{Thành công ✓} \\
+    \bottomrule
+\end{tabular}
+\vspace{0.3em}
+\begin{minipage}{0.9\textwidth}
+\small \textit{Ghi chú:} Thực nghiệm sử dụng thông số robot: $T=0.8$ m, $h=0.4$ m, $SSF=1.0$, $\alpha_{\max}=350$ J/bước.
+Điều kiện bản đồ: Map BenchNav \texttt{000\_025.pt}, lưới $64\times64$ ô, kích thước ô $= 1$ m, 4 loại đất.
+\end{minipage}
+\end{table}
+
+% --- Bảng 3: Hiệu năng NMPC ---
+\begin{table}[htbp]
+\centering
+\caption{Kết quả mô phỏng điều khiển NMPC bám quỹ đạo A* dưới nhiễu trượt $\alpha = 10\%$}
+\label{tab:nmpc_results}
+\begin{tabular}{lc}
+    \toprule
+    \textbf{Chỉ số đánh giá} & \textbf{Giá trị} \\
+    \midrule
+    Số bước điều khiển          & 651 bước \\
+    Thời gian mô phỏng          & 65.1 giây \\
+    Thời gian giải NMPC (tổng)  & 8.01 giây \\
+    Sai số Tracking ban đầu     & 0.100 m \\
+    Sai số Tracking cực đại     & 0.216 m \\
+    Dải vận tốc $v$ (thực tế)   & $[1.04,\; 1.12]$ m/s \\
+    Dải vận tốc góc $\omega$    & $[-0.41,\; 1.0]$ rad/s \\
+    Tuân thủ ràng buộc $v$      & 100\% ($v_{\max} = 2.0$ m/s) \\
+    Tuân thủ ràng buộc $\omega$ & 100\% ($|\omega_{\max}| = 1.0$ rad/s) \\
+    Hệ số trượt được bù          & $\alpha = 10\%$ \\
+    \bottomrule
+\end{tabular}
+\end{table}

@@ -1,0 +1,86 @@
+{
+  "total_maps": 30,
+  "results": [
+    {
+      "mode_id": 1,
+      "mode_name": "Traditional NMPC (Time-Domain)",
+      "avg_rmse_m": 1.0640087654703676,
+      "avg_max_err_m": 2.181080506995619,
+      "avg_energy_j": 77.88322414937842,
+      "success_rate_pct": 30.0,
+      "avg_solve_time_ms": 24.007147662079245
+    },
+    {
+      "mode_id": 2,
+      "mode_name": "Hybrid NMPC (Time-Domain)",
+      "avg_rmse_m": 0.8494220309130215,
+      "avg_max_err_m": 3.8145611756955917,
+      "avg_energy_j": 125.16454253189364,
+      "success_rate_pct": 90.0,
+      "avg_solve_time_ms": 28.007585689352638
+    },
+    {
+      "mode_id": 3,
+      "mode_name": "Dual-Mode LMPC/NMPC (TCI-driven)",
+      "avg_rmse_m": 0.6440205909120138,
+      "avg_max_err_m": 1.50285753128724,
+      "avg_energy_j": 85.67409712416833,
+      "success_rate_pct": 83.33333333333334,
+      "avg_solve_time_ms": 5.486955820422365
+    },
+    {
+      "mode_id": 4,
+      "mode_name": "Space-Domain NMPC (SMPC)",
+      "avg_rmse_m": 0.8494220309130215,
+      "avg_max_err_m": 3.8145611756955917,
+      "avg_energy_j": 125.16454253189364,
+      "success_rate_pct": 90.0,
+      "avg_solve_time_ms": 14.007318530540553
+    },
+    {
+      "mode_id": 5,
+      "mode_name": "Dual-Mode LMPC/SMPC",
+      "avg_rmse_m": 0.6440205909120138,
+      "avg_max_err_m": 1.50285753128724,
+      "avg_energy_j": 85.67409712416833,
+      "success_rate_pct": 83.33333333333334,
+      "avg_solve_time_ms": 3.0769371839368977
+    },
+    {
+      "mode_id": 6,
+      "mode_name": "DNN-NMPC Policy",
+      "avg_rmse_m": 6.10188548430924,
+      "avg_max_err_m": 9.369867129048504,
+      "avg_energy_j": 50.104858296712244,
+      "success_rate_pct": 10.0,
+      "avg_solve_time_ms": 0.19852219216750006
+    },
+    {
+      "mode_id": 7,
+      "mode_name": "Hybrid DNN-SMPC (Warm-Start)",
+      "avg_rmse_m": 0.8494220309130215,
+      "avg_max_err_m": 3.8145611756955917,
+      "avg_energy_j": 125.16454253189364,
+      "success_rate_pct": 90.0,
+      "avg_solve_time_ms": 4.507653988232503
+    },
+    {
+      "mode_id": 8,
+      "mode_name": "Adaptive SMPC (Online Correction)",
+      "avg_rmse_m": 0.6115838622573755,
+      "avg_max_err_m": 3.8145611756955917,
+      "avg_energy_j": 125.16454253189364,
+      "success_rate_pct": 93.33333333333333,
+      "avg_solve_time_ms": 15.01538693830126
+    },
+    {
+      "mode_id": 9,
+      "mode_name": "Unified Multi-Model Hybrid MPC",
+      "avg_rmse_m": 0.43793400182016934,
+      "avg_max_err_m": 1.1271431484654297,
+      "avg_energy_j": 85.67409712416833,
+      "success_rate_pct": 96.66666666666667,
+      "avg_solve_time_ms": 1.5631812729351675
+    }
+  ]
+}
