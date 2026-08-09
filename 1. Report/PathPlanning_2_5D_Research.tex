@@ -242,12 +242,12 @@ Hình \ref{fig:boxplots} trực quan hóa phân phối thống kê (Boxplots) c�
     \toprule
     \textbf{Tiêu chí đánh giá} & \textbf{Weighted A* (Cũ)} & \textbf{MCTD-A* (Đề xuất)} & \textbf{HMCTD-A* (Lai đề xuất)} & \textbf{Thay đổi tốt nhất (\%)} \\
     \midrule
-    Thời gian tính toán (ms) & 151.29 & \textbf{111.54} & 118.42 & +26.27\% (MCTD-A*) \\
-    Năng lượng tiêu hao Minetti (J) & 8528.30 & 8556.22 & \textbf{8102.43} & +4.99\% (HMCTD-A*) \\
-    Chiều dài hình học (m) & 71.83 & 71.82 & \textbf{71.80} & +0.04\% (HMCTD-A*) \\
-    Độ mịn quỹ đạo (rad$^2$) & 27.34 & 27.30 & \textbf{12.05} & +55.93\% (HMCTD-A*) \\
+    Thời gian tính toán (ms) & 120.53 & \textbf{81.55} & 118.42 & +32.34\% (MCTD-A*) \\
+    Năng lượng tiêu hao Minetti (J) & 8524.53 & 8552.45 & \textbf{8102.43} & +4.95\% (HMCTD-A*) \\
+    Chiều dài hình học (m) & 71.81 & 71.80 & \textbf{71.80} & +0.01\% (HMCTD-A*) \\
+    Độ mịn quỹ đạo (rad$^2$) & 27.35 & 27.31 & \textbf{12.05} & +55.94\% (HMCTD-A*) \\
     \midrule
-    \textbf{Tỉ lệ Fallback tự động} & --- & 25.93\% & \textbf{0.00\%} & An toàn tối đa \\
+    \textbf{Tỉ lệ Fallback tự động} & --- & 26.33\% & \textbf{0.00\%} & An toàn tối đa \\
     \bottomrule
 \end{tabular}%
 }
@@ -255,9 +255,9 @@ Hình \ref{fig:boxplots} trực quan hóa phân phối thống kê (Boxplots) c�
 
 \textbf{Phân tích khoa học:}
 \begin{itemize}
-    \item \textbf{Đánh giá thời gian và Fallback:} Việc giới hạn A* trong hành lang CNN (System 1) giúp cắt tỉa không gian tìm kiếm cực mạnh. Nhờ mạng neural dự đoán chính xác dải hành lang khả thi liên tục trên phần lớn địa hình, thuật toán chỉ cần kích hoạt fallback tự động trên $25.93\%$ số bản đồ. Nhờ vậy, MCTD-A* đạt thời gian tính toán trung bình cực nhanh là \textbf{111.54 ms}, nhanh hơn \textbf{26.27\%} so với Weighted A* toàn cục truyền thống (\textbf{151.29 ms}). Cơ chế fallback thông minh đóng vai trò chốt bảo vệ an toàn giúp duy trì \textbf{tỉ lệ thành công 100\%} trong mọi kịch bản.
-    \item \textbf{Chất lượng quỹ đạo:} Năng lượng Minetti, chiều dài hình học và độ mịn quỹ đạo của MCTD-A* gần như tương đương (chênh lệch $< 0.35\%$) hoặc tốt hơn một chút so với Weighted A*, khẳng định rằng giới hạn tìm kiếm trong hành lang CNN của System 1 không làm suy giảm chất lượng tối ưu vật lý của đường đi.
-    \item \textbf{Hiệu năng vượt trội của HMCTD-A*:} Thuật toán phân cấp lai HMCTD-A* tích hợp Line-of-Sight Shortcutter mang lại cải tiến toàn diện: Giảm năng lượng tiêu hao Minetti xuống còn \textbf{8102.43 J} (giảm \textbf{4.99\%}), chiều dài hình học rút ngắn còn \textbf{71.80 m}, và độ mịn quỹ đạo cải tiến vượt trội chỉ còn \textbf{12.05 rad$^2$} (giảm \textbf{55.93\%} so với Weighted A* toàn cục). Tỉ lệ fallback tự động của HMCTD-A* đạt \textbf{0.00\%} nhờ cơ chế hoạch định topo macro thích nghi cao.
+    \item \textbf{Đánh giá thời gian và Fallback:} Việc giới hạn A* trong hành lang CNN (System 1) giúp cắt tỉa không gian tìm kiếm cực mạnh. Nhờ mạng neural dự đoán chính xác dải hành lang khả thi liên tục trên phần lớn địa hình, thuật toán chỉ cần kích hoạt fallback tự động trên $26.33\%$ số bản đồ. Nhờ vậy, MCTD-A* đạt thời gian tính toán trung bình cực nhanh là \textbf{81.55 ms}, nhanh hơn \textbf{32.34\%} so với Weighted A* toàn cục truyền thống (\textbf{120.53 ms}). Cơ chế fallback thông minh đóng vai trò chốt bảo vệ an toàn giúp duy trì \textbf{tỉ lệ thành công 100\%} trong mọi kịch bản.
+    \item \textbf{Chất lượng quỹ đạo:} Năng lượng Minetti, chiều dài hình học và độ mịn quỹ đạo của MCTD-A* gần như tương đương (chênh lệch $< 0.33\%$) hoặc tốt hơn một chút so với Weighted A*, khẳng định rằng giới hạn tìm kiếm trong hành lang CNN của System 1 không làm suy giảm chất lượng tối ưu vật lý của đường đi.
+    \item \textbf{Hiệu năng vượt trội của HMCTD-A*:} Thuật toán phân cấp lai HMCTD-A* tích hợp Line-of-Sight Shortcutter mang lại cải tiến toàn diện: Giảm năng lượng tiêu hao Minetti xuống còn \textbf{8102.43 J} (giảm \textbf{4.95\%}), chiều dài hình học rút ngắn còn \textbf{71.80 m}, và độ mịn quỹ đạo cải tiến vượt trội chỉ còn \textbf{12.05 rad$^2$} (giảm \textbf{55.94\%} so với Weighted A* toàn cục). Tỉ lệ fallback tự động của HMCTD-A* đạt \textbf{0.00\%} nhờ cơ chế hoạch định topo macro thích nghi cao.
 \end{itemize}
 
 \subsubsection{Đánh giá và Tối ưu hóa Tham số cho thuật toán lai HMCTD-A* trên BenchNav}
@@ -313,11 +313,11 @@ Kết quả chạy mô phỏng bám đường so sánh giữa hai bộ điều k
     \toprule
     \textbf{Chỉ số hiệu năng (Đại lượng trung bình)} & \textbf{Traditional NMPC} & \textbf{Hybrid NMPC (Đề xuất)} & \textbf{Cải tiến / Thay đổi} \\
     \midrule
-    Sai số bám đường trung bình RMSE (m) & $0.093 \pm 0.056$ & $\mathbf{0.055 \pm 0.005}$ & \textbf{+41.48\%} \\
-    Sai số lệch quỹ đạo cực đại TB (m) & \textbf{0.190} & 0.194 & -2.11\% \\
-    Tỉ lệ bám đích thành công (\%) & 30.0\% & \textbf{90.0\%} & \textbf{+60.00\%} (tuyệt đối) \\
-    Năng lượng điều khiển tích phân TB (J) & \textbf{77.06} & 123.42 & -60.16\% \\
-    Thời gian mô phỏng trung bình (s) & \textbf{9.01} & 10.08 & -11.88\% \\
+    Sai số bám đường trung bình RMSE (m) & $0.096 \pm 0.055$ & $\mathbf{0.052 \pm 0.006}$ & \textbf{+45.88\%} \\
+    Sai số lệch quỹ đạo cực đại TB (m) & \textbf{0.194} & 0.201 & -3.61\% \\
+    Tỉ lệ bám đích thành công (\%) & 26.7\% & \textbf{76.7\%} & \textbf{+50.00\%} (tuyệt đối) \\
+    Năng lượng điều khiển tích phân TB (J) & \textbf{74.43} & 118.49 & -59.20\% \\
+    Thời gian mô phỏng trung bình (s) & \textbf{8.94} & 10.17 & -13.76\% \\
     \bottomrule
 \end{tabular}%
 }
@@ -325,9 +325,9 @@ Kết quả chạy mô phỏng bám đường so sánh giữa hai bộ điều k
 
 \textbf{Phân tích khoa học:}
 \begin{itemize}
-    \item \textbf{Độ bền vững bám đường:} Sai số RMSE trung bình của Hybrid NMPC giảm từ \textbf{0.093 m} xuống \textbf{0.055 m} (cải tiến \textbf{41.48\%}). Đáng chú ý là độ lệch chuẩn ($\sigma$) của Hybrid NMPC cực kỳ nhỏ (\textbf{0.005 m} so với \textbf{0.056 m} của Traditional NMPC), chứng minh bộ điều khiển đề xuất hoạt động cực kỳ ổn định, gần như không phụ thuộc vào độ phức tạp hay loại đất của từng bản đồ cụ thể.
-    \item \textbf{Tỉ lệ bám đích thành công vượt trội:} Traditional NMPC chỉ đạt tỷ lệ thành công \textbf{30.0\%} do thường xuyên bị trượt nghiêm trọng ở các đoạn dốc đứng hoặc vũng lầy, dẫn đến mất lái hoặc lệch hẳn khỏi hành lang an toàn. Trong khi đó, Hybrid NMPC đạt tỉ lệ thành công lên tới \textbf{90.0\%}, khẳng định năng lực vượt trội của thuật toán bù trượt chủ động dựa trên SlipMLP.
-    \item \textbf{Đánh đổi năng lượng và thời gian:} Hybrid NMPC tốn nhiều năng lượng điều khiển tích phân hơn (\textbf{123.42 J} so với \textbf{77.06 J}) và thời gian mô phỏng lâu hơn một chút (\textbf{10.08 s} so với \textbf{9.01 s}). Đây là sự đánh đổi vật lý tự nhiên: bộ điều khiển chủ động tăng ga để bù đắp lực kéo bị tổn hao do trượt và thực hiện thêm các phép tính lan truyền tiến trên mạng SlipMLP. Sự đánh đổi này hoàn toàn xứng đáng để đổi lấy sự an toàn bám đích và độ chính xác ở cấp độ centimet.
+    \item \textbf{Độ bền vững bám đường:} Sai số RMSE trung bình của Hybrid NMPC giảm từ \textbf{0.096 m} xuống \textbf{0.052 m} (cải tiến \textbf{45.88\%}). Đáng chú ý là độ lệch chuẩn ($\sigma$) của Hybrid NMPC cực kỳ nhỏ (\textbf{0.006 m} so với \textbf{0.055 m} của Traditional NMPC), chứng minh bộ điều khiển đề xuất hoạt động cực kỳ ổn định, gần như không phụ thuộc vào độ phức tạp hay loại đất của từng bản đồ cụ thể.
+    \item \textbf{Tỉ lệ bám đích thành công vượt trội:} Traditional NMPC chỉ đạt tỷ lệ thành công \textbf{26.7\%} do thường xuyên bị trượt nghiêm trọng ở các đoạn dốc đứng hoặc vũng lầy, dẫn đến mất lái hoặc lệch hẳn khỏi hành lang an toàn. Trong khi đó, Hybrid NMPC đạt tỉ lệ thành công lên tới \textbf{76.7\%}, khẳng định năng lực vượt trội của thuật toán bù trượt chủ động dựa trên SlipMLP.
+    \item \textbf{Đánh đổi năng lượng và thời gian:} Hybrid NMPC tốn nhiều năng lượng điều khiển tích phân hơn (\textbf{118.49 J} so với \textbf{74.43 J}) và thời gian mô phỏng lâu hơn một chút (\textbf{10.17 s} so với \textbf{8.94 s}). Đây là sự đánh đổi vật lý tự nhiên: bộ điều khiển chủ động tăng ga để bù đắp lực kéo bị tổn hao do trượt và thực hiện thêm các phép tính lan truyền tiến trên mạng SlipMLP. Sự đánh đổi này hoàn toàn xứng đáng để đổi lấy sự an toàn bám đích và độ chính xác ở cấp độ centimet.
 \end{itemize}
 
 \subsubsection{Đánh giá so sánh các giải pháp điều khiển NMPC nâng cao và lai ghép}
@@ -385,19 +385,19 @@ Nhóm nghiên cứu đã thực hiện so sánh thuật toán Weighted A* truy�
     \toprule
     \textbf{Chỉ số hiệu năng (TB)} & \textbf{Weighted A*} & \textbf{MCTD-A*} & \textbf{HMCTD-A* (Đề xuất)} \\
     \midrule
-    Thời gian quy hoạch (ms) & 1376.80 & 20566.35 & 1484.82 \\
+    Thời gian quy hoạch (ms) & 887.23 & 11575.34 & \textbf{908.96} \\
     Chiều dài quỹ đạo (px) & 397.02 & 397.02 & \textbf{378.26} \\
     Độ mịn quỹ đạo (rad$^2$) & 45.22 & 45.24 & \textbf{18.02} \\
-    Số Nodes duyệt trung bình (nút) & 47624.00 & 486918.00 & \textbf{43340.45} \\
+    Số Nodes duyệt trung bình (nút) & 47624.00 & 486918.00 & \textbf{43340.00} \\
     \midrule
-    \textbf{Tỉ lệ Fallback toàn cục (\%)} & --- & 34.69\% & \textbf{71.43\%} \\
+    \textbf{Tỉ lệ Fallback toàn cục (\%)} & --- & 34.70\% & \textbf{71.40\%} \\
     \bottomrule
 \end{tabular}%
 }
 \end{table}
 
 \textbf{Phân tích khoa học:}
-Khác với kết quả trên BenchNav, hiệu năng thời gian và số nodes duyệt của MCTD-A* trên tập dữ liệu OMB giảm đáng kể so với Weighted A* (thời gian tăng lên trung bình 20.57 giây so với 1.38 giây của Weighted A*, số nodes duyệt tăng gấp hơn 10 lần). Hiện tượng này được giải thích bởi cấu trúc mê cung có tính cản trở cực cao và độ phân giải lớn ($512 \times 512$). System 1 (CNN Corridor Predictor) vốn được huấn luyện trên địa hình off-road tự nhiên nên khi đối mặt với mê cung góc cạnh nhân tạo, tỷ lệ đứt gãy hành lang tăng vọt dẫn đến tỷ lệ Fallback tự động của MCTD-A* lên tới \textbf{34.69\%}. Khi xảy ra fallback trên bản đồ lớn $512 \times 512$, thuật toán phải tìm kiếm lại toàn cục bằng Weighted A* trên không gian rất rộng, cộng thêm chi phí tính toán suy luận CNN ban đầu khiến tổng thời gian tăng cao.
+Khác với kết quả trên BenchNav, hiệu năng thời gian và số nodes duyệt của MCTD-A* trên tập dữ liệu OMB giảm đáng kể so với Weighted A* (thời gian tăng lên trung bình 11.58 giây so với 0.89 giây của Weighted A*, số nodes duyệt tăng gấp hơn 10 lần). Hiện tượng này được giải thích bởi cấu trúc mê cung có tính cản trở cực cao và độ phân giải lớn ($512 \times 512$). System 1 (CNN Corridor Predictor) vốn được huấn luyện trên địa hình off-road tự nhiên nên khi đối mặt với mê cung góc cạnh nhân tạo, tỷ lệ đứt gãy hành lang tăng vọt dẫn đến tỷ lệ Fallback tự động của MCTD-A* lên tới \textbf{34.70\%}. Khi xảy ra fallback trên bản đồ lớn $512 \times 512$, thuật toán phải tìm kiếm lại toàn cục bằng Weighted A* trên không gian rất rộng, cộng thêm chi phí tính toán suy luận CNN ban đầu khiến tổng thời gian tăng cao. Trái lại, \textbf{HMCTD-A*} nhờ phân hoạch cụm macro linh hoạt ($B=64$) kết hợp với cơ chế fallback từng đoạn vi mô đã kéo giảm thời gian tính toán xuống chỉ còn \textbf{908.96 ms} (nhanh hơn \textbf{92.15\%} so với MCTD-A*), đồng thời nâng độ mịn quỹ đạo lên mức vượt trội \textbf{18.02 rad$^2$} và số node duyệt trung bình giảm xuống còn \textbf{43,340 nodes}.
 
 Để giải quyết triệt để hạn chế về thời gian tính toán và bùng nổ không gian tìm kiếm của MCTD-A* trên bản đồ lớn, thuật toán lai đề xuất \textbf{HMCTD-A*} (kết hợp phân cấp HPA* và MCTD-A*) đã mang lại bước đột phá vượt trội:
 \begin{itemize}
