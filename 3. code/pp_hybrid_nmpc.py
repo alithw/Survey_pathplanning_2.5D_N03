@@ -134,9 +134,16 @@ def get_astar_trajectory():
     )
 
     START_MANUAL = (33, 8)
-    GOAL_MANUAL = (40, 58)
+    GOAL_MANUAL = (38, 58)
     path, _ = planner.plan(START_MANUAL, GOAL_MANUAL)
+    if path is None:
+        # Fallback to (10, 10) -> (50, 50) if needed
+        for s, g in [((33, 8), (38, 58)), ((10, 10), (50, 50))]:
+            path, _ = planner.plan(s, g)
+            if path is not None: break
+
     return np.array(path), heights, slopes, t_classes
+
 
 # ==========================================
 # 3. CHẠY MÔ PHỎNG NMPC (COMPENSATION VS NO COMPENSATION)
@@ -374,7 +381,7 @@ if __name__ == "__main__":
     
     ax2.set_title("Độ lệch vị trí thời gian thực (Tracking Error Over Time)", fontsize=12)
     ax2.set_xlabel("Thời gian (giây)")
-    ax2.set_ylabel("Sai lệch vị trí (mét)")
+    ax2.set_ylabel("Sai lệch vị trí (cm)")
     ax2.legend()
     ax2.grid(True)
     
@@ -384,5 +391,12 @@ if __name__ == "__main__":
     os.makedirs('figures', exist_ok=True)
     save_path = 'figures/nmpc_controller_comparison.png'
     plt.savefig(save_path, dpi=300, bbox_inches='tight')
-    print(f"[THÀNH CÔNG] Đã lưu biểu đồ so sánh vào: {save_path}")
+    
+    # Đồng thời lưu/sao chép sang thư mục 1. Report/figures
+    report_fig_dir = os.path.join(os.path.dirname(__file__), '..', '1. Report', 'figures')
+    os.makedirs(report_fig_dir, exist_ok=True)
+    report_save_path = os.path.join(report_fig_dir, 'nmpc_controller_comparison.png')
+    plt.savefig(report_save_path, dpi=300, bbox_inches='tight')
+    print(f"[THÀNH CÔNG] Đã lưu biểu đồ so sánh vào: {save_path} và {report_save_path}")
+
     # plt.show()
