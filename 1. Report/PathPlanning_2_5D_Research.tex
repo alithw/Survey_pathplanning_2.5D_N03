@@ -1,15 +1,7 @@
 \documentclass[12pt, a4paper]{article}
 \usepackage[a4paper, top=2.5cm, bottom=2.5cm, left=2cm, right=2cm]{geometry}
-\usepackage{fontspec}
-\usepackage{polyglossia}
-\setmainlanguage{vietnamese}
-\setotherlanguage{english}
+\usepackage[utf8]{vietnam}
 
-\IfFontExistsTF{Times New Roman}{
-    \setmainfont{Times New Roman}
-}{
-    \setmainfont{TeX Gyre Termes}
-}
 
 \usepackage{enumitem}
 \setlist[itemize]{label=-}
@@ -51,7 +43,7 @@
 \maketitle
 
 \begin{abstract}
-Nghiên cứu này trình bày việc thiết kế, triển khai thực nghiệm và đánh giá quy mô lớn một hệ thống quy hoạch đường đi liên hợp (Joint Planning and Control) chuyên dụng cho robot tự hành off-road di chuyển trên địa hình 2.5D. Tầng quy hoạch toàn cục đề xuất thuật toán quy hoạch phân cấp lai \textbf{HMCTD-A*}, kết hợp hữu cơ cấu trúc phân cấp \textbf{HPA*}, cơ chế thích ứng địa hình \textbf{TCI} và trực giác của \textbf{MCTD-A*} (tích hợp \textbf{System 1 CNN corridor mask} và \textbf{System 2 Weighted A*}). Tầng điều khiển cục bộ đề xuất bộ điều khiển thích nghi đa mô hình \textbf{Unified Multi-Model Hybrid MPC} (Mode 9) tích hợp mô hình học máy phi tuyến \textbf{SlipMLP} bù trượt chủ động và mạng sâu \textbf{DNN Warm-Start}. Đánh giá diện rộng trên tập dữ liệu \textbf{BenchNav (509 bản đồ)} chứng minh quy hoạch MCTD-A* đạt thời gian trung bình cực nhanh là \textbf{111.54 ms} (nhanh hơn \textbf{26.27\%} so với Weighted A* toàn cục), trong khi bộ điều khiển Hybrid NMPC cải tiến vượt trội \textbf{41.48\%} sai số bám đường trung bình (RMSE đạt \textbf{0.055 $\pm$ 0.005 m}) và nâng tỷ lệ thành công bám đích từ \textbf{30.0\%} lên \textbf{90.0\%}. Đặc biệt, trên tập dữ liệu mê cung đa giác phức tạp \textbf{OMB (49 bản đồ lớn $512 \times 512$)}, thuật toán đề xuất HMCTD-A* giúp tăng tốc độ quy hoạch \textbf{92.78\%} so với global MCTD-A*, đồng thời bộ điều khiển Mode 9 đạt RMSE cực tiểu \textbf{0.438 m} và tỷ lệ thành công \textbf{96.7\%} trong thời gian giải tối ưu siêu việt chỉ \textbf{1.56 ms}.
+Nghiên cứu này trình bày việc thiết kế, triển khai thực nghiệm và đánh giá quy mô lớn một hệ thống quy hoạch đường đi liên hợp (Joint Planning and Control) chuyên dụng cho robot tự hành off-road di chuyển trên địa hình 2.5D. Tầng quy hoạch toàn cục đề xuất thuật toán quy hoạch phân cấp lai \textbf{HMCTD-A*}, kết hợp hữu cơ cấu trúc phân cấp \textbf{HPA*}, cơ chế thích ứng địa hình \textbf{TCI} và trực giác của \textbf{MCTD-A*} (tích hợp \textbf{System 1 CNN corridor mask} và \textbf{System 2 Weighted A*}). Tầng điều khiển cục bộ đề xuất bộ điều khiển thích nghi đa mô hình \textbf{Unified Multi-Model Hybrid MPC} (Mode 9) tích hợp mô hình học máy phi tuyến \textbf{SlipMLP} bù trượt chủ động và mạng sâu \textbf{DNN Warm-Start}. Đánh giá diện rộng trên tập dữ liệu \textbf{BenchNav (509 bản đồ)} chứng minh quy hoạch MCTD-A* đạt thời gian trung bình cực nhanh là \textbf{111.54 ms} (nhanh hơn \textbf{26.27\%} so với Weighted A* toàn cục), trong khi bộ điều khiển Hybrid NMPC cải tiến vượt trội \textbf{41.48\%} sai số bám đường trung bình (RMSE đạt \textbf{0.055 $\pm$ 0.005 m}) và nâng tỷ lệ thành công bám đích từ \textbf{30.0\%} lên \textbf{90.0\%}. Đặc biệt, trên tập dữ liệu mê cung đa giác phức tạp \textbf{OMB (49 bản đồ lớn $512 \times 512$)}, thuật toán đề xuất HMCTD-A* giúp tăng tốc độ quy hoạch \textbf{92.78\%} so với global MCTD-A*, đồng thời bộ điều khiển Mode 9 đạt RMSE cực tiểu \textbf{0.438 m} và tỷ lệ thành công \textbf{96.7\%} trong thời gian giải cực kỳ tối ưu với \textbf{1.56 ms}.
 \end{abstract}
 
 % ============================================================
