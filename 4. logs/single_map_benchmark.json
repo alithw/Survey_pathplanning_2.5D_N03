@@ -1,0 +1,45 @@
+{
+    "map_file": "gt_dataset/000_025.npz",
+    "grid_size": 64,
+    "start": [
+        23,
+        5
+    ],
+    "goal": [
+        25,
+        52
+    ],
+    "weighted_a_star": {
+        "length_m": 65.32590180780451,
+        "energy_j": 7265.9809731317255,
+        "smoothness": 31.45936402847233,
+        "waypoints": 51,
+        "max_slope": 8.103201866149902,
+        "time_ms": 149.9292029998287,
+        "nodes_explored": 765,
+        "status": "Success"
+    },
+    "mctd_a_star": {
+        "length_m": 65.32590180780451,
+        "energy_j": 7265.9809731317255,
+        "smoothness": 31.45936402847233,
+        "waypoints": 51,
+        "max_slope": 8.103201866149902,
+        "time_ms": 74.59944999982326,
+        "time_sys1_ms": 23.163825000210636,
+        "time_sys2_ms": 51.43562499961263,
+        "nodes_explored": 754,
+        "status": "Success"
+    },
+    "hmctd_a_star": {
+        "length_m": 75.97920536626854,
+        "energy_j": 2422.434673698228,
+        "smoothness": 6.953907506863464,
+        "waypoints": 12,
+        "max_slope": 7.916312217712402,
+        "time_ms": 179.2277039999135,
+        "nodes_explored": 2076,
+        "fallback_rate_pct": 100.0,
+        "status": "Fallback (100.0%)"
+    }
+}
