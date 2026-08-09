@@ -5,3 +5,11 @@ PathPlanning_2.5D-task.pdf
 3. code/dataset_omb
 3. code/gt_dataset
 3. code/__pycache__
+*.Zone.Identifier
+.DS_Store
+*.aux
+*.log
+*.out
+*.toc
+*.blg
+*.bbl
