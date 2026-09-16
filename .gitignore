@@ -4,6 +4,10 @@
 PathPlanning_2.5D-task.pdf
 3. code/dataset_omb
 3. code/gt_dataset
+3. code/dataset_benchnav
+3. code/dataset_goose
+3. code/dataset_tartandrive
+3. code/dataset_ycor
 3. code/__pycache__
 *.Zone.Identifier
 .DS_Store
@@ -13,3 +17,7 @@ PathPlanning_2.5D-task.pdf
 *.toc
 *.blg
 *.bbl
+*.fls
+*.fdb_latexmk
+demo
+*.MD
