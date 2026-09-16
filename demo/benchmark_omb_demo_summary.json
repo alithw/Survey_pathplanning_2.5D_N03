@@ -1,0 +1,30 @@
+{
+    "dataset_paper": "Nguyen Kieu Linh et al., Dataset of orthogonal polygon-derived maze environments for path planning benchmarking. Data in Brief, 60:112841, 2026.",
+    "maze_file": "maze_100000_12.json",
+    "grid_size": 512,
+    "start": [
+        389,
+        442
+    ],
+    "goal": [
+        28,
+        82
+    ],
+    "weighted_a_star": {
+        "time_ms": 465.90251200001376,
+        "nodes": 36184,
+        "smoothness": 48.731171730378726
+    },
+    "mctd_a_star": {
+        "time_ms": 647.8180159999738,
+        "nodes": 36184,
+        "smoothness": 48.731171730378726
+    },
+    "hmctd_a_star": {
+        "time_ms": 423.36478499998975,
+        "nodes": 1342,
+        "smoothness": 26.255861210596926,
+        "speedup": 1.1004753548409205,
+        "node_reduction_pct": 96.29117842140172
+    }
+}

@@ -1,0 +1,21 @@
+{
+    "weighted_a_star": {
+        "time_ms": 107.31749800015677,
+        "energy_j": 313.7627444699071,
+        "smoothness": 25.290861277791485,
+        "waypoints": 65
+    },
+    "hmctd_a_star": {
+        "time_ms": 106.47471700031019,
+        "energy_j": 313.7627444699071,
+        "smoothness": 25.290861277791485,
+        "waypoints": 65
+    },
+    "fast_hmctd_a_star": {
+        "time_ms": 90.7255800002531,
+        "expanded_nodes": 1836,
+        "energy_j": 282.49306189965273,
+        "smoothness": 5.427288465940403,
+        "waypoints": 12
+    }
+}

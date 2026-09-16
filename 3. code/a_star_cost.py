@@ -23,7 +23,7 @@ class AStarPlanner:
         self.min_step_cost = min_step_cost
         
         # Bảng hệ số cản của đất
-        self.soil_resistance = {0: 1.0, 1: 1.5, 2: 3.0, 3: 8.0} 
+        self.soil_resistance = {0: 1.0, 1: 1.2, 2: 2.2, 3: 8.5, 4: 4.0, 5: 2.5, 6: 6.0, 7: 1.5} 
         
         # Chuẩn bị bản đồ độ cản của đất đã được làm mượt
         self.smoothed_bekker = self._prepare_soil_resistance()
@@ -50,9 +50,12 @@ class AStarPlanner:
         dist_1step = np.sqrt((nx-x)**2 + (ny-y)**2)
         
         # 1. RỦI RO LẬT XE (LTR)
-        LTR = self.slopes[nx, ny] / self.ssf
-        penalty_LTR = 5.0 * LTR
-        if LTR >= 1.5: 
+        # slopes stored in degrees; convert to radians for physical SSF tip calculation
+        sl_deg = float(self.slopes[nx, ny])
+        sl_rad = np.radians(sl_deg) if sl_deg > 1.5 else sl_deg
+        LTR = sl_rad / self.ssf
+        penalty_LTR = 15.0 * LTR
+        if LTR >= 0.75:  # Critical rollover angle (> 48 deg)
             penalty_LTR += 5000.0  
         
         # 2. CHỈ SỐ CẢN CỦA ĐẤT
@@ -69,8 +72,9 @@ class AStarPlanner:
         s_pitch = dz / real_dist if real_dist > 0 else 0
         
         # 4. NĂNG LƯỢNG TIÊU HAO (Mô hình Minetti)
-        c_minetti = 155.4*(s_pitch**5) - 30.4*(s_pitch**4) - 43.3*(s_pitch**3) + 46.3*(s_pitch**2) + 19.5*s_pitch + 3.6
-        c_minetti = max(c_minetti, 0.5) 
+        s_pitch_clamped = float(np.clip(s_pitch, -0.35, 0.35))
+        c_minetti = 155.4*(s_pitch_clamped**5) - 30.4*(s_pitch_clamped**4) - 43.3*(s_pitch_clamped**3) + 46.3*(s_pitch_clamped**2) + 19.5*s_pitch_clamped + 3.6
+        c_minetti = float(np.clip(c_minetti, 0.5, 30.0)) 
         energy_cost = c_minetti * dist_1step  
         
         step_cost = (energy_cost) + (1.5 * c_bekker) + (50*LTR)

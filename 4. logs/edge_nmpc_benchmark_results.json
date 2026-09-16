@@ -1,0 +1,57 @@
+{
+    "nominal": {
+        "traditional": {
+            "rmse": 0.1510172852875185,
+            "max_cte": 0.3796163504792814,
+            "mean_solve_time_ms": 5.8062587762146896,
+            "max_solve_time_ms": 352.7021969998714,
+            "control_frequency_hz": 172.22794204359184,
+            "energy_joules": 84.9990487831682,
+            "success": false
+        },
+        "hybrid_mlp": {
+            "rmse": 0.09410376385723478,
+            "max_cte": 0.3435852056486227,
+            "mean_solve_time_ms": 4.388952775030495,
+            "max_solve_time_ms": 15.3719039999487,
+            "control_frequency_hz": 227.844784680567,
+            "energy_joules": 160.71178895506782,
+            "success": false
+        },
+        "edge_hybrid": {
+            "rmse": 0.07698856676508797,
+            "max_cte": 0.3328808399957208,
+            "mean_solve_time_ms": 4.336928915200857,
+            "max_solve_time_ms": 15.612035000231117,
+            "control_frequency_hz": 230.57790882737743,
+            "energy_joules": 158.50000202890007,
+            "success": false
+        }
+    },
+    "disturbed": {
+        "traditional": {
+            "rmse": 0.13278304555666037,
+            "max_cte": 0.27871568418788845,
+            "mean_solve_time_ms": 4.537982819782721,
+            "control_frequency_hz": 220.36222694379438,
+            "energy_joules": 92.29138087169592,
+            "success": false
+        },
+        "hybrid_mlp": {
+            "rmse": 0.08927929567400858,
+            "max_cte": 0.3471892777360462,
+            "mean_solve_time_ms": 4.593939428749622,
+            "control_frequency_hz": 217.6780986144129,
+            "energy_joules": 198.14696735653098,
+            "success": true
+        },
+        "edge_hybrid": {
+            "rmse": 0.08084556144019639,
+            "max_cte": 0.31007999261587965,
+            "mean_solve_time_ms": 4.375638472323626,
+            "control_frequency_hz": 228.53807651731407,
+            "energy_joules": 159.06726475122085,
+            "success": false
+        }
+    }
+}

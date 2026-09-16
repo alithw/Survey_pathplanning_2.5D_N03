@@ -1,0 +1,27 @@
+{
+    "map": "000_025.npz",
+    "grid_size": 64,
+    "start": [
+        23,
+        5
+    ],
+    "goal": [
+        25,
+        52
+    ],
+    "weighted_a_star": {
+        "time_ms": 139.3706280000515,
+        "nodes": 2077,
+        "smoothness": 31.45936402847233
+    },
+    "mctd_a_star": {
+        "time_ms": 57.75779399994008,
+        "nodes": 726,
+        "smoothness": 31.45936402847233
+    },
+    "hmctd_a_star": {
+        "time_ms": 161.1531029999469,
+        "nodes": 2076,
+        "smoothness": 6.953907506863464
+    }
+}

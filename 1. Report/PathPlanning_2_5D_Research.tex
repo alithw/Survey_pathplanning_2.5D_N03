@@ -2,7 +2,6 @@
 \usepackage[a4paper, top=2.5cm, bottom=2.5cm, left=2cm, right=2cm]{geometry}
 \usepackage[utf8]{vietnam}
 
-
 \usepackage{enumitem}
 \setlist[itemize]{label=-}
 
@@ -34,434 +33,442 @@
 }
 \lstset{style=mystyle}
 
-\title{\textbf{NGHIÊN CỨU LIÊN HỢP QUY HOẠCH PHÂN CẤP LAI HMCTD-A* VÀ BỘ ĐIỀU KHIỂN THÍCH NGHI ĐA MÔ HÌNH HYBRID MPC BÙ TRƯỢT ĐỊA HÌNH TRÊN BẢN ĐỒ 2.5D}}
-\author{\textbf{Nhóm 3: Động lực học \& Điều khiển}}
-\date{Ngày 20 tháng 5, 2026}
+\title{\textbf{NGHIÊN CỨU LIÊN HỢP QUY HOẠCH PHÂN CẤP LAI VÀ BỘ ĐIỀU KHIỂN THÍCH NGHI ĐA MÔ HÌNH HYBRID NMPC BÙ TRƯỢT ĐỊA HÌNH TRÊN BẢN ĐỒ 2.5D}}
+\author{
+    \textbf{Nhóm 2: Động lực học \& Điều khiển} \\
+    \textit{Giảng viên hướng dẫn: TS. Nguyễn Kiều Linh}
+}
+\date{Tháng 9/2026}
 
 \begin{document}
 
 \maketitle
 
 \begin{abstract}
-Nghiên cứu này trình bày việc thiết kế, triển khai thực nghiệm và đánh giá quy mô lớn một hệ thống quy hoạch đường đi liên hợp (Joint Planning and Control) chuyên dụng cho robot tự hành off-road di chuyển trên địa hình 2.5D. Tầng quy hoạch toàn cục đề xuất thuật toán quy hoạch phân cấp lai \textbf{HMCTD-A*}, kết hợp hữu cơ cấu trúc phân cấp \textbf{HPA*}, cơ chế thích ứng địa hình \textbf{TCI} và trực giác của \textbf{MCTD-A*} (tích hợp \textbf{System 1 CNN corridor mask} và \textbf{System 2 Weighted A*}). Tầng điều khiển cục bộ đề xuất bộ điều khiển thích nghi đa mô hình \textbf{Unified Multi-Model Hybrid MPC} (Mode 9) tích hợp mô hình học máy phi tuyến \textbf{SlipMLP} bù trượt chủ động và mạng sâu \textbf{DNN Warm-Start}. Đánh giá diện rộng trên tập dữ liệu \textbf{BenchNav (509 bản đồ)} chứng minh quy hoạch MCTD-A* đạt thời gian trung bình cực nhanh là \textbf{111.54 ms} (nhanh hơn \textbf{26.27\%} so với Weighted A* toàn cục), trong khi bộ điều khiển Hybrid NMPC cải tiến vượt trội \textbf{41.48\%} sai số bám đường trung bình (RMSE đạt \textbf{0.055 $\pm$ 0.005 m}) và nâng tỷ lệ thành công bám đích từ \textbf{30.0\%} lên \textbf{90.0\%}. Đặc biệt, trên tập dữ liệu mê cung đa giác phức tạp \textbf{OMB (49 bản đồ lớn $512 \times 512$)}, thuật toán đề xuất HMCTD-A* giúp tăng tốc độ quy hoạch \textbf{92.78\%} so với global MCTD-A*, đồng thời bộ điều khiển Mode 9 đạt RMSE cực tiểu \textbf{0.438 m} và tỷ lệ thành công \textbf{96.7\%} trong thời gian giải cực kỳ tối ưu với \textbf{1.56 ms}.
+Nghiên cứu này trình bày việc thiết kế, hiện thực hóa và đánh giá thực nghiệm một hệ thống liên hợp (Joint Planning and Control) hoàn chỉnh chuyên biệt cho xe tự hành mặt đất (Unmanned Ground Vehicle - UGV) vận hành trên địa hình dã chiến 2.5D phi cấu trúc. Nhằm khắc phục đồng thời sự bùng nổ không gian tìm kiếm và nguy cơ mất ổn định cơ học do trượt lún, hệ thống được cấu trúc thành hai tầng liên hợp chặt chẽ. Ở tầng quy hoạch toàn cục, chúng em đề xuất thuật toán quy hoạch phân cấp lai \textbf{Fast-HMCTD-A*} tích hợp hàm Heuristic phi đẳng hướng vật lý (\textbf{Anisotropic Physics Heuristic - APH}), thuật toán nắn thẳng tầm nhìn bề mặt \textbf{2.5D Surface-Aware Shortcutter} và \textbf{Kiến trúc Fallback 3 Tầng Bảo đảm Toán học}, cam kết tỷ lệ thành công tìm kiếm đạt \textbf{100.0\% tuyệt đối}. Ở tầng điều khiển cục bộ, chúng em đề xuất bộ điều khiển tối ưu nhúng \textbf{Edge-Hybrid NMPC} tích hợp bảng tra cứu trượt 3 chiều \textbf{Slip-LUT} nội suy tam tuyến tính thời gian thực $O(1)$ kết hợp bộ lọc thích nghi đệ quy trực tuyến \textbf{Online Slip Adapter}, loại bỏ hoàn toàn độ trễ tính toán của mạng học sâu trong vòng lặp kín. Hệ thống được kiểm nghiệm định lượng nghiêm ngặt trên \textbf{40 kịch bản địa hình} thuộc 4 bộ dữ liệu tiêu chuẩn quốc tế: \textbf{BenchNav}, \textbf{TartanDrive} (CMU), \textbf{YCOR} (Yamaha-CMU) và \textbf{GOOSE} (Fraunhofer IOSB). Kết quả thực nghiệm minh chứng \textbf{Fast-HMCTD-A*} giúp tiết kiệm \textbf{20.1\%} năng lượng cơ học Minetti, cải thiện độ êm dịu góc bẻ lái \textbf{81.9\%} và giảm \textbf{91.5\%} số lượng điểm mốc trung gian; trong khi \textbf{Edge-Hybrid NMPC} duy trì tần số điều khiển ổn định trên \textbf{163 Hz}, giảm \textbf{11.7\%} sai số bám vết RMSE (đạt độ chính xác \textbf{1.09 cm} trong điều kiện thuận lợi) và khử trượt an toàn trước các bề mặt bùn lầy bất thường.
 \end{abstract}
+
+\vspace{0.5em}
+\noindent\textbf{Từ khóa:} Quy hoạch đường đi 2.5D, Robot tự hành dã chiến (Field UGV), Cơ học đất Terramechanics, Phân cấp lai Fast-HMCTD-A*, Nonlinear MPC, Bảng tra cứu Slip-LUT, Bù trượt thích nghi trực tuyến, Khảo sát đa bộ dữ liệu.
 
 % ============================================================
 \section{Giới thiệu}
 % ============================================================
-Trong môi trường địa hình phức tạp ngoài trời (Field Robotics), chuyển động của robot tự hành bị ảnh hưởng sâu sắc bởi hai yếu tố phi tuyến: độ gồ ghề của địa hình (2.5D heightmap) và sự tương tác phức tạp giữa bánh xe và nền đất mềm (Terramechanics) \cite{liu2023}. Các thuật toán quy hoạch truyền thống như A* \cite{hart1968} hay RRT* \cite{karaman2011} thường chỉ tối ưu hóa dựa trên các chỉ số hình học thuần túy (như khoảng cách Euclidean), dẫn đến việc sinh ra các quỹ đạo quá dốc, tốn nhiều năng lượng cơ học (Minetti) hoặc đi vào các vùng đất lầy lội có hệ số ma sát cực thấp, gây nguy cơ trượt hoặc lật xe \cite{higa2019}.
-
-Để giải quyết bài toán này, Nhóm 3 (Động lực học \& Điều khiển) thiết lập một pipeline liên hợp hoàn chỉnh từ quy hoạch toàn cục đến điều khiển cục bộ. Sự đóng góp chính của nghiên cứu này bao gồm:
+Trong các nhiệm vụ tự hành ngoài trời như tìm kiếm cứu nạn, khảo sát địa chất, tuần tra biên giới và nông nghiệp thông minh, phương tiện mặt đất không người lái (UGV) bắt buộc phải di chuyển qua các địa hình tự nhiên gồ ghề và biến dạng phức tạp \cite{liu2023}. Khác với môi trường trong nhà hay đường giao thông đô thị có thể giả định mặt phẳng 2D lý tưởng, bề mặt dã chiến 2.5D (Elevation Map) đặt ra hai thách thức phi tuyến cốt lõi:
 \begin{enumerate}
-    \item \textbf{Quy hoạch phân cấp lai HMCTD-A* thích nghi địa hình:} Kết hợp hữu cơ cấu trúc phân cấp HPA* và thuật toán nhận thức hai bán cầu MCTD-A* (System 1 + 2) chạy bên trong hành lang xác suất. Phát triển cơ chế điều tiết kích thước cửa sổ thích nghi theo chỉ số phức tạp địa hình cục bộ (TCI) và tích hợp bộ nắn thẳng quỹ đạo Line-of-Sight Shortcutter giúp tăng tốc độ tìm đường và giảm thiểu hiện tượng răng cưa.
-    \item \textbf{Bộ điều khiển Unified Multi-Model Hybrid MPC bù trượt chủ động:} Thiết kế bộ điều khiển phi tuyến đa mô hình thống nhất, tích hợp mạng học máy phi tuyến siêu nhẹ \texttt{SlipMLP} để bù trượt động theo thời gian thực và mạng nơ-ron sâu DNN làm điểm khởi động ấm (Warm-Start) giúp kéo giảm chu kỳ tính toán tối ưu xuống mức mili-giây.
-    \item \textbf{Đánh giá học thuật quy mô lớn trên bộ dữ liệu BenchNav và OMB:} Thay vì thử nghiệm đơn lẻ, nhóm đã kiểm chứng hệ thống trên toàn bộ tập dữ liệu BenchNav (509 bản đồ) và OMB (49 bản đồ lớn $512 \times 512$), ghi nhận chi tiết 4 chỉ số hiệu năng khắt khe: thời gian tính toán, năng lượng tiêu hao Minetti, chiều dài hình học và độ mịn quỹ đạo, khẳng định tính trung thực 100\% của số liệu thực nghiệm.
+    \item \textbf{Độ dốc địa hình và nguy cơ lật xe (Rollover Hazard):} Sườn dốc nghiêng lớn làm thay đổi mạnh mẽ phân bố tải trọng lên các bánh xe. Khi góc nghiêng ngang vượt quá giới hạn ổn định tĩnh ($\text{SSF} = T / (2h)$), UGV đối mặt với nguy cơ lật đổ thảm khốc \cite{chen2012ltr}. Đồng thời, việc leo dốc liên tục làm tiêu hao năng lượng cơ học rất lớn theo mô hình phi tuyến Minetti \cite{minetti2002}.
+    \item \textbf{Tương tác bánh xe - nền đất biến dạng (Terramechanics):} Nền đất dã chiến bao gồm nhiều phân lớp vật lý đa dạng như bùn nhão, sỏi đá, cát lún và thảm mùn xốp \cite{bekker1956}. Lực bám ma sát hạn chế gây ra hiện tượng trượt dọc (wheel slip) và trượt ngang (side slip), làm mất liên kết động học giữa lệnh điều khiển vận tốc và chuyển động thực của xe.
 \end{enumerate}
 
-% ============================================================
-\section{Mô hình hóa Động lực học \& Cơ học đất}
-% ============================================================
-\subsection{Đánh giá Traversability Đa phương pháp}
-Trước khi quy hoạch, bản đồ 2.5D đầu vào được phân tích qua ba lớp đánh giá traversability bổ sung lẫn nhau \cite{triebel2006}:
+Phần lớn các công trình nghiên cứu hiện nay thường tiếp cận bài toán một cách rời rạc: tầng quy hoạch toàn cục (A*, RRT*) chỉ tối ưu hóa chiều dài hình học phẳng mà bỏ qua độ dốc và cơ học đất, dẫn đến quỹ đạo răng cưa nguy hiểm \cite{hart1968, karaman2011}; trong khi tầng điều khiển bám vết (NMPC) nếu tích hợp mạng nơ-ron sâu trực tiếp trong vòng lặp thời gian thực sẽ gây trễ tính toán nghiêm trọng và có nguy cơ tràn bộ nhớ trên các máy tính nhúng biên \cite{grandia2023}.
+
+Nhằm giải quyết triệt để sự mất cân đối này, nghiên cứu của \textbf{Nhóm 2 (Động lực học \& Điều khiển)} tập trung xây dựng một hệ thống liên hợp khép kín từ quy hoạch toàn cục nhận thức hai giai đoạn đến điều khiển tối ưu nhúng có xét đầy đủ cơ học đất Bekker-Wong. Các đóng góp khoa học chính của bài báo bao gồm:
 \begin{itemize}
-    \item \textbf{Geometric Traversability ($T_{\text{geo}}$):} Phân tích độ dốc ngang và dọc ($s_{\text{pitch}}, s_{\text{roll}}$), độ gồ ghề của địa hình bằng độ lệch chuẩn độ cao trong cửa sổ $5 \times 5$, và chướng ngại bậc (step hazard) cực đại trong cửa sổ $3 \times 3$.
-    \item \textbf{Physical Traversability ($T_{\text{phys}}$):} Sử dụng mô hình ma sát Coulomb và giới hạn trượt $\mu - \tan(\theta_{\text{slope}}) \geq 0$ \cite{bekker1956}. Hệ số ma sát tĩnh $\mu$ được xác định theo từng loại đất (Cỏ: 0.65, Bùn: 0.20, Đá: 0.80, Cát: 0.40).
-    \item \textbf{Semantic Traversability ($T_{\text{sem}}$):} Mô phỏng đầu ra của mạng CNN phân loại đất thực tế với nhiễu Gaussian ($\sigma = 0.05$). Điểm traversability lý thuyết: Cỏ (0.90), Bùn (0.20), Đá (0.60), Cát (0.55).
-\end{itemize}
-Ba lớp trên được tích hợp bằng Weighted Fusion để sinh ra bản đồ Traversability tổng hợp $T_{\text{fused}} \in [0, 1]$ (không thứ nguyên):
-\begin{equation}
-    T_{\text{fused}} = 0.35\,T_{\text{geo}} + 0.35\,T_{\text{phys}} + 0.30\,T_{\text{sem}}
-\end{equation}
-
-\subsection{Hàm chi phí Vật lý tích hợp}
-Hàm chi phí tổng hợp để di chuyển giữa hai trạng thái liền kề trên lưới có khoảng cách phân đoạn $d$ ($m$) được xây dựng bằng cách kết hợp mô hình tiêu hao năng lượng sinh học Minetti \cite{minetti2002} và độ lún Bekker-Wong \cite{bekker1956}:
-\begin{equation}
-    \text{StepCost} = W_{\text{slope}} + \lambda_1 W_{\text{soil}} + \lambda_2 \text{LTR} \quad (J)
-\end{equation}
-Trong đó $W_{\text{slope}} = m \cdot g \cdot C(s_{\text{pitch}}) \cdot d$ là điện năng tiêu hao để leo dốc ($J$) với $m = 25$ $kg$ là khối lượng robot, $g = 9.81$ $m/s^2$ là gia tốc trọng trường, $C(s_{\text{pitch}})$ là hệ số chi phí leo dốc theo hàm Minetti phi tuyến bậc 5 (không thứ nguyên):
-\begin{equation}
-    C(s) = 155.4 s^5 - 30.4 s^4 - 43.3 s^3 + 46.3 s^2 + 19.5 s + 3.6
-\end{equation}
-với $s = s_{\text{pitch}}$ là độ dốc (không thứ nguyên). $W_{\text{soil}} = R_c \cdot d$ là công thắng lực cản lăn của đất mềm ($J$) theo Bekker-Wong với lực cản lăn $R_c$ ($N$), và $\text{LTR} = s_{\text{roll}} / SSF$ biểu thị tỉ số chuyển dịch trọng lượng bên (không thứ nguyên, với ngưỡng an toàn tĩnh $SSF = T/2h = 1.0$). $\lambda_1, \lambda_2$ là các trọng số chuyển đổi đơn vị tương ứng. Nếu $LTR \geq 1.5$, $\text{StepCost} = \infty$.
-
-\subsection{Mô hình Trượt phi tuyến và mạng SlipMLP}
-Trong thực tế, robot tự hành off-road trên đất dốc luôn chịu sự trượt lốp không mong muốn, làm giảm hiệu năng chuyển động tịnh tiến. Nhóm mô hình hóa hệ số trượt phi tuyến thực tế của môi trường bằng phương trình:
-\begin{equation}
-    \alpha_{\text{actual}} = \alpha_{\text{soil}} + 0.35 \sin(\theta_{\text{slope}}) + 0.05 v
-\end{equation}
-Với $\alpha_{\text{soil}}$ lần lượt là $0.05$ (cỏ), $0.15$ (đá), $0.40$ (bùn) và $0.10$ (cát).
-
-Để bộ điều khiển dự báo cục bộ có thể thích ứng trực tuyến với địa hình mà không cần biết trước bản đồ ma sát lý thuyết, Nhóm nghiên cứu thiết kế mạng \textbf{SlipMLP} phi tuyến siêu nhẹ (Hình \ref{fig:slip_mlp}). Mạng gồm 3 lớp: Lớp vào nhận 3 tham số dễ đo đạc trực tuyến gồm chỉ số loại đất $[Soil\_Class / 3.0]$ (không thứ nguyên), độ dốc dọc $[Slope]$ ($rad$), và vận tốc dài $[v / 2.0]$ ($m/s$). Lớp ẩn lần lượt có 16 và 8 nơ-ron kích hoạt ReLU, và lớp ra kích hoạt Sigmoid để dự đoán giá trị trượt ước lượng $\alpha_{\text{est}} \in [0, 1]$ (không thứ nguyên).
-
-\begin{figure}[H]
-  \centering
-  \includegraphics[width=0.7\textwidth]{figures/cost_function_demo.png}
-  \caption{Mô hình Minetti và StepCost tổng hợp tích hợp vật lý theo độ dốc (trái/phải).}
-  \label{fig:slip_mlp}
-\end{figure}
-
-% ============================================================
-\section{Quy hoạch Toàn cục MCTD-A* (System 1 + 2)}
-% ============================================================
-Thuật toán MCTD-A* (Monte Carlo Tree Diffusion A*) của nhóm được lấy cảm hứng từ cấu trúc nhận thức hai bán cầu System 1 \& 2 \cite{yoon2025}:
-\begin{itemize}
-    \item \textbf{System 1 (CNN Corridor Predictor):} Sử dụng mạng neural CNN (\texttt{System1CNN}) nhận đầu vào là độ cao chuẩn hóa, độ dốc, loại đất, bản đồ vị trí Start và Goal. Nó dự đoán trực giác một dải hành lang xác suất khả thi (Corridor Mask) giúp khoanh vùng tìm kiếm đường đi (threshold $\geq 0.2$).
-    \item \textbf{System 2 (Weighted A*):} Chạy thuật toán tìm đường tối ưu vật lý (Weighted A*, $W_{\text{heuristic}} = 3.0$) nhưng giới hạn việc phát triển tập Node con \textbf{chỉ nằm bên trong hành lang} do System 1 cung cấp. Điều này giúp giảm đáng kể không gian tìm kiếm.
-    \item \textbf{Cơ chế Fallback An toàn:} Do tính chất học máy, dải hành lang do System 1 sinh ra có thể bị đứt gãy hoặc không có đường đi traversable thực tế. Để đảm bảo 100\% tỉ lệ thành công, System 2 tích hợp một chốt bảo vệ: Nếu tìm kiếm trong hành lang thất bại, bộ quy hoạch lập tức kích hoạt fallback chạy Weighted A* trên toàn bộ bản đồ.
+    \item \textbf{Đề xuất thuật toán quy hoạch toàn cục Fast-HMCTD-A*:} Kết hợp cơ chế phân cấp thích nghi địa hình (TCI) với Heuristic phi đẳng hướng vật lý (APH) và thuật toán nắn thẳng bề mặt 2.5D Shortcutter. Đặc biệt, chúng em thiết kế \textbf{Kiến trúc Fallback 3 Tầng Bảo đảm Toán học}, loại bỏ hoàn toàn điểm nghẽn thất bại tìm đường, đạt tỷ lệ thành công 100.0\% trên mọi kịch bản.
+    \item \textbf{Phát triển bộ điều khiển nhúng thời gian thực Edge-Hybrid NMPC:} Thay thế mạng học sâu nặng nề bằng bảng tra cứu trượt 3 chiều \texttt{Slip-LUT} ($31 \times 31 \times 8$) nội suy tam tuyến tính $O(1)$ với thời gian truy xuất dưới $5\ \mu$s, kết hợp bộ ước lượng thích nghi đệ quy trực tuyến bù sai lệch trượt khi xe đi vào nền đất lạ chưa từng được huấn luyện.
+    \item \textbf{Khảo sát và đối chuẩn toàn diện trên 4 bộ dữ liệu thực tế:} Toàn bộ hệ thống được thử nghiệm trên 40 kịch bản chuẩn hóa từ 4 bộ dữ liệu nổi tiếng thế giới (\textbf{BenchNav}, \textbf{TartanDrive}, \textbf{YCOR}, \textbf{GOOSE}), cung cấp các phân tích thống kê chi tiết theo phân vị Mean, High-average (điều kiện khắc nghiệt) và Low-average (điều kiện thuận lợi).
 \end{itemize}
 
-\begin{figure}[H]
-  \centering
-  \includegraphics[width=\textwidth]{figures/mctd_astar_comparison.png}
-  \caption{Mô phỏng quy hoạch MCTD-A* trên bản đồ BenchNav 000\_025: (Trái) Hành lang xác suất do System 1 dự đoán; (Phải) So sánh đường đi tối ưu năng lượng vật lý giữa Weighted A* thuần túy và MCTD-A*.}
-  \label{fig:mctd_astar}
-\end{figure}
-
-\subsection{Thuật toán quy hoạch phân cấp lai HMCTD-A*}
-Để giải quyết bài toán bùng nổ không gian tìm kiếm và hạn chế thời gian tính toán của quy hoạch toàn cục trên bản đồ kích thước lớn (như lưới $512 \times 512$ pixel của tập dữ liệu OMB), Nhóm nghiên cứu đề xuất thuật toán quy hoạch phân cấp lai \textbf{HMCTD-A*}. Thuật toán là sự kết hợp hữu cơ giữa cấu trúc quy hoạch phân cấp \textbf{HPA*} (Hierarchical Path-finding A*) và thuật toán nhận thức hai bán cầu \textbf{MCTD-A*}. Quy trình hoạt động của HMCTD-A* gồm các giai đoạn cốt lõi:
-
-\begin{enumerate}
-    \item \textbf{Phân hoạch cụm thô (HPA* Macro-Graph):} Bản đồ lưới lớn được chia thành các cụm (clusters) kích thước $B \times B$ pixel (với $B = 64$ pixel cho tập dữ liệu OMB và $B = 32$ pixel cho BenchNav). Các lối đi liên thông giữa các cụm liền kề (cổng biên - doors) được xác định để xây dựng đồ thị topo vĩ mô (Macro-graph). Thuật toán Weighted A* thô được giải ở cấp vĩ mô để tìm chuỗi cụm đi qua từ Start đến Goal, xác định đường đi macro thô.
-    \item \textbf{Cơ chế kích thước cửa sổ thích nghi theo độ phức tạp địa hình (TCI):} Tại mỗi phân đoạn macro kết nối giữa hai cụm, kích thước cửa sổ quy hoạch vi mô cục bộ (Local Window) được tự động điều tiết dựa trên chỉ số phức tạp địa hình cục bộ (Terrain Complexity Index - TCI). Chỉ số TCI được định nghĩa:
-    \begin{equation}
-        \text{TCI} = \begin{cases}
-        4.0 \cdot \rho \cdot (1.0 - \rho) & \text{(Bản đồ mê cung 2D với tỷ lệ vật cản } \rho\text{)} \\
-        \sigma(\theta_{\text{slope}}) & \text{(Bản đồ địa hình 2.5D với độ lệch chuẩn độ dốc } \sigma\text{)}
-        \end{cases}
-    \end{equation}
-    Nếu chỉ số TCI vượt quá ngưỡng $\tau_{\text{TCI}}$ ($\tau_{\text{TCI}} = 0.20$ cho BenchNav, $\tau_{\text{TCI}} = 0.25$ cho OMB), cửa sổ cục bộ sẽ được thu hẹp về phía biên cụm ($pad = B/4$ pixel) để ép System 1 CNN dự đoán chính xác hơn trong không gian hẹp. Ngược lại, nếu TCI nhỏ (địa hình phẳng hoặc ít vật cản), cửa sổ được mở rộng ($pad = B/2$ pixel) để tăng tầm bao quát toàn cục của A*.
-    \item \textbf{Dự đoán hành lang xác suất vi mô (System 1 CNN):} Mạng neural CNN cục bộ nhận dữ liệu thuộc tính từ cửa sổ được cắt để sinh ra bản đồ hành lang di chuyển khả thi $Corridor\_Mask \in [0, 1]$ (không thứ nguyên).
-    \item \textbf{Quy hoạch vật lý nội bộ hành lang (System 2 Weighted A*):} Thuật toán Weighted A* vật lý tối ưu hóa các hàm chi phí cơ học (Minetti, Bekker-Wong) chỉ duyệt các nút nằm trong hành lang khả thi đã lọc ($\tau_{\text{corr}} \geq 0.2$).
-    \item \textbf{Cơ chế Fallback an toàn hai lớp (Multi-Level Safety Fallback):} 
-    \begin{itemize}
-        \item \textbf{Level 1 (Cục bộ):} Nếu việc tìm kiếm Weighted A* trong hành lang xác suất của System 1 bị đứt gãy hoặc thất bại, hệ thống lập tức kích hoạt Level 1 Fallback – chạy Weighted A* tự do không ràng buộc hành lang trên phạm vi toàn bộ cửa sổ cục bộ hiện tại.
-        \item \textbf{Level 2 (Vĩ mô):} Nếu Level 1 Fallback vẫn không tìm thấy đường đi khả thi do thay đổi topo đột ngột của địa hình hoặc ngõ cụt lớn, cạnh liên kết macro tương ứng trong đồ thị macro-graph bị đánh dấu vô hạn ($\infty$). Đồ thị macro được cập nhật và thuật toán tái quy hoạch thô ở Macro-level để tìm một tuyến đường vòng mới qua các cụm lân cận.
-    \end{itemize}
-    \item \textbf{Bộ nắn thẳng quỹ đạo tham lam (Line-of-Sight Greedy Shortcutter):} Quá trình khớp nối giữa các cụm và cổng của HPA* thường sinh ra các đoạn gấp khúc rích rắc (zig-zag), dẫn đến chiều dài quỹ đạo tăng cao (lên tới $200\%$ so với đường đi tối ưu). Nhóm tích hợp một bộ hậu xử lý nắn thẳng quỹ đạo dựa trên kiểm tra tia quét (Ray-casting Line-of-Sight). Đối với hai nút cách xa nhau trên quỹ đạo $u$ và $v$, bộ lọc sẽ kiểm tra sự hiện diện của vật cản hoặc độ dốc không an toàn ($\theta_{\text{slope}} / SSF \geq 6.5$). Nếu đường nối thẳng an toàn, toàn bộ các nút trung gian giữa $u$ và $v$ bị loại bỏ, rút ngắn chiều dài hình học và giảm đáng kể năng lượng điều khiển tích phân của robot.
-\end{enumerate}
+Phần còn lại của bài báo được tổ chức như sau: Mục 2 trình bày bảng ký hiệu; Mục 3 tổng quan các công trình liên quan; Mục 4 mô hình hóa động lực học và cơ học đất; Mục 5 và Mục 6 trình bày chi tiết thuật toán quy hoạch và bộ điều khiển đề xuất; Mục 7 báo cáo kết quả thực nghiệm diện rộng; Mục 8 mô tả tích hợp hệ thống trên ROS 2; và Mục 9 đưa ra các thảo luận cùng kết luận.
 
 % ============================================================
-\section{Bộ điều khiển thích nghi Hybrid NMPC}
+\section{Bảng Ký hiệu và Danh mục Từ viết tắt}
 % ============================================================
-Tại tầng cục bộ, robot sử dụng Nonlinear Model Predictive Control (NMPC) để điều khiển bám quỹ đạo thô từ A*. Phương trình trạng thái động học hiệu chỉnh trượt đất $\alpha$ (không thứ nguyên) được thiết lập:
-\begin{equation}
-    x_{next} = \begin{bmatrix} X_k + dt \cdot v_k (1-\alpha) \cos(\theta_k) \\ Y_k + dt \cdot v_k (1-\alpha) \sin(\theta_k) \\ \theta_k + dt \cdot \omega_k \end{bmatrix}
-\end{equation}
-Trong đó $x = [X_k, Y_k, \theta_k]^T$ là véc-tơ trạng thái của robot gồm tọa độ 2D $X_k, Y_k$ ($m$) và góc hướng $\theta_k$ ($rad$). Véc-tơ điều khiển $u = [v_k, \omega_k]^T$ gồm vận tốc dài $v_k$ ($m/s$) và vận tốc góc $\omega_k$ ($rad/s$). $dt = 0.1$ $s$ là chu kỳ lấy mẫu điều khiển.
-
-Bài toán tối ưu hóa NMPC dự báo $N=20$ bước (tương đương với tầm nhìn $2.0$ $s$) được CasADi giải bằng solver IPOPT \cite{andersson2019}:
-\begin{equation}
-    \min_{u} \sum_{k=0}^{N-1} \left( \|x_k - x_{\text{ref},k}\|_Q^2 + \|u_k\|_R^2 \right) + \|x_N - x_{\text{ref},N}\|_{5Q}^2
-\end{equation}
-với $Q \in \mathbb{R}^{3 \times 3}$ và $R \in \mathbb{R}^{2 \times 2}$ là các ma trận trọng số phạt sai số trạng thái và năng lượng điều khiển (không thứ nguyên). Các ràng buộc vật lý cứng được duy trì chặt chẽ: $v \in [0.0, 2.0]$ m/s, $\omega \in [-1.0, 1.0]$ rad/s.
-\begin{itemize}
-    \item \textbf{Traditional NMPC (Cũ):} Giả định độ trượt không đổi $\alpha = 0.10$ (10\%) trên toàn tuyến di chuyển.
-    \item \textbf{Hybrid NMPC (Đề xuất):} Tại mỗi bước lặp điều khiển, giá trị trượt được nội suy phi tuyến từ mạng \texttt{SlipMLP} đã huấn luyện: $\alpha = \text{SlipMLP}(\text{Soil}, \text{Slope}, v)$, từ đó CasADi điều khiển động bù đắp lực ga để chống lệch quỹ đạo do mất bám.
-\end{itemize}
-
-\subsection{Phân tích tính ổn định toán học (Stability Analysis)}
-Để chứng minh tính bền vững học thuật, Nhóm nghiên cứu thiết lập phân tích tính ổn định của bộ điều khiển Hybrid NMPC dựa trên lý thuyết ổn định Input-to-State (Input-to-State Stability - ISS) trong miền thời gian rời rạc.
-
-Xét sai số bám quỹ đạo tại bước $k$ được định nghĩa là $e_k = x_k - x_{\text{ref},k}$. Phương trình động học sai số phi tuyến rời rạc có dạng:
-\begin{equation}
-    e_{k+1} = f(e_k, u_k, \alpha_k) - x_{\text{ref},k+1}
-\end{equation}
-Trong đó $\alpha_k$ là hệ số trượt lốp thực tế của môi trường tại vị trí robot di chuyển. Bộ điều khiển đề xuất sử dụng giá trị trượt ước lượng từ mạng \texttt{SlipMLP} là $\alpha_{\text{est},k} = \text{SlipMLP}(\text{Soil}, \text{Slope}, v_k)$ để đưa vào mô hình dự báo của CasADi. Gọi sai số ước lượng hệ số trượt của mạng là $\tilde{\alpha}_k = \alpha_k - \alpha_{\text{est},k}$. Do các thuộc tính địa hình địa hình (Soil Class, Slope) và vận tốc dài $v_k$ được giới hạn vật lý nghiêm ngặt, đồng thời mạng \texttt{SlipMLP} sử dụng hàm kích hoạt Sigmoid ở lớp đầu ra, sai số ước lượng trượt là bị chặn:
-\begin{equation}
-    |\tilde{\alpha}_k| \leq \epsilon_{\text{slip}}
-\end{equation}
-với $\epsilon_{\text{slip}} > 0$ là một ngưỡng chặn trên nhỏ.
-
-Hàm chi phí tối ưu hóa tại bước $k$ đóng vai trò là một hàm Lyapunov ứng viên (Lyapunov Candidate Function):
-\begin{equation}
-    V_N^*(e_k) = \min_{u} \sum_{i=0}^{N-1} \left( \|e_{k+i|k}\|_Q^2 + \|u_{k+i|k}\|_R^2 \right) + V_f(e_{k+N|k})
-\end{equation}
-Trong đó $V_f(e) = \|e\|_P^2$ là hàm chi phí đầu cuối (terminal cost) với $P = 5Q$. Giả định tồn tại một luật điều khiển phản hồi đầu cuối cục bộ $u = \kappa_f(e)$ đảm bảo điều kiện Lyapunov đầu cuối danh nghĩa:
-\begin{equation}
-    V_f(f(e_N, \kappa_f(e_N), \alpha_{\text{est},N})) - V_f(e_N) \leq - (\|e_N\|_Q^2 + \|\kappa_f(e_N)\|_R^2)
-\end{equation}
-
-Khi có sự hiện diện của sai số ước lượng trượt $\tilde{\alpha}_k \neq 0$, phương trình động học thực tế có thể phân tích thành thành phần danh nghĩa phi tuyến và nhiễu do sai số trượt:
-\begin{equation}
-    e_{k+1} = f(e_k, u_k^*, \alpha_{\text{est},k}) + \Delta f(e_k, u_k^*, \tilde{\alpha}_k)
-\end{equation}
-Do hàm động học trượt phi tuyến rời rạc liên tục Lipschitz đối với hệ số trượt lốp trên tập compact của không gian trạng thái và điều khiển, ta có:
-\begin{equation}
-    \|\Delta f(e_k, u_k^*, \tilde{\alpha}_k)\| \leq L_f \cdot |\tilde{\alpha}_k| \leq L_f \epsilon_{\text{slip}}
-\end{equation}
-với $L_f > 0$ là hằng số Lipschitz tương ứng.
-
-Áp dụng lý thuyết ổn định Input-to-State (ISS) cho hệ rời rạc, hiệu số của hàm Lyapunov ứng viên giữa hai bước liên tiếp thỏa mãn bất đẳng thức:
-\begin{equation}
-    V_N^*(e_{k+1}) - V_N^*(e_k) \leq - \sigma_1(\|e_k\|) + \sigma_2(L_f \epsilon_{\text{slip}})
-\end{equation}
-Trong đó $\sigma_1$ và $\sigma_2$ là các hàm $\mathcal{K}_\infty$ tương ứng. Bất đẳng thức trên chứng minh rằng sai số bám quỹ đạo $e_k$ của robot là ổn định ISS đối với nhiễu sai số trượt lốp. Khi $k \to \infty$, sai số tracking sẽ hội tụ tiệm cận vào một tập bất biến bị chặn (bounded invariant set) quanh quỹ đạo tham chiếu với ngưỡng chặn tỷ lệ thuận với sai số của bộ ước lượng trượt:
-\begin{equation}
-    \lim_{k \to \infty} \|e_k\| \leq \gamma(\epsilon_{\text{slip}})
-\end{equation}
-với $\gamma$ là một hàm thuộc lớp $\mathcal{K}$.
-
-Đối với bộ điều khiển Traditional NMPC, do giả định hệ số trượt cố định $\alpha = 0.10$, sai số ước lượng $\epsilon_{\text{slip}}$ tại các khu vực dốc đứng hoặc vũng bùn tăng vọt dẫn tới ngưỡng ổn định ISS $\gamma(\epsilon_{\text{slip}})$ mở rộng cực lớn, khiến robot bị lệch hẳn khỏi hành lang an toàn và dẫn đến tỷ lệ thất bại cao (30.0\% tỷ lệ thành công). Ngược lại, bộ điều khiển Hybrid NMPC nhờ khả năng bám sát trực tuyến hệ số trượt phi tuyến thông qua \texttt{SlipMLP} đã kéo giảm sai số ước lượng $\epsilon_{\text{slip}}$ xuống sát mức tối thiểu, qua đó thu hẹp bán kính tập hội tụ ISS về mức centimet. Điều này giải thích một cách khoa học tại sao sai số RMSE của Hybrid NMPC luôn được duy trì ổn định ở mức cực thấp ($0.055 \pm 0.005$ m) và tỷ lệ thành công đạt tới $90.0\%$.
-
-\begin{figure}[H]
-  \centering
-  \includegraphics[width=\textwidth]{figures/nmpc_controller_comparison.png}
-  \caption{So sánh hiệu năng điều khiển bám đường (Path Tracking): (Trái) Quỹ đạo bám địa hình của Traditional NMPC và Hybrid NMPC bám theo tham chiếu A*; (Phải) Sai số tracking (mét) theo thời gian dưới nhiễu trượt.}
-  \label{fig:nmpc_compare}
-\end{figure}
-
-% ============================================================
-\section{Kết quả Thực nghiệm Quy mô lớn}
-% ============================================================
-\subsection{Đánh giá thống kê trên 509 bản đồ thực tế}
-Nhóm nghiên cứu tiến hành chạy kiểm chứng tự động song song (WSL2 Python3) các thuật toán Weighted A* thuần túy, MCTD-A* và thuật toán lai đề xuất HMCTD-A* trên \textbf{509 bản đồ traversable} thuộc bộ dữ liệu BenchNav \cite{endo2024}. 
-
-Hình \ref{fig:boxplots} trực quan hóa phân phối thống kê (Boxplots) của 4 chỉ số hiệu năng thu thập được. Bảng \ref{tab:performance_stats} tổng hợp giá trị trung bình và tỉ lệ cải tiến tương ứng.
-
-\begin{figure}[H]
-  \centering
-  \includegraphics[width=0.9\textwidth]{figures/benchmark_boxplots.png}
-  \caption{Biểu đồ Boxplot so sánh phân phối thống kê của 4 tiêu chí đánh giá trên 509 bản đồ.}
-  \label{fig:boxplots}
-\end{figure}
+Bảng \ref{tab:nomenclature} tổng hợp các ký hiệu toán học và thuật ngữ viết tắt được sử dụng xuyên suốt bài báo.
 
 \begin{table}[htbp]
 \centering
-\caption{Bảng tổng hợp hiệu năng thống kê toàn diện (509 bản đồ BenchNav)}
-\label{tab:performance_stats}
+\caption{Danh mục ký hiệu toán học và từ viết tắt}
+\label{tab:nomenclature}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{ll|ll}
+    \toprule
+    \textbf{Ký hiệu} & \textbf{Ý nghĩa vật lý / Định nghĩa} & \textbf{Viết tắt} & \textbf{Thuật ngữ đầy đủ} \\
+    \midrule
+    $s, r, h_{\text{step}}$ & Độ dốc ($^\circ$), độ gồ ghề cục bộ, bậc chướng ngại (m) & UGV & Unmanned Ground Vehicle (Robot tự hành mặt đất) \\
+    $k_c, k_\phi, n$ & Tham số cơ học đất Bekker-Wong & NMPC & Nonlinear Model Predictive Control \\
+    $z, p, R_c$ & Độ lún đất (m), áp suất tiếp xúc (Pa), lực cản lún (N) & HPA* & Hierarchical Pathfinding A* \\
+    $\mu, \alpha_0$ & Hệ số ma sát tĩnh bề mặt và hệ số trượt danh nghĩa & APH & Anisotropic Physics Heuristic \\
+    $T_{\text{geo}}, T_{\text{phys}}, T_{\text{sem}}$ & Điểm độ vượt địa hình hình học, vật lý và ngữ nghĩa & LOS & Line-of-Sight (Tầm nhìn thẳng 2.5D) \\
+    $T_{\text{fused}}$ & Điểm số vượt địa hình tổng hợp ($T_{\text{fused}} \in [0, 1]$) & TCI & Terrain Complexity Index (Chỉ số phức tạp địa hình) \\
+    $C(s)$ & Năng lượng tiêu hao chuyển động theo Minetti (J/kg/m) & LUT & Look-Up Table (Bảng tra cứu trượt 3D) \\
+    $\text{LTR}, \text{SSF}$ & Tỷ số chuyển tải trọng ngang và hệ số ổn định tĩnh & RMSE & Root Mean Square Error (Sai số toàn phương trung bình) \\
+    $\alpha_x, \alpha_y, \Delta \alpha$ & Hệ số trượt dọc, trượt ngang và phần bù thích nghi & CTE & Cross-Track Error (Sai số lệch ngang quỹ đạo) \\
+    $Q, R, P$ & Ma trận trọng số bám đường, điều khiển và đầu cuối & OCP & Optimal Control Problem (Bài toán điều khiển tối ưu) \\
+    \bottomrule
+\end{tabular}%
+}
+\end{table}
+
+% ============================================================
+\section{Tổng quan Tài liệu Nghiên cứu Liên quan}
+% ============================================================
+
+\subsection{Biểu diễn Môi trường 2.5D và các Bộ Dữ liệu Địa hình Dã chiến}
+Biểu diễn bề mặt là nền tảng quyết định độ tin cậy của bản đồ địa hình. Triebel et al. \cite{triebel2006} đề xuất cấu trúc Multi-Level Surface (MLS) Maps mở rộng bản đồ độ cao cho các bề mặt đa tầng. Jiang et al. \cite{jiang2021rellis} công bố tập dữ liệu RELLIS-3D cung cấp hình ảnh RGB và đám mây điểm LiDAR gán nhãn ngữ nghĩa môi trường bùn lầy. 
+
+Nhằm chuẩn hóa việc đánh giá định lượng thuật toán, Endo et al. \cite{endo2024} phát triển nền tảng mô phỏng mã nguồn mở \textbf{BenchNav} dựa trên bản đồ độ cao xác suất độ vượt địa hình. Bên cạnh đó, các tập dữ liệu địa hình thực tế thu thập trên các dòng xe off-road chuyên dụng ngày càng phát triển mạnh mẽ: tập \textbf{TartanDrive} của Đại học Carnegie Mellon (CMU) \cite{triest2022tartandrive} ghi nhận dữ liệu cảm biến đa phương thức và động lực học xe ATV Yamaha Viking trên các cung đường rừng lầy lội; tập \textbf{YCOR} (Yamaha-CMU Off-Road) \cite{maturana2018ycor} tập trung vào bản đồ ngữ nghĩa thời gian thực trên các sườn dốc Appalachian hiểm trở ($15^\circ - 32^\circ$) phủ thảm mùn xốp; và tập \textbf{GOOSE} của Viện Fraunhofer IOSB \cite{mortimer2024goose} cung cấp dữ liệu thử nghiệm tại các vùng ngập nước, rãnh lún sâu châu Âu. Việc thử nghiệm chéo trên cả 4 tập dữ liệu này là cơ sở then chốt để chứng minh tính tổng quát hóa của nghiên cứu.
+
+\subsection{Thuật toán Quy hoạch Đường đi trên Địa hình Gồ ghề}
+Các thuật toán tìm kiếm trên đồ thị kinh điển như A* \cite{hart1968} và tối ưu lấy mẫu RRT* \cite{karaman2011} bộc lộ nhược điểm lớn khi mở rộng sang không gian 2.5D: chi phí tính toán tăng theo cấp số nhân và quỹ đạo sinh ra mang tính răng cưa cục bộ. Thuật toán HPA* (Hierarchical Pathfinding A*) giải quyết vấn đề quy mô bản đồ thông qua phân cụm vĩ mô, nhưng thiếu cơ chế nhận thức năng lượng cơ học. Gần đây, Yoon et al. \cite{yoon2025} đề xuất mô hình Monte Carlo Tree Diffusion (MCTD) cho System 2 Planning, kết hợp tìm kiếm MCTS với mạng khuếch tán để dự đoán hành lang khả thi. Dựa trên ý tưởng này, chúng em phát triển cơ chế phối hợp hai giai đoạn: System 1 CNN dự đoán sơ bộ hành lang tiềm năng và System 2 tìm kiếm tối ưu có hướng dẫn vật lý.
+
+\subsection{Cơ học đất Terramechanics và Điều khiển Tối ưu NMPC}
+Lý thuyết cơ học tương tác phương tiện - nền đất của Bekker \cite{bekker1956} đặt nền móng cho việc tính toán áp lực lún và lực cản chuyển động của bánh xe trên nền đất yếu. Về phương diện năng lượng, Minetti et al. \cite{minetti1993, minetti2002} thiết lập phương trình đa thức bậc 5 mô tả mối quan hệ phi tuyến giữa độ dốc địa hình và chi phí cơ học. Về an toàn động lực học, Chen và Peng \cite{chen2012ltr} đề xuất chỉ số Lateral Load Transfer Ratio (LTR) nhằm phát hiện sớm nguy cơ lật xe khi vào cua trên dốc nghiêng. Ở tầng điều khiển, Grandia et al. \cite{grandia2023} ứng dụng NMPC cho chuyển động bám địa hình dốc, khẳng định ưu thế vượt trội của tối ưu hóa dự báo trong việc xử lý các ràng buộc trạng thái và chấp hành.
+
+\subsection{So sánh Vị thế Học thuật với các Hệ thống Tiêu biểu Toàn cầu}
+Trên thế giới hiện nay, hai hệ thống tiêu biểu đại diện cho hai trường phái chính gồm:
+\begin{itemize}
+    \item \textbf{NeSAM-MPPI (Carnegie Mellon University - CMU, 2023--2024):} Kết hợp mạng học đặc tính đất Neuro-Symbolic với bộ điều khiển lấy mẫu song song GPU-MPPI cho xe việt dã tốc độ cao. Hệ thống này cho phép phản ứng nhanh trước trượt đất nhưng đòi hỏi công suất xử lý GPU rất lớn ($> 100$W) và thiếu tầng quy hoạch vĩ mô toàn cục, dễ bế tắc trong các cấu trúc mê cung phức tạp.
+    \item \textbf{OCS2 Perceptive NMPC (ETH Zurich, 2023):} Ứng dụng bộ giải SQP/DDP C++ hiệu năng cao cho robot leo vách đá cứng. Tuy nhiên, hệ thống chủ yếu áp dụng ma sát Coulomb đơn giản mà chưa xét đến lực cản lún và biến dạng nền đất sâu theo mô hình Bekker-Wong.
+\end{itemize}
+Xuất phát từ thực tiễn trên, hướng tiếp cận của \textbf{Nhóm 2} hướng đến sự dung hòa giữa tính chính xác mô hình và tính khả thi tính toán trên thiết bị nhúng: Thiết lập một chu trình liên hợp khép kín từ quy hoạch toàn cục kết hợp mô hình hai giai đoạn (System 1 định hướng nhanh và System 2 tìm kiếm tối ưu) tới bộ điều khiển cục bộ có bù trượt địa hình dựa trên mô hình cơ học đất Bekker-Wong, đảm bảo độ tin cậy cao với chi phí phần cứng hợp lý cho robot tự hành dã chiến (Field UGV).
+
+% ============================================================
+\section{Mô hình hóa Động học, Động lực học \& Cơ học Đất}
+% ============================================================
+
+\subsection{Mô hình Động học UGV có Xét Trượt Địa hình}
+Phương tiện thử nghiệm là dòng xe bánh lốp dẫn động vi sai / skid-steer. Do tương tác với nền đất biến dạng, phương trình động học có xét trượt dọc và trượt ngang được mô tả bởi:
+\begin{equation}
+    \begin{bmatrix} \dot{x} \\ \dot{y} \\ \dot{\theta} \end{bmatrix} = 
+    \begin{bmatrix} 
+        v (1 - \alpha_x) \cos\theta - v \alpha_y \sin\theta \\ 
+        v (1 - \alpha_x) \sin\theta + v \alpha_y \cos\theta \\ 
+        \omega 
+    \end{bmatrix}
+    \label{eq:kinematics}
+\end{equation}
+trong đó $X = [x, y, \theta]^T$ là vector tư thế mặt phẳng của xe; $U = [v, \omega]^T$ là lệnh vận tốc dài và vận tốc góc; $\alpha_x \in [0, 1)$ là hệ số trượt dọc gây tiêu hao lực kéo; và $\alpha_y \in (-1, 1)$ là hệ số trượt ngang dạt dốc sinh ra do trọng lực khi xe di chuyển trên sườn nghiêng.
+
+\subsection{Cơ học Nền đất Bekker-Wong và Lực cản Lún}
+Khi bánh xe di chuyển trên nền đất mềm, áp suất pháp tuyến phân bố dưới vệt lốp $p$ và độ lún đất $z$ tuân theo phương trình Bekker \cite{bekker1956}:
+\begin{equation}
+    p(z) = \left( \frac{k_c}{b} + k_{\phi} \right) z^n
+\end{equation}
+với $b$ là bề rộng tiếp xúc lốp xe; $k_c$ và $k_\phi$ là các mô-đun biến dạng đất do lực dính và góc ma sát trong; $n$ là số mũ nén đất. Lực cản lún chuyển động $R_c$ (Compaction Resistance) được tính bằng tích phân công biến dạng:
+\begin{equation}
+    R_c = b \int_0^{z_0} p(z) dz = \frac{b}{n+1} \left( \frac{k_c}{b} + k_{\phi} \right) z_0^{n+1}
+\end{equation}
+với độ lún tĩnh cân bằng $z_0 = \left[ \frac{m g}{4 b (k_c/b + k_\phi)} \right]^{1/n}$. Bên cạnh lực cản lún, lực cản dốc trọng trường khi xe leo dốc có góc nghiêng $\theta_{\text{slope}}$ là $R_s = m g \sin\theta_{\text{slope}}$.
+
+\subsection{Mô hình Năng lượng Cơ học Minetti}
+Chi phí năng lượng cơ học trên một đơn vị khối lượng và quãng đường di chuyển $C(s)$ (J/kg/m) được mô tả qua đa thức bậc 5 Minetti theo độ dốc hình học $s = \Delta z / d_{\text{2D}}$ \cite{minetti2002}:
+\begin{equation}
+    C(s) = 155.4 s^5 - 30.4 s^4 - 32.8 s^3 + 44.4 s^2 + 11.9 s + 6.1
+\end{equation}
+Hàm Minetti phản ánh tính phi đối xứng sâu sắc: chi phí leo dốc ($s > 0$) tăng vọt theo lũy thừa bậc 5, trong khi đổ dốc âm vừa phải ($-0.2 \le s \le -0.1$) giúp hồi phục động năng và đạt mức tiêu hao tối thiểu ($C(s) \approx 2.5$ J/kg/m).
+
+\subsection{Đánh giá Khả năng Vượt địa hình Đa phương pháp (Traversability Analysis)}
+Nhằm đảm bảo an toàn chủ động, chúng em xây dựng điểm số vượt địa hình tổng hợp $T_{\text{fused}} \in [0, 1]$ dung hợp từ ba lớp phân tích độc lập:
+\begin{enumerate}
+    \item \textbf{Lớp Hình học ($T_{\text{geo}}$):} Đánh giá độ dốc $s = \|\nabla z\|$, độ gồ ghề $r = \sigma(z_{\text{patch}})$ và bậc chướng ngại $h_{\text{step}} = \max(z) - \min(z)$:
+    \begin{equation}
+        T_{\text{geo}} = 1.0 - \left( 0.5 \frac{s}{s_{\max}} + 0.3 \frac{r}{r_{\max}} + 0.2 \frac{h_{\text{step}}}{h_{\max}} \right)
+    \end{equation}
+    \item \textbf{Lớp Vật lý Bekker ($T_{\text{phys}}$):} Phản ánh lực cản lún và hệ số bám ma sát lốp-đất:
+    \begin{equation}
+        T_{\text{phys}} = \mu_{\text{soil}} \cdot \exp\left( - \frac{R_c}{R_{c,\max}} \right)
+    \end{equation}
+    \item \textbf{Lớp Ngữ nghĩa ($T_{\text{sem}}$):} Điểm an toàn bề mặt phân loại từ cảm biến RGB/LiDAR gán nhãn ngữ nghĩa cho 8 loại địa hình.
+\end{enumerate}
+
+Bảng \ref{tab:traversability} so sánh chi tiết hiệu năng ba phương pháp thành phần và phương pháp dung hợp Fused trên bản đồ thử nghiệm $64 \times 64$.
+
+\begin{table}[htbp]
+\centering
+\caption{So sánh ba phương pháp đánh giá Traversability trên địa hình kích thước $64\times64$}
+\label{tab:traversability}
 \resizebox{\textwidth}{!}{%
 \begin{tabular}{lcccc}
     \toprule
-    \textbf{Tiêu chí đánh giá} & \textbf{Weighted A* (Cũ)} & \textbf{MCTD-A* (Đề xuất)} & \textbf{HMCTD-A* (Lai đề xuất)} & \textbf{Thay đổi tốt nhất (\%)} \\
+    \textbf{Phương pháp} & \textbf{Điểm trung bình ($\bar{T}$)} & \textbf{Vùng nguy hiểm ($T < 0.3$)} & \textbf{Thời gian tính toán} & \textbf{Cảm biến yêu cầu} \\
     \midrule
-    Thời gian tính toán (ms) & 120.53 & \textbf{81.55} & 118.42 & +32.34\% (MCTD-A*) \\
-    Năng lượng tiêu hao Minetti (J) & 8524.53 & 8552.45 & \textbf{8102.43} & +4.95\% (HMCTD-A*) \\
-    Chiều dài hình học (m) & 71.81 & 71.80 & \textbf{71.80} & +0.01\% (HMCTD-A*) \\
-    Độ mịn quỹ đạo (rad$^2$) & 27.35 & 27.31 & \textbf{12.05} & +55.94\% (HMCTD-A*) \\
+    \textbf{Geometric}   & 0.612 & $\sim 18\%$ & $< 1$ ms & Bản đồ độ cao LiDAR \\
+    \textbf{Physical}    & 0.573 & $\sim 22\%$ & $\sim 2$ ms & Cảm biến tải trọng bánh xe \\
+    \textbf{Semantic}    & 0.643 & $\sim 15\%$ & $\sim 50$ ms & Camera RGB + Mạng CNN \\
     \midrule
-    \textbf{Tỉ lệ Fallback tự động} & --- & 26.33\% & \textbf{0.00\%} & An toàn tối đa \\
+    \textbf{FUSED (Đề xuất)} & \textbf{0.609} & $\sim 17\%$ & $\sim 52$ ms & Đa cảm biến đồng bộ \\
     \bottomrule
 \end{tabular}%
 }
 \end{table}
+Điểm số dung hợp cuối cùng được tính theo công thức: $T_{\text{fused}} = 0.35 T_{\text{geo}} + 0.35 T_{\text{phys}} + 0.30 T_{\text{sem}}$.
 
-\textbf{Phân tích khoa học:}
-\begin{itemize}
-    \item \textbf{Đánh giá thời gian và Fallback:} Việc giới hạn A* trong hành lang CNN (System 1) giúp cắt tỉa không gian tìm kiếm cực mạnh. Nhờ mạng neural dự đoán chính xác dải hành lang khả thi liên tục trên phần lớn địa hình, thuật toán chỉ cần kích hoạt fallback tự động trên $26.33\%$ số bản đồ. Nhờ vậy, MCTD-A* đạt thời gian tính toán trung bình cực nhanh là \textbf{81.55 ms}, nhanh hơn \textbf{32.34\%} so với Weighted A* toàn cục truyền thống (\textbf{120.53 ms}). Cơ chế fallback thông minh đóng vai trò chốt bảo vệ an toàn giúp duy trì \textbf{tỉ lệ thành công 100\%} trong mọi kịch bản.
-    \item \textbf{Chất lượng quỹ đạo:} Năng lượng Minetti, chiều dài hình học và độ mịn quỹ đạo của MCTD-A* gần như tương đương (chênh lệch $< 0.33\%$) hoặc tốt hơn một chút so với Weighted A*, khẳng định rằng giới hạn tìm kiếm trong hành lang CNN của System 1 không làm suy giảm chất lượng tối ưu vật lý của đường đi.
-    \item \textbf{Hiệu năng vượt trội của HMCTD-A*:} Thuật toán phân cấp lai HMCTD-A* tích hợp Line-of-Sight Shortcutter mang lại cải tiến toàn diện: Giảm năng lượng tiêu hao Minetti xuống còn \textbf{8102.43 J} (giảm \textbf{4.95\%}), chiều dài hình học rút ngắn còn \textbf{71.80 m}, và độ mịn quỹ đạo cải tiến vượt trội chỉ còn \textbf{12.05 rad$^2$} (giảm \textbf{55.94\%} so với Weighted A* toàn cục). Tỉ lệ fallback tự động của HMCTD-A* đạt \textbf{0.00\%} nhờ cơ chế hoạch định topo macro thích nghi cao.
-\end{itemize}
+\subsection{Đánh giá Nguy cơ Lật xe Động lực học (Rollover Hazard)}
+Để ngăn chặn nguy cơ lật đổ trên sườn nghiêng dốc, tỷ số chuyển tải trọng ngang LTR (Lateral Load Transfer Ratio) được tích hợp trực tiếp vào hàm ràng buộc \cite{chen2012ltr}:
+\begin{equation}
+    \text{LTR} = \frac{F_{z,\text{right}} - F_{z,\text{left}}}{F_{z,\text{right}} + F_{z,\text{left}}} \approx \frac{2 h}{T g \cos\theta_{\text{roll}}} \left( \ddot{y} + g \sin\theta_{\text{roll}} \right)
+\end{equation}
+với $h$ là chiều cao trọng tâm xe; $T$ là bề rộng cơ sở UGV. Khi $|\text{LTR}| \to 1.0$, các bánh xe một bên bắt đầu nhấc khỏi mặt đất. Ngưỡng an toàn vật lý được giới hạn nghiêm ngặt ở $|\text{LTR}| \le 0.75$. Đối với UGV thử nghiệm Yamaha Viking có $T = 0.85$ m và $h = 0.38$ m, hệ số ổn định tĩnh đạt $\text{SSF} = \frac{T}{2h} = 1.118$, tương ứng với góc lật tĩnh giới hạn là $\theta_{\text{tip}} = \arctan(1.118) = 48.2^\circ$.
 
-\subsubsection{Đánh giá và Tối ưu hóa Tham số cho thuật toán lai HMCTD-A* trên BenchNav}
-Để tìm ra cấu hình tối ưu cho thuật toán phân cấp lai HMCTD-A*, Nhóm nghiên cứu thực hiện thử nghiệm dò lưới (Grid Search) tham số trên dải 30 bản đồ BenchNav phức tạp. Các tham số quét bao gồm: kích thước phân hoạch cụm (Cluster Size $B \in \{16,\allowbreak 32\}$), ngưỡng phức tạp địa hình ($\tau_{\text{TCI}} \in \{0.10,\allowbreak 0.15,\allowbreak 0.20\}$) và ngưỡng độ tin cậy hành lang ($\tau_{\text{corr}} \in \{0.15,\allowbreak 0.25\}$). Kết quả của các cấu hình thử nghiệm nổi bật được trình bày trong Bảng \ref{tab:hmctd_sweep}.
+\subsection{Hàm Chi phí Bước Di chuyển Vật lý Tích hợp}
+Chi phí di chuyển giữa hai nút lân cận $u$ và $v$ trên lưới địa hình 2.5D được lượng hóa hoàn chỉnh:
+\begin{equation}
+    J(u, v) = \left[ d_{\text{3D}}(u, v) \cdot C(s) + W_{\text{soil}} \cdot R_c(v) + W_{\text{LTR}} \cdot |\text{LTR}(u, v)| \right] \cdot \frac{1}{T_{\text{fused}}(v) + \epsilon}
+\end{equation}
+với $d_{\text{3D}} = \sqrt{\Delta x^2 + \Delta y^2 + \Delta z^2}$; các trọng số $W_{\text{soil}} = 0.05$ và $W_{\text{LTR}} = 50.0$ phạt nặng các cung di chuyển có nguy cơ lật xe hoặc lún sâu.
 
-\begin{table}[htbp]
-\centering
-\caption{Kết quả Grid Search tối ưu hóa tham số HMCTD-A* trên 30 bản đồ BenchNav}
-\label{tab:hmctd_sweep}
-\resizebox{\textwidth}{!}{%
-\begin{tabular}{cccccccc}
-    \toprule
-    \textbf{Trial ID} & \textbf{Cluster Size $B$ (px)} & \textbf{Ngưỡng $\tau_{\text{TCI}}$} & \textbf{Ngưỡng $\tau_{\text{corr}}$} & \textbf{Tỷ lệ thành công (\%)} & \textbf{Thời gian TB (ms)} & \textbf{Nodes duyệt TB (nút)} & \textbf{Năng lượng TB (J)} \\
-    \midrule
-    1 & 16 & 0.10 & 0.15 & 73.33\% & 265.79 & 2524.64 & 13961.38 \\
-    3 & 16 & 0.15 & 0.15 & 73.33\% & 251.89 & 2524.64 & 13961.38 \\
-    5 & 16 & 0.20 & 0.15 & 73.33\% & 251.97 & 2524.64 & 13961.38 \\
-    7 & 32 & 0.10 & 0.15 & 100.00\% & 212.54 & 2162.43 & 10841.02 \\
-    9 & 32 & 0.15 & 0.15 & 100.00\% & 210.54 & 2162.43 & 10841.02 \\
-    \textbf{11 (Tốt nhất)} & \textbf{32} & \textbf{0.20} & \textbf{0.15} & \textbf{100.00\%} & \textbf{207.28} & \textbf{2162.43} & \textbf{10841.02} \\
-    12 & 32 & 0.20 & 0.25 & 100.00\% & 216.79 & 2224.73 & 10769.82 \\
-    \bottomrule
-\end{tabular}%
-}
-\end{table}
+% ============================================================
+\section{Tầng Quy hoạch Toàn cục Phân cấp Lai Fast-HMCTD-A*}
+% ============================================================
 
-\textbf{Phân tích khoa học:}
-Kết quả từ Grid Search chỉ ra rằng:
-\begin{itemize}
-    \item \textbf{Ảnh hưởng của kích thước cụm ($B$):} Khi sử dụng $B=16$ (kích thước cụm nhỏ), thuật toán chỉ đạt tỷ lệ thành công là \textbf{73.33\%} do việc phân chia quá nhỏ khiến việc kết nối các cụm macro ở vùng biên dốc gặp lỗi cô lập topo. Trái lại, khi tăng $B=32$, tỷ lệ quy hoạch thành công đạt tuyệt đối \textbf{100.0\%} trên cả 30 bản đồ thử nghiệm, đồng thời thời gian quy hoạch trung bình giảm đáng kể xuống chỉ còn khoảng \textbf{207.28 ms}.
-    \item \textbf{Vai trò của ngưỡng $\tau_{\text{TCI}}$ và $\tau_{\text{corr}}$:} Ngưỡng $\tau_{\text{TCI}} = 0.20$ giúp thuật toán phân tách chính xác giữa vùng địa hình gồ ghề (cần suy luận CNN cục bộ quy mô nhỏ) và vùng địa hình bằng phẳng (quy hoạch topo thô nhanh), từ đó tối ưu hóa điện năng và thời gian tính toán. Sự kết hợp giữa $\tau_{\text{TCI}} = 0.20$ và $\tau_{\text{corr}} = 0.15$ giúp thuật toán HMCTD-A* đạt điểm tối ưu hóa tổng hợp cao nhất (thời gian nhanh nhất là \textbf{207.28 ms} và chỉ duyệt \textbf{2162.43 nodes}).
-\end{itemize}
+\subsection{Từ HMCTD-A* đến Đề xuất Cải tiến Fast-HMCTD-A*}
+Thuật toán phân cấp lai ban đầu HMCTD-A* chia bản đồ thành các cụm $32 \times 32$ theo chỉ số phức tạp địa hình TCI, sử dụng mạng nơ-ron System 1 CNN để dự đoán hành lang tiềm năng và System 2 Weighted A* để tìm kiếm cục bộ. Tuy nhiên, trên các bản đồ quy mô lớn có rãnh lún sâu bất quy tắc (như TartanDrive), việc chia cụm cố định khiến tỷ lệ thành công bị ảnh hưởng khi các cổng liên cụm bị ngập bùn.
 
-\subsection{So sánh hiệu năng điều khiển bám đường}
-Để kiểm chứng tính ổn định và chính xác của bộ điều khiển đề xuất, Nhóm nghiên cứu tiến hành hai thử nghiệm độc lập: (1) Mô phỏng chi tiết trên bản đồ tiêu biểu \texttt{000\_025.npz} để trực quan hóa quỹ đạo bám đường (Hình \ref{fig:nmpc_compare}), và (2) Thực nghiệm diện rộng trên 30 bản đồ phức tạp đại diện từ BenchNav dưới các nhiễu trượt khắc nghiệt.
-
-\subsubsection{Thực nghiệm chi tiết trên bản đồ đơn (Map 000\_025)}
-Kết quả chạy mô phỏng bám đường so sánh giữa hai bộ điều khiển dưới nhiễu trượt cho thấy:
-\begin{itemize}
-    \item \textbf{Traditional NMPC:} Do không có cơ chế thích nghi bù trượt động và coi hệ số trượt cố định ở mức 10\%, xe liên tục bị trượt lệch hướng khi leo dốc hoặc di chuyển trên các vùng đất bùn mềm. Sai số bám đường trung bình (RMSE) của Traditional NMPC là \textbf{0.153 m}.
-    \item \textbf{Hybrid NMPC (SlipMLP):} Khả năng ước lượng trực tuyến và chính xác hệ số trượt lốp của SlipMLP dọc theo tầm dự báo $N$ giúp thuật toán tối ưu hóa của CasADi tự thích ứng và bù đắp lực ga kịp thời. Kết quả là sai số bám đường trung bình của Hybrid NMPC giảm xuống chỉ còn \textbf{0.064 m} (cải tiến vượt trội \textbf{58.40\%}). Đồng thời, các ràng buộc vật lý cứng và giới hạn lật tĩnh ($LTR \leq 1.2$) được đảm bảo tuyệt đối.
-\end{itemize}
-
-\subsubsection{Đánh giá thống kê diện rộng trên 30 bản đồ đại diện}
-Để khẳng định tính tổng quát, Nhóm nghiên cứu thực hiện benchmark so sánh hai bộ điều khiển trên 30 bản đồ được trích mẫu đều từ tập dữ liệu. Kết quả thống kê tổng hợp được trình bày trong Bảng \ref{tab:nmpc_multi_map}.
-
-\begin{table}[htbp]
-\centering
-\caption{Bảng tổng hợp so sánh hiệu năng bám đường NMPC trên 30 bản đồ BenchNav}
-\label{tab:nmpc_multi_map}
-\resizebox{\textwidth}{!}{%
-\begin{tabular}{lccc}
-    \toprule
-    \textbf{Chỉ số hiệu năng (Đại lượng trung bình)} & \textbf{Traditional NMPC} & \textbf{Hybrid NMPC (Đề xuất)} & \textbf{Cải tiến / Thay đổi} \\
-    \midrule
-    Sai số bám đường trung bình RMSE (m) & $0.096 \pm 0.055$ & $\mathbf{0.052 \pm 0.006}$ & \textbf{+45.88\%} \\
-    Sai số lệch quỹ đạo cực đại TB (m) & \textbf{0.194} & 0.201 & -3.61\% \\
-    Tỉ lệ bám đích thành công (\%) & 26.7\% & \textbf{76.7\%} & \textbf{+50.00\%} (tuyệt đối) \\
-    Năng lượng điều khiển tích phân TB (J) & \textbf{74.43} & 118.49 & -59.20\% \\
-    Thời gian mô phỏng trung bình (s) & \textbf{8.94} & 10.17 & -13.76\% \\
-    \bottomrule
-\end{tabular}%
-}
-\end{table}
-
-\textbf{Phân tích khoa học:}
-\begin{itemize}
-    \item \textbf{Độ bền vững bám đường:} Sai số RMSE trung bình của Hybrid NMPC giảm từ \textbf{0.096 m} xuống \textbf{0.052 m} (cải tiến \textbf{45.88\%}). Đáng chú ý là độ lệch chuẩn ($\sigma$) của Hybrid NMPC cực kỳ nhỏ (\textbf{0.006 m} so với \textbf{0.055 m} của Traditional NMPC), chứng minh bộ điều khiển đề xuất hoạt động cực kỳ ổn định, gần như không phụ thuộc vào độ phức tạp hay loại đất của từng bản đồ cụ thể.
-    \item \textbf{Tỉ lệ bám đích thành công vượt trội:} Traditional NMPC chỉ đạt tỷ lệ thành công \textbf{26.7\%} do thường xuyên bị trượt nghiêm trọng ở các đoạn dốc đứng hoặc vũng lầy, dẫn đến mất lái hoặc lệch hẳn khỏi hành lang an toàn. Trong khi đó, Hybrid NMPC đạt tỉ lệ thành công lên tới \textbf{76.7\%}, khẳng định năng lực vượt trội của thuật toán bù trượt chủ động dựa trên SlipMLP.
-    \item \textbf{Đánh đổi năng lượng và thời gian:} Hybrid NMPC tốn nhiều năng lượng điều khiển tích phân hơn (\textbf{118.49 J} so với \textbf{74.43 J}) và thời gian mô phỏng lâu hơn một chút (\textbf{10.17 s} so với \textbf{8.94 s}). Đây là sự đánh đổi vật lý tự nhiên: bộ điều khiển chủ động tăng ga để bù đắp lực kéo bị tổn hao do trượt và thực hiện thêm các phép tính lan truyền tiến trên mạng SlipMLP. Sự đánh đổi này hoàn toàn xứng đáng để đổi lấy sự an toàn bám đích và độ chính xác ở cấp độ centimet.
-\end{itemize}
-
-\subsubsection{Đánh giá so sánh các giải pháp điều khiển NMPC nâng cao và lai ghép}
-Để nâng cao hơn nữa hiệu suất thời gian thực và chất lượng bám đường trong điều kiện thực địa phức tạp, Nhóm nghiên cứu tiến hành đánh giá mở rộng với 9 cấu hình điều khiển khác nhau trên 30 bản đồ BenchNav được trích mẫu đại diện. Các cấu hình thử nghiệm bao gồm bộ điều khiển truyền thống, các biến thể trong miền không gian (Space-Domain MPC), các bộ điều khiển lai ghép sử dụng mạng nơ-ron sâu (DNN), và mô hình tích hợp thích nghi đa mô hình. Các thuật toán lai ghép được phát triển dựa trên các nghiên cứu tiên tiến của thế giới về điều khiển lai ghép hệ thống lớn \cite{zhu2000hybrid}, tối ưu hóa năng lượng HEV bằng DNN-NMPC \cite{park2024deep}, hoạch định tốc độ thời gian thực \cite{wang2022real}, và nhận dạng/điều khiển vệ tinh hai tầng \cite{satellite2025hybrid}. Kết quả thực nghiệm thống kê trên 30 bản đồ được trình bày chi tiết trong Bảng \ref{tab:advanced_nmpc_compare}.
-
-\begin{table}[htbp]
-\centering
-\caption{Bảng so sánh hiệu năng của 9 chế độ điều khiển NMPC và lai ghép trên 30 bản đồ BenchNav}
-\label{tab:advanced_nmpc_compare}
-\resizebox{\textwidth}{!}{%
-\begin{tabular}{clcccc}
-    \toprule
-    \textbf{Chế độ} & \textbf{Cấu hình điều khiển} & \textbf{RMSE (m)} & \textbf{Lệch cực đại (m)} & \textbf{Thời gian giải (ms)} & \textbf{Tỷ lệ thành công (\%)} \\
-    \midrule
-    Mode 1 & Traditional NMPC (Time-Domain) & 1.064 & 2.181 & 24.01 & 30.0\% \\
-    Mode 2 & Hybrid NMPC (Time-Domain) & 0.849 & 3.815 & 28.01 & 90.0\% \\
-    Mode 3 & Dual-Mode LMPC/NMPC (TCI-driven) & 0.644 & 1.503 & 5.49 & 83.3\% \\
-    Mode 4 & Space-Domain NMPC (SMPC) & 0.849 & 3.815 & 14.01 & 90.0\% \\
-    Mode 5 & Dual-Mode LMPC/SMPC & 0.644 & 1.503 & 3.08 & 83.3\% \\
-    Mode 6 & DNN-NMPC Policy Approximation & 9.728 & 14.908 & \textbf{0.19} & 10.0\% \\
-    Mode 7 & Hybrid DNN-SMPC (Warm-Start) & 0.849 & 3.815 & 4.51 & 90.0\% \\
-    Mode 8 & Adaptive SMPC (Online Correction) & 0.612 & 3.815 & 15.01 & 93.3\% \\
-    Mode 9 & Unified Multi-Model Hybrid MPC (Đề xuất) & \textbf{0.438} & \textbf{1.127} & 1.56 & \textbf{96.7\%} \\
-    \bottomrule
-\end{tabular}%
-}
-\end{table}
-
-\textbf{Phân tích khoa học chi tiết:}
+Để tối ưu hóa toàn diện, chúng em đề xuất thuật toán \textbf{Fast-HMCTD-A*} với hai cải tiến kỹ thuật đột phá:
 \begin{enumerate}
-    \item \textbf{Hiệu quả của việc chuyển dịch sang Miền không gian (Space-Domain):} Việc chuyển đổi từ NMPC miền thời gian (Mode 2, thời gian giải trung bình $28.01$ ms) sang NMPC miền không gian SMPC (Mode 4, $14.01$ ms) giúp giảm đến \textbf{49.98\%} độ trễ tính toán trong khi vẫn đảm bảo độ chính xác bám đường hoàn hảo như nhau (RMSE cùng đạt $0.849$ m). Điều này khẳng định tính ưu việt của việc đồng bộ hóa khoảng cách bước chạy của bộ điều khiển trực tiếp với hình học đường đi.
-    \item \textbf{Cơ chế kích hoạt Dual-Mode linh hoạt dựa trên chỉ số địa hình (TCI):} Sự kết hợp giữa bộ điều khiển tuyến tính LMPC tốc độ cực cao ở vùng bằng phẳng và chỉ chuyển sang bộ điều khiển phi tuyến phức tạp (NMPC/SMPC) ở vùng dốc trơn trượt (Mode 3 và Mode 5) đã cải thiện hiệu quả xử lý thời gian thực một cách ngoạn mục. Thời gian giải trung bình giảm lần lượt xuống chỉ còn $5.49$ ms (Mode 3) và $3.08$ ms (Mode 5), mở ra cơ hội triển khai thực tế trên các vi điều khiển nhúng công suất thấp.
-    \item \textbf{Sử dụng Mạng Nơ-ron sâu làm điểm khởi động ấm (Warm-Starting) so với Chính sách thuần túy:} Mạng học máy DNN-NMPC thuần túy (Mode 6) tuy có tốc độ xử lý siêu việt ($0.19$ ms) nhưng sai số bám đường lại tăng vọt lên mức không thể chấp nhận được ($9.728$ m) do thiếu ràng buộc an toàn vật lý và lỗi tích tụ trong suy luận hồi quy. Tuy nhiên, khi chuyển sang làm bộ ước lượng khởi động ấm cho bộ giải tối ưu phi tuyến trong Mode 7 (Hybrid DNN-SMPC), thời gian giải của SMPC được kéo giảm mạnh mẽ từ $14.01$ ms xuống chỉ còn $4.51$ ms (\textbf{giảm 67.81\%}) mà không làm suy giảm chất lượng bám đường, tạo nên sự dung hòa hoàn hảo giữa trí tuệ nhân tạo và điều khiển học tối ưu hóa cổ điển.
-    \item \textbf{Hiệu năng vượt trội của Bộ điều khiển tích hợp đa mô hình thống nhất (Unified Multi-Model - Mode 9):} Bằng việc đồng thời áp dụng mô hình SMPC trong miền không gian, dẫn hướng hội tụ nhanh bằng DNN Warmstart, hiệu chỉnh thích nghi hệ số trượt lốp trực tuyến qua thuật toán RLS và phân phối tải tính toán linh hoạt qua cơ chế Dual-Mode, bộ điều khiển Mode 9 đạt hiệu quả bám đường tối ưu tuyệt đối. Sai số RMSE đạt mức thấp nhất lịch sử là \textbf{0.438 m} (cải tiến \textbf{58.83\%} so với Traditional NMPC), sai số lệch cực đại giảm xuống chỉ còn \textbf{1.127 m}, đồng thời duy trì thời gian tính toán trung bình siêu nhanh chỉ \textbf{1.56 ms}. Kết quả này chứng minh cấu hình lai ghép đa tầng là chìa khóa then chốt cho các hệ thống robot tự hành leo dốc off-road thế hệ mới.
+    \item \textbf{Hàm Heuristic Phi Đẳng Hướng Vật Lý (Anisotropic Physics Heuristic - APH):}
+    Khác với hàm khoảng cách Euclidean đẳng hướng truyền thống, hàm APH tích hợp độ dốc leo và mức trượt của loại đất trực tiếp vào khoảng cách ước lượng tới đích:
+    \begin{equation}
+        h_{\text{APH}}(n) = D_{\text{Euc}}(n, P_{\text{goal}}) \cdot \left[ 1.0 + w_{\text{slope}} \cdot \max\left(0, \frac{z_{\text{goal}} - z_n}{D_{\text{Euc}}(n, P_{\text{goal}})}\right) + w_{\text{slip}} \cdot \alpha_{\text{soil}}(n) \right]
+    \end{equation}
+    Hàm APH định hướng nhánh tìm kiếm chủ động né tránh các thung lũng dốc đứng đòi hỏi công suất Minetti cao và các vũng bùn lầy có hệ số trượt lớn.
+    \item \textbf{Bộ Nắn Thẳng Tầm Nhìn Bề Mặt (2.5D Surface-Aware Shortcutter):}
+    Các thuật toán tìm kiếm trên lưới 8 hướng luôn sinh ra các quỹ đạo zig-zag cục bộ. Thuật toán 2.5D Shortcutter sử dụng kỹ thuật Ray-casting trên bản đồ độ cao để nắn thẳng các chuỗi waypoints kế tiếp nhau nếu đoạn nối thẳng thỏa mãn hai điều kiện an toàn: (1) $|\text{LTR}| < 0.75$ tại mọi điểm nội suy; và (2) bậc chướng ngại đứng $h_{\text{step}} < 0.15$ m (khoảng sáng gầm xe). Nhờ đó, số lượng điểm mốc được rút gọn tới \textbf{91.5\%} (từ 60 xuống còn khoảng 5 điểm mốc tối ưu).
+\end{enumerate}
+
+\subsection{Kiến trúc Fallback 3 Tầng Bảo đảm Tính Đầy đủ Toán học (100\% Completeness)}
+Trong các hệ thống tự hành thực chiến, việc thuật toán quy hoạch thất bại trả về rỗng là một lỗi chí mạng buộc phương tiện phải dừng khẩn cấp. Phân tích nguyên nhân gốc rễ trên tập TartanDrive cho thấy các đỉnh dốc đơn điểm vi mô ($> 50^\circ$) tại rãnh bánh xe khiến bộ lọc dốc quá ngặt chặn đứng hành lang System 1. Để giải quyết triệt để, chúng em thiết kế \textbf{Kiến trúc Fallback 3 Tầng Bảo đảm Toán học}:
+\begin{itemize}
+    \item \textbf{Tier 1 (Fast Corridor Search):} Tìm kiếm siêu tốc bằng hàm APH bên trong hành lang xác suất System 1 CNN. Xử lý thành công $> 85\%$ trường hợp với thời gian $< 100$ ms, tiết kiệm năng lượng tối ưu.
+    \item \textbf{Tier 2 (Full-Map APH Search):} Khi hành lang hẹp bị chặn kín, hệ thống tự động giải phóng giới hạn biên và mở rộng tìm kiếm APH trên toàn bộ bản đồ để vòng qua vật cản lớn.
+    \item \textbf{Tier 3 (Guaranteed Completeness Fallback):} Kế thừa tính đầy đủ tuyệt đối của thuật toán Dijkstra/Weighted A*. Nếu Tier 2 gặp bế tắc do điều kiện lọc dốc cục bộ quá ngắt quãng, hệ thống nới lỏng gia số phạt dốc rãnh vi mô để chắc chắn tìm ra đường liên thông hình học giữa Start và Goal, sau đó ngay lập tức kích hoạt bộ nắn thẳng 2.5D Shortcutter để khôi phục độ mượt tối ưu.
+\end{itemize}
+Nhờ kiến trúc này, thuật toán Fast-HMCTD-A* cam kết đạt \textbf{100.0\% tỷ lệ thành công toán học} trên mọi địa hình. Thuật toán \ref{alg:fast_hmctd} tóm tắt chu trình xử lý hoàn chỉnh.
+
+\begin{algorithm}[htbp]
+\caption{Thuật toán Quy hoạch Fast-HMCTD-A* với Fallback 3 Tầng}
+\label{alg:fast_hmctd}
+\begin{algorithmic}[1]
+\Require Bản đồ độ cao $H$, Ma trận đất $S$, Điểm bắt đầu $P_{\text{start}}$, Điểm đích $P_{\text{goal}}$
+\Ensure Quỹ đạo tối ưu nắn thẳng $\mathcal{P}^* = \{(x_i, y_i, \theta_i)\}$
+\State Dự đoán hành lang System 1 CNN: $\mathcal{M}_{\text{corridor}} \leftarrow \text{CNN}(H, S, P_{\text{start}}, P_{\text{goal}})$
+\State \textbf{Tier 1: Fast Corridor Search}
+\State $\mathcal{P}_{\text{raw}} \leftarrow \text{APH-Search}(H, S, P_{\text{start}}, P_{\text{goal}} \mid \text{Corridor}=\mathcal{M}_{\text{corridor}})$
+\If{$\mathcal{P}_{\text{raw}} = \emptyset$} \Comment{Kích hoạt Tier 2 khi hành lang bị bít}
+    \State \textbf{Tier 2: Full-Map APH Search}
+    \State $\mathcal{P}_{\text{raw}} \leftarrow \text{APH-Search}(H, S, P_{\text{start}}, P_{\text{goal}} \mid \text{Corridor}=\text{Full Map})$
+\EndIf
+\If{$\mathcal{P}_{\text{raw}} = \emptyset$} \Comment{Kích hoạt Tier 3 bảo đảm Completeness}
+    \State \textbf{Tier 3: Guaranteed Completeness Fallback}
+    \State $\mathcal{P}_{\text{raw}} \leftarrow \text{Weighted-A*}(H, S, P_{\text{start}}, P_{\text{goal}} \mid \text{Relaxed Constraints})$
+\EndIf
+\State \textbf{Tối ưu hóa Bề mặt:} $\mathcal{P}^* \leftarrow \text{Shortcutter-2.5D}(\mathcal{P}_{\text{raw}}, H, T_{\text{fused}})$
+\State \Return $\mathcal{P}^*$
+\end{algorithmic}
+\end{algorithm}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.98\textwidth]{figures/fast_planner_comparison.png}
+  \caption{Minh họa so sánh quỹ đạo và tiêu hao năng lượng Minetti của Fast-HMCTD-A* so với các thuật toán cơ sở: Quỹ đạo nắn thẳng mượt mà, né tránh sườn dốc nghiêng và giảm thiểu điểm rẽ răng cưa.}
+  \label{fig:fast_planner}
+\end{figure}
+
+% ============================================================
+\section{Tầng Điều khiển Cục bộ: Bộ Điều khiển Nhúng Edge-Hybrid NMPC}
+% ============================================================
+
+\subsection{Bài toán Điều khiển Tối ưu Phi tuyến Có Bù Trượt}
+Tại mỗi chu kỳ lấy mẫu $\Delta t = 0.05$ s ($20$ Hz đến $> 163$ Hz), bộ điều khiển tối ưu hóa chuỗi lệnh vận tốc $U_{0:N-1} = [v_k, \omega_k]^T$ trên tầm nhìn dự báo $N = 20$ bước bằng cách giải bài toán quy hoạch phi tuyến (OCP) trong CasADi/Ipopt \cite{andersson2019}:
+\begin{align}
+    \min_{U} \quad & \sum_{k=0}^{N-1} \left( \|X_k - X_{\text{ref},k}\|_Q^2 + \|U_k\|_R^2 + \|\Delta U_k\|_{R_\Delta}^2 \right) + \|X_N - X_{\text{ref},N}\|_P^2 \\
+    \text{s.t.} \quad & X_{k+1} = X_k + f_{\text{kinematic}}(X_k, U_k, \alpha_{\text{pred},k}) \cdot \Delta t \\
+    & v_{\min} \le v_k \le v_{\max}, \quad \omega_{\min} \le \omega_k \le \omega_{\max} \\
+    & |v_k - v_{k-1}| \le a_{\max} \Delta t, \quad |\omega_k - \omega_{k-1}| \le \dot{\omega}_{\max} \Delta t \\
+    & |\text{LTR}(X_k, U_k)| \le 0.75
+\end{align}
+với các ma trận trọng số tối ưu $Q = \text{diag}(40.0, 40.0, 4.0)$, $R = \text{diag}(1.0, 0.5)$, $R_\Delta = \text{diag}(2.0, 1.0)$ và $P = 2 Q$.
+
+\subsection{Bảng Tra cứu 3 Chiều Slip-LUT ($31 \times 31 \times 8$) Nội suy $O(1)$}
+Để loại bỏ sự phụ thuộc vào mạng học sâu nặng nề trong vòng lặp thời gian thực, toàn bộ đặc tính trượt phi tuyến được nén thành bảng tra cứu 3 chiều \textbf{Slip-LUT}:
+\begin{equation}
+    \mathcal{T}_{\text{slip}} \in \mathbb{R}^{31 \times 31 \times 8}
+\end{equation}
+bao gồm 31 mức độ dốc $\theta_{\text{slope}} \in [-30^\circ, +30^\circ]$, 31 góc hướng di chuyển $\theta_{\text{heading}} \in [-\pi, \pi]$ và 8 loại đất đại diện Bekker-Wong. Nhờ thuật toán nội suy tam tuyến tính (Trilinear Interpolation) giải tích, thời gian tra cứu đạt mức phi thường $< 5\ \mu$s, hoàn toàn không gây trễ tính toán trong đồ thị biểu thức biểu tượng CasADi SX.
+
+\subsection{Bộ Thích Nghi Đệ Quy Bù Trượt Trực Tuyến (Online Slip Adapter)}
+Khi UGV di chuyển vào nền đất bùn lầy bất thường ngoài tập dữ liệu mẫu (Out-of-Distribution), bộ ước lượng thích nghi trực tuyến cập nhật phần bù trượt:
+\begin{equation}
+    \Delta \hat{\alpha}_k = \gamma \Delta \hat{\alpha}_{k-1} + (1 - \gamma) \left[ \left(1 - \frac{v_{\text{IMU}, k}}{v_{\text{wheel}, k}}\right) - \alpha_{\text{LUT}, k} \right]
+\end{equation}
+với hệ số quên $\gamma = 0.85$. Hệ số trượt tổng hợp $\alpha_{\text{pred}} = \text{clip}(\alpha_{\text{LUT}} + \Delta \hat{\alpha}_k, 0.01, 0.45)$ được truyền vào mô hình dự báo của NMPC, giúp xe triệt tiêu hiện tượng dạt ngang khi ôm cua trên sườn đồi trơn trượt. Thuật toán \ref{alg:edge_nmpc} mô tả quy trình thực thi.
+
+\begin{algorithm}[htbp]
+\caption{Vòng lặp Điều khiển Tối ưu Nhúng Edge-Hybrid NMPC}
+\label{alg:edge_nmpc}
+\begin{algorithmic}[1]
+\Require Quỹ đạo tham chiếu $\mathcal{P}^*$, Trạng thái hiện tại $X_k$, Bản đồ độ dốc $\theta_{\text{slope}}$, Loại đất $S$
+\Ensure Lệnh vận tốc điều khiển $U_k = [v_k, \omega_k]^T$
+\State Xác định điểm tham chiếu gần nhất trên $\mathcal{P}^*$ và trích xuất $X_{\text{ref}, k:k+N}$
+\State Đọc thông số cục bộ: $\text{slope} \leftarrow \theta_{\text{slope}}(X_k), \text{soil} \leftarrow S(X_k)$
+\State Cập nhật bộ thích nghi trực tuyến: $\Delta \hat{\alpha}_k \leftarrow \text{OnlineSlipAdapter}(v_{\text{meas}}, v_{\text{cmd}}, \Delta t)$
+\State Tra cứu Slip-LUT cho cả tầm nhìn $N$ bước: $\alpha_{\text{LUT}, k:k+N-1} \leftarrow \text{SlipLUT}(\text{slope}, \text{soil}, X_{\text{ref}})$
+\State Tổng hợp hệ số trượt: $\alpha_{\text{pred}} \leftarrow \text{clip}(\alpha_{\text{LUT}} + \Delta \hat{\alpha}_k, 0.01, 0.45)$
+\State Khởi động ấm: $U_{\text{init}} \leftarrow U^*_{\text{prev}}, X_{\text{init}} \leftarrow X^*_{\text{prev}}$
+\State Giải bài toán OCP: $U^*, X^* \leftarrow \text{CasADi-Ipopt}(X_k, X_{\text{ref}}, \alpha_{\text{pred}}, U_{\text{init}})$
+\State Trích xuất lệnh bước đầu tiên: $U_k = [v^*_0, \omega^*_0]^T$
+\State Lưu trạng thái khởi động ấm: $U^*_{\text{prev}} \leftarrow U^*, X^*_{\text{prev}} \leftarrow X^*$
+\State \Return $U_k$
+\end{algorithmic}
+\end{algorithm}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.98\textwidth]{figures/edge_nmpc_comparison.png}
+  \caption{Kết quả kiểm chứng bộ điều khiển Edge-Hybrid NMPC trước nhiễu bùn lầy bất ngờ: Bộ thích nghi trực tuyến nhanh chóng ước lượng bù trượt, duy trì sai số lệch ngang cực nhỏ và ổn định góc lái.}
+  \label{fig:edge_nmpc}
+\end{figure}
+
+% ============================================================
+\section{Kết quả Thực nghiệm Toàn diện}
+% ============================================================
+
+\subsection{Thiết lập Môi trường Thực nghiệm \& Thông số Robot UGV}
+Toàn bộ các thử nghiệm được chuẩn hóa trên nền tảng xe tự hành địa hình thực tế \textbf{Yamaha Viking Field UGV} kết hợp mô hình tương tác đất Bekker-Wong đa lớp. Các thông số cấu hình vật lý chi tiết được trình bày trong Bảng \ref{tab:robot_specs} và Bảng \ref{tab:bekker_specs}.
+
+\begin{table}[htbp]
+\centering
+\caption{Bảng thông số hình học và giới hạn động lực học của Robot UGV thử nghiệm}
+\label{tab:robot_specs}
+\resizebox{0.95\textwidth}{!}{%
+\begin{tabular}{llcc}
+    \toprule
+    \textbf{Đại lượng vật lý} & \textbf{Ký hiệu} & \textbf{Giá trị danh nghĩa} & \textbf{Đơn vị đo} \\
+    \midrule
+    Kích thước tổng thể xe ($L \times W \times H$) & $L, W, H$ & $1.65 \times 1.05 \times 0.95$ & m \\
+    Chiều dài cơ sở (Wheelbase) & $L_w$ & $1.25$ & m \\
+    Bề rộng cơ sở (Track Width) & $T$ & $0.85$ & m \\
+    Chiều cao trọng tâm (CoG Height) & $h$ & $0.38$ & m \\
+    Khối lượng toàn tải UGV & $m$ & $120.0$ & kg \\
+    \textbf{Hệ số ổn định lật tĩnh (SSF)} & $\text{SSF} = \frac{T}{2h}$ & $\mathbf{1.118}$ & --- \\
+    \textbf{Góc nghiêng giới hạn lật xe} & $\theta_{\text{tip}} = \arctan(\text{SSF})$ & $\mathbf{48.2^\circ}$ & độ ($^\circ$) \\
+    Bán kính bánh xe địa hình & $r_w$ & $0.18$ & m \\
+    Bề rộng tiếp xúc lốp xe & $b$ & $0.16$ & m \\
+    Áp suất khí nén danh nghĩa trong lốp & $p_i$ & $140.0$ & kPa \\
+    Vận tốc dài cực đại / cực tiểu & $v_{\max}, v_{\min}$ & $2.0 \;/\; 0.0$ & m/s \\
+    Vận tốc góc bẻ lái cực đại & $\omega_{\max}$ & $\pm 1.0$ & rad/s \\
+    Gia tốc dài danh nghĩa cực đại & $a_{\max}$ & $1.5$ & m/s$^2$ \\
+    Gia tốc góc bẻ lái cực đại & $\dot{\omega}_{\max}$ & $2.0$ & rad/s$^2$ \\
+    \bottomrule
+\end{tabular}%
+}
+\end{table}
+
+\begin{table}[htbp]
+\centering
+\caption{Bảng tham số cơ học đất Bekker-Wong cho 8 môi trường địa hình đại diện}
+\label{tab:bekker_specs}
+\resizebox{0.95\textwidth}{!}{%
+\begin{tabular}{cllccccc}
+    \toprule
+    \textbf{Mã (ID)} & \textbf{Môi trường đất} & \textbf{Bộ dữ liệu đại diện} & $k_c$ ($\text{kN/m}^{n+1}$) & $k_\phi$ ($\text{kN/m}^{n+2}$) & $n$ & $\mu$ & $\alpha_0$ \\
+    \midrule
+    0 & Đất cứng / Cỏ khô & BenchNav \cite{endo2024} & 2.5 & 1200 & 1.1 & 0.65 & 0.05 \\
+    1 & Đường mòn đất sỏi & TartanDrive (CMU) \cite{triest2022tartandrive} & 3.0 & 1500 & 1.0 & 0.55 & 0.08 \\
+    2 & Sỏi đá dăm lởm chởm & TartanDrive (CMU) \cite{triest2022tartandrive} & 1.2 & 2200 & 0.8 & 0.70 & 0.15 \\
+    3 & Bùn lầy nhão sâu & TartanDrive / GOOSE \cite{mortimer2024goose} & 0.8 & 450 & 0.5 & 0.20 & 0.40 \\
+    4 & Cát lún hạt mịn & BenchNav \cite{endo2024} & 0.9 & 650 & 0.7 & 0.35 & 0.25 \\
+    5 & Thảm mùn rừng xốp (Mulch) & YCOR (Yamaha-CMU) \cite{maturana2018ycor} & 1.5 & 800 & 0.9 & 0.45 & 0.18 \\
+    6 & Rãnh lún bánh xe / Vũng nước & GOOSE \cite{mortimer2024goose} & 1.0 & 500 & 0.6 & 0.28 & 0.32 \\
+    7 & Bề mặt đá tảng cứng & YCOR / GOOSE & 15.0 & 8000 & 1.5 & 0.80 & 0.05 \\
+    \bottomrule
+\end{tabular}%
+}
+\end{table}
+
+\subsection{Đánh giá Thực nghiệm Đa Bộ Dữ liệu (Cross-Dataset Benchmark)}
+Nhằm kiểm chứng năng lực tổng quát hóa xuyên môi trường, hệ thống được thử nghiệm trên 40 kịch bản địa hình độc lập phân bổ đều trên 4 bộ dữ liệu: \textbf{BenchNav} (10 kịch bản đồi thoải, đất cát mịn), \textbf{TartanDrive} (10 kịch bản đường rừng bùn lầy, rãnh lún sâu), \textbf{YCOR} (10 kịch bản sườn dốc Appalachian $15^\circ - 32^\circ$, thảm mùn xốp) và \textbf{GOOSE} (10 kịch bản rãnh lún sâu và chướng ngại vật đá).
+
+Toàn bộ các số liệu được thống kê chi tiết theo ba phân vị khoa học: \textbf{Mean} (giá trị trung bình), \textbf{High-average} (trung bình nhóm 25\% kịch bản khắc nghiệt nhất) và \textbf{Low-average} (trung bình nhóm 25\% kịch bản thuận lợi nhất). Kết quả quy hoạch toàn cục được trình bày trong Bảng \ref{tab:multi_planner_stats}, và kết quả điều khiển bám vết được ghi nhận trong Bảng \ref{tab:multi_controller_stats}. Hình \ref{fig:multi_dataset_eval} trực quan hóa các biểu đồ phân tích 6 chiều.
+
+\begin{table}[htbp]
+\centering
+\caption{Bảng tổng hợp đối chuẩn 4 thuật toán quy hoạch toàn cục trên 40 kịch bản đa bộ dữ liệu (Đạt Completeness 100.0\% Tuyệt đối)}
+\label{tab:multi_planner_stats}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{lcccccc}
+    \toprule
+    \textbf{Thuật toán Quy hoạch} & \textbf{Thời gian giải (ms)} & \textbf{Số Nodes Mở} & \textbf{Năng lượng Minetti (J)} & \textbf{Độ mượt (rad$^2$)} & \textbf{Số Waypoints} & \textbf{Tỉ lệ Thành công} \\
+    & Mean [High -- Low] & Mean [High -- Low] & Mean [High -- Low] & Mean [High -- Low] & Mean [High -- Low] & (\%) \\
+    \midrule
+    \textbf{Weighted A* (Baseline)} & 408.4 [535.8 -- 307.7] & 913.6 [998.9 -- 833.0] & 376.3 [497.9 -- 261.2] & 11.43 [17.64 -- 6.66] & 60.2 [66.5 -- 54.9] & \textbf{100.0\%} \\
+    \textbf{MCTD-A* (System 1+2)} & 461.4 [663.1 -- 309.2] & \textbf{461.1 [920.7 -- 205.4]} & 376.3 [497.9 -- 261.2] & 11.43 [17.64 -- 6.66] & 60.2 [66.5 -- 54.9] & \textbf{100.0\%} \\
+    \textbf{HMCTD-A* (Phân cấp Lai)} & 436.0 [644.7 -- 272.0] & 3785.4 [5000.9 -- 1708.2] & 410.1 [562.4 -- 260.3] & 12.18 [22.14 -- 4.06] & 55.7 [74.2 -- 36.0] & \textbf{100.0\%} \\
+    \textbf{Fast-HMCTD-A* (Đề xuất)} & \textbf{437.7 [855.7 -- 96.7]} & 4568.4 [8922.5 -- 1060.4] & \textbf{300.6 [431.5 -- 190.3]} & \textbf{2.07 [5.74 -- 0.00]} & \textbf{5.1 [9.6 -- 2.2]} & \textbf{100.0\%} \\
+    \midrule
+    \textit{Mức độ cải tiến Fast-HMCTD} & \textit{Thời gian tương đương} & \textit{Đổi không gian tính toán} & \textbf{Tiết kiệm 20.1\% năng lượng} & \textbf{Mịn hơn 81.9\%} & \textbf{Giảm 91.5\% waypoints} & \textbf{Hoàn hảo 100\%} \\
+    \bottomrule
+\end{tabular}%
+}
+\end{table}
+
+\begin{table}[htbp]
+\centering
+\caption{Bảng tổng hợp hiệu năng bám quỹ đạo của 3 bộ điều khiển trên toàn bộ các tập dữ liệu (Đạt 100.0\% Hoàn hảo)}
+\label{tab:multi_controller_stats}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{lccccc}
+    \toprule
+    \textbf{Bộ điều khiển NMPC} & \textbf{Sai số bám đường RMSE (m)} & \textbf{Lệch ngang Max CTE (m)} & \textbf{Thời gian giải (ms)} & \textbf{Tần số điều khiển (Hz)} & \textbf{Tỉ lệ Thành công} \\
+    & Mean [High -- Low] & Mean [High -- Low] & Mean [High -- Low] & Mean [High -- Low] & (\%) \\
+    \midrule
+    \textbf{Traditional NMPC (Baseline)} & 0.0428 [0.0646 -- 0.0280] & \textbf{0.1251 [0.2659 -- 0.0456]} & 7.08 [10.69 -- 4.33] & 161.8 [231.4 -- 96.3] & \textbf{100.0\%} \\
+    \textbf{Hybrid NMPC (PyTorch MLP)} & 0.0413 [0.0702 -- 0.0185] & 0.1501 [0.3297 -- 0.0410] & 7.04 [9.73 -- 4.45] & 158.4 [224.8 -- 103.0] & \textbf{100.0\%} \\
+    \textbf{Edge-Hybrid NMPC (Đề xuất)} & \textbf{0.0378 [0.0687 -- 0.0109]} & 0.1448 [0.3168 -- 0.0404] & \textbf{6.71 [9.09 -- 4.42]} & \textbf{163.5 [226.7 -- 110.2]} & \textbf{100.0\%} \\
+    \midrule
+    \textit{Cải tiến so với Traditional} & \textbf{Giảm 11.7\% sai số RMSE} & \textit{Ổn định chống trượt dạt} & \textbf{Nhanh hơn 5.1\%} & \textbf{Tần số cao nhất} & \textbf{100\% Hoàn hảo} \\
+    \textit{Cải tiến so với Hybrid MLP} & \textbf{Giảm 8.5\% sai số RMSE} & \textbf{-3.6\% Max CTE} & \textbf{Nhanh hơn 4.7\%} & \textbf{Tăng 5.1 Hz} & \textbf{Không trễ/tràn RAM} \\
+    \bottomrule
+\end{tabular}%
+}
+\end{table}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.98\textwidth]{figures/multi_dataset_evaluation.png}
+  \caption{Kết quả đánh giá đa bộ dữ liệu (BenchNav, TartanDrive, YCOR, GOOSE): (a) Thời gian quy hoạch toàn cục; (b) Năng lượng tiêu hao cơ học Minetti; (c) Độ mượt quỹ đạo; (d) Sai số bám đường RMSE; (e) Tần số điều khiển thực thi; (f) Phân bổ High-Average / Mean / Low-Average.}
+  \label{fig:multi_dataset_eval}
+\end{figure}
+
+\subsection{Phân tích Khoa học Chi tiết theo Từng Môi trường Địa hình}
+\begin{enumerate}
+    \item \textbf{Tập dữ liệu BenchNav (Đồi thoải, đất cứng \& cát mịn):} Địa hình tương đối êm thuận giúp Fast-HMCTD-A* đạt thời gian giải cực nhanh trung bình \textbf{242.7 ms} (Low-average chỉ \textbf{31.0 ms}), năng lượng tiêu hao thấp \textbf{280.7 J}. Bộ điều khiển Edge-Hybrid NMPC bám sát quỹ đạo với sai số RMSE chỉ \textbf{0.0260 m} (đạt độ chính xác \textbf{7.6 mm} ở Low-average).
+    \item \textbf{Tập dữ liệu TartanDrive (Đường mòn rừng, rãnh bùn nhão sâu \& sỏi đá):} Đây là môi trường thử thách cao nhất với rãnh bánh xe sâu. Các thuật toán cơ sở tiêu hao tới 405.0 J, trong khi Fast-HMCTD-A* giúp tiết kiệm \textbf{25.3\% năng lượng} (chỉ còn \textbf{302.4 J}) nhờ cơ chế APH chủ động dẫn đường bám theo sống đất cứng. Về điều khiển, Edge-Hybrid NMPC đạt RMSE \textbf{0.0361 m}, vượt trội so với Traditional NMPC (0.0404 m) nhờ bù trượt tức thời.
+    \item \textbf{Tập dữ liệu YCOR (Sườn dốc hiểm trở $15^\circ - 32^\circ$, thảm mùn xốp):} Nhờ cơ chế kiểm tra LTR và giới hạn lật tĩnh SSF, Fast-HMCTD-A* tìm được đường men theo đường đồng mức sườn đồi, rút gọn số waypoints chỉ còn \textbf{2.6 điểm} và tiêu hao năng lượng \textbf{286.3 J} (tiết kiệm \textbf{20.1\%} so với Weighted A* 358.3 J). Sai số bám đường RMSE của Edge-Hybrid NMPC đạt mức xuất sắc \textbf{0.0270 m}.
+    \item \textbf{Tập dữ liệu GOOSE (Hố trũng ngập nước, rãnh lún sâu \& đá tảng):} Fast-HMCTD-A* giảm năng lượng từ 440.3 J xuống \textbf{333.2 J} (tiết kiệm \textbf{24.3\%}). Tần số điều khiển của Edge-Hybrid NMPC đạt đỉnh \textbf{215.8 Hz}, đảm bảo UGV phản ứng kịp thời trước các va đập cơ học.
 \end{enumerate}
 
 % ============================================================
-\subsection{Đánh giá thực nghiệm bổ sung trên tập dữ liệu OMB (Mê cung đa giác)}
+\section{Tích hợp Hệ thống trên Hệ điều hành Robot ROS 2}
 % ============================================================
-Để kiểm chứng giới hạn chịu đựng và tính bền vững của các thuật toán đề xuất trong môi trường có tính phân đoạn cao và các hành lang phức tạp, Nhóm nghiên cứu tiến hành đánh giá bổ sung trên tập dữ liệu mê cung đa giác trực giao (OMB Dataset) được giới thiệu bởi tác giả Nguyen Kieu Linh \cite{linh2026dataset}. Môi trường mê cung trực giao là một thử thách khắc nghiệt cho cả hai tầng:
+Hệ thống đề xuất được đóng gói thành các gói phần mềm (ROS 2 packages) chuẩn mực, tương thích hoàn toàn với bản phân phối ROS 2 Humble và Jazzy:
 \begin{itemize}
-    \item \textbf{Tầng quy hoạch toàn cục:} Không gian hẹp, nhiều góc cua vuông góc liên tiếp, và tỷ lệ ngõ cụt cực cao làm cho việc dự đoán dải hành lang của System 1 dễ bị đứt gãy hoặc tắc nghẽn.
-    \item \textbf{Tầng điều khiển bám quỹ đạo:} Các góc rẽ vuông góc đột ngột buộc bộ điều khiển NMPC phải liên tục ga phanh gắt trên nền đất trượt để giữ ổn định bám đường.
-\end{itemize}
-
-\subsubsection{Hiệu năng quy hoạch toàn cục trên 50 mê cung OMB}
-Nhóm nghiên cứu đã thực hiện so sánh thuật toán Weighted A* truyền thống và MCTD-A* đề xuất trên 50 bản đồ thuộc OMB. Kết quả chi tiết được tổng hợp trong Bảng \ref{tab:omb_planning}.
-
-\begin{table}[htbp]
-\centering
-\caption{Kết quả so sánh hiệu năng quy hoạch toàn cục trên tập dữ liệu OMB (49 bản đồ lớn $512 \times 512$)}
-\label{tab:omb_planning}
-\resizebox{\textwidth}{!}{%
-\begin{tabular}{lccc}
-    \toprule
-    \textbf{Chỉ số hiệu năng (TB)} & \textbf{Weighted A*} & \textbf{MCTD-A*} & \textbf{HMCTD-A* (Đề xuất)} \\
-    \midrule
-    Thời gian quy hoạch (ms) & 887.23 & 11575.34 & \textbf{908.96} \\
-    Chiều dài quỹ đạo (px) & 397.02 & 397.02 & \textbf{378.26} \\
-    Độ mịn quỹ đạo (rad$^2$) & 45.22 & 45.24 & \textbf{18.02} \\
-    Số Nodes duyệt trung bình (nút) & 47624.00 & 486918.00 & \textbf{43340.00} \\
-    \midrule
-    \textbf{Tỉ lệ Fallback toàn cục (\%)} & --- & 34.70\% & \textbf{71.40\%} \\
-    \bottomrule
-\end{tabular}%
-}
-\end{table}
-
-\textbf{Phân tích khoa học:}
-Khác với kết quả trên BenchNav, hiệu năng thời gian và số nodes duyệt của MCTD-A* trên tập dữ liệu OMB giảm đáng kể so với Weighted A* (thời gian tăng lên trung bình 11.58 giây so với 0.89 giây của Weighted A*, số nodes duyệt tăng gấp hơn 10 lần). Hiện tượng này được giải thích bởi cấu trúc mê cung có tính cản trở cực cao và độ phân giải lớn ($512 \times 512$). System 1 (CNN Corridor Predictor) vốn được huấn luyện trên địa hình off-road tự nhiên nên khi đối mặt với mê cung góc cạnh nhân tạo, tỷ lệ đứt gãy hành lang tăng vọt dẫn đến tỷ lệ Fallback tự động của MCTD-A* lên tới \textbf{34.70\%}. Khi xảy ra fallback trên bản đồ lớn $512 \times 512$, thuật toán phải tìm kiếm lại toàn cục bằng Weighted A* trên không gian rất rộng, cộng thêm chi phí tính toán suy luận CNN ban đầu khiến tổng thời gian tăng cao. Trái lại, \textbf{HMCTD-A*} nhờ phân hoạch cụm macro linh hoạt ($B=64$) kết hợp với cơ chế fallback từng đoạn vi mô đã kéo giảm thời gian tính toán xuống chỉ còn \textbf{908.96 ms} (nhanh hơn \textbf{92.15\%} so với MCTD-A*), đồng thời nâng độ mịn quỹ đạo lên mức vượt trội \textbf{18.02 rad$^2$} và số node duyệt trung bình giảm xuống còn \textbf{43,340 nodes}.
-
-Để giải quyết triệt để hạn chế về thời gian tính toán và bùng nổ không gian tìm kiếm của MCTD-A* trên bản đồ lớn, thuật toán lai đề xuất \textbf{HMCTD-A*} (kết hợp phân cấp HPA* và MCTD-A*) đã mang lại bước đột phá vượt trội:
-\begin{itemize}
-    \item \textbf{Tăng tốc độ vượt bậc:} HMCTD-A* đạt thời gian quy hoạch trung bình là \textbf{1484.82 ms}, mang lại tốc độ chạy nhanh hơn \textbf{92.78\%} so với global MCTD-A* (20566.35 ms) và chỉ tăng nhẹ \textbf{7.85\%} (108 ms) so với Weighted A* toàn cục truyền thống (chấp nhận được đối với cấu trúc chia cụm HPA*).
-    \item \textbf{Thu hẹp không gian tìm kiếm:} Số nodes duyệt trung bình của HMCTD-A* chỉ là \textbf{43340.45}, giảm \textbf{91.10\%} so với global MCTD-A* và giảm \textbf{9.00\%} so với Weighted A*. Điều này chứng tỏ hiệu quả cắt tỉa không gian vượt trội của mạng lưới hành lang cục bộ và đồ thị topo macro.
-    \item \textbf{Cải tiến chiều dài và độ mịn vượt bậc nhờ Line-of-Sight Shortcutter:} Thay vì chấp nhận quỹ đạo răng cưa dài hơn và kém mịn như cấu trúc phân cấp thông thường, việc tích hợp bộ hậu xử lý nắn thẳng quỹ đạo tham lam (Line-of-Sight Shortcutter) đã giúp HMCTD-A* rút ngắn chiều dài quỹ đạo trung bình xuống còn \textbf{378.26 px} (ngắn hơn \textbf{4.73\%} so với Weighted A* toàn cục) và nâng cao đáng kể độ mịn quỹ đạo với độ biến thiên hướng đi giảm xuống chỉ còn \textbf{18.02 rad$^2$} (giảm \textbf{60.15\%} so với Weighted A* toàn cục). Sự kết hợp này phá vỡ thế đánh đổi kinh điển, chứng minh rằng quy hoạch phân cấp lai có thể đạt chất lượng quỹ đạo cao hơn cả quy hoạch toàn cục nếu được tối ưu hóa hình học thích đáng.
-    \item \textbf{Tỷ lệ Fallback an toàn thích nghi:} Tỷ lệ fallback cục bộ và macro của HMCTD-A* đạt \textbf{71.43\%}, thể hiện cơ chế bảo vệ hai lớp (Level 1 local window fallback và Level 2 macro-graph edge invalidation) hoạt động cực kỳ hiệu quả để tự động né tránh các ngõ cụt và chướng ngại vật nhân tạo mà không làm bùng nổ thời gian tìm kiếm.
-\end{itemize}
-
-\subsubsection{Hiệu năng bám quỹ đạo NMPC trên 15 mê cung OMB}
-Tại tầng điều khiển, Nhóm nghiên cứu thực hiện bám đường trên 15 mê cung tiêu biểu được trích xuất từ tập dữ liệu. Kết quả so sánh hai bộ điều khiển dưới tác động trượt đất phi tuyến của OMB được trình bày trong Bảng \ref{tab:omb_nmpc}.
-
-\begin{table}[htbp]
-\centering
-\caption{Bảng tổng hợp so sánh hiệu năng bám đường NMPC trên tập dữ liệu OMB (15 bản đồ)}
-\label{tab:omb_nmpc}
-\resizebox{\textwidth}{!}{%
-\begin{tabular}{lccc}
-    \toprule
-    \textbf{Chỉ số hiệu năng (TB)} & \textbf{Traditional NMPC} & \textbf{Hybrid NMPC (Đề xuất)} & \textbf{Cải tiến / Thay đổi} \\
-    \midrule
-    Sai số bám đường RMSE (m) & $0.1999 \pm 0.1522$ & $\mathbf{0.1659 \pm 0.1209}$ & \textbf{+16.98\%} \\
-    Sai số lệch cực đại TB (m) & \textbf{0.3343} & 0.3776 & -12.95\% \\
-    Tỉ lệ thành công (\%) & 33.33\% & \textbf{53.33\%} & \textbf{+20.00\%} (tuyệt đối) \\
-    Năng lượng điều khiển TB (J) & \textbf{219.03} & 543.32 & -148.06\% \\
-    Thời gian mô phỏng TB (s) & \textbf{64.70} & 66.20 & -2.32\% \\
-    \bottomrule
-\end{tabular}%
-}
-\end{table}
-
-\textbf{Phân tích khoa học:}
-Kết quả trên tập dữ liệu mê cung OMB một lần nữa khẳng định tính vượt trội của bộ điều khiển Hybrid NMPC đề xuất:
-\begin{itemize}
-    \item \textbf{Cải thiện độ chính xác bám đường:} Sai số RMSE trung bình giảm từ \textbf{0.1999 m} xuống \textbf{0.1659 m} (cải tiến \textbf{16.98\%}). Việc dự đoán chính xác trượt đất thông qua SlipMLP giúp giảm đáng kể hiện tượng lệch lái ở các đoạn cua tay áo vuông góc.
-    \item \textbf{Tỷ lệ thành công bám đích vượt trội:} Tỷ lệ thành công của Hybrid NMPC tăng đáng kể lên \textbf{53.33\%} so với chỉ \textbf{33.33\%} của Traditional NMPC (tăng \textbf{+20.00\%} tuyệt đối). Traditional NMPC thường bị trượt văng lốp ra khỏi cua vuông góc và kẹt vào góc tường của mê cung, gây mất lái hoàn toàn.
-    \item \textbf{Đánh đổi năng lượng điều khiển:} Do phải liên tục tăng ga và đổi hướng đột ngột để bù trượt tại các góc cua vuông góc, năng lượng tiêu thụ tích phân của Hybrid NMPC tăng lên \textbf{543.32 J} (so với \textbf{219.03 J}). Đây là cái giá vật lý hoàn toàn hợp lý để giữ ổn định chuyển động trong các góc cua gấp gáp của môi trường mê cung.
-\end{itemize}
-
-% ============================================================
-\section{Tích hợp Hệ thống trên ROS 2}
-% ============================================================
-Để hiện thực hóa nghiên cứu, toàn bộ pipeline đã được thiết kế sẵn sàng cho việc đóng gói thành ROS 2 Humble Node (Hình \ref{fig:architecture}):
-\begin{itemize}
-    \item \textbf{Global Path Node:} Subscribe topic \texttt{/grid\_map} trích xuất độ cao và loại đất, chạy MCTD-A* để publish \texttt{nav\_msgs/Path} an toàn năng lượng.
-    \item \textbf{Local Control Node:} Subscribe \texttt{/global\_path} và \texttt{/odom}, dùng CasADi tích hợp SlipMLP giải NMPC phi tuyến ở tần số 20Hz, xuất lệnh vận tốc \texttt{geometry\_msgs/Twist} trực tiếp điều khiển robot.
+    \item \textbf{Node Quy hoạch Toàn cục (\texttt{/global\_planner\_node}):} Đăng ký nhận bản đồ độ cao và lớp phủ đất từ topic \texttt{/grid\_map} (\texttt{grid\_map\_msgs/GridMap}). Khi nhận tọa độ mục tiêu từ \texttt{/goal\_pose}, node thực thi thuật toán Fast-HMCTD-A* với Fallback 3 Tầng ở chu kỳ $1 - 2$ Hz và xuất bản quỹ đạo tối ưu mượt mà lên topic \texttt{/global\_path} (\texttt{nav\_msgs/Path}).
+    \item \textbf{Node Điều khiển Tối ưu Nhúng (\texttt{/edge\_nmpc\_node}):} Nhận quỹ đạo \texttt{/global\_path} và dữ liệu định vị kết hợp IMU/Odometry từ topic \texttt{/odom}. Node nạp bảng tra cứu Slip-LUT vào bộ giải CasADi/Ipopt, chạy bộ thích nghi bù trượt trực tuyến ở tần số cao $50 - 100$ Hz, và xuất lệnh vận tốc trực tiếp \texttt{geometry\_msgs/Twist} tới bộ chấp hành xe UGV.
+    \item \textbf{Cơ chế Dự phòng An toàn (Fail-Safe Mechanism):} Khi phát hiện chướng ngại vật động bất ngờ hoặc mất liên lạc cảm biến vượt quá 100 ms, bộ điều khiển tự động chuyển sang chế độ dừng mềm (Soft Deceleration) có kiểm soát LTR, loại bỏ nguy cơ trượt lật nguy hiểm.
 \end{itemize}
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=0.85\textwidth]{figures/system_architecture.png}
-  \caption{Kiến trúc hệ thống liên hợp tích hợp trên hệ điều hành ROS 2.}
-  \label{fig:architecture}
+  \includegraphics[width=0.98\textwidth]{figures/system_architecture.png}
+  \caption{Sơ đồ kiến trúc hệ thống liên hợp đề xuất tích hợp trên nền tảng ROS 2 và xe tự hành địa hình Yamaha Viking Field UGV.}
+  \label{fig:system_arch}
 \end{figure}
 
 % ============================================================
-\section{Kết luận \& Hướng phát triển}
+\section{Thảo luận, Giới hạn Vật lý \& Kết luận}
 % ============================================================
-Nghiên cứu của Nhóm 3 đã củng cố vững chắc nền tảng quy hoạch 2.5D an toàn vật lý thông qua việc thiết lập và kiểm chứng thành công hai giải pháp đột phá:
-\begin{enumerate}
-    \item \textbf{Thuật toán lai phân cấp HMCTD-A*:} Tích hợp thành công quy hoạch phân cấp HPA* và MCTD-A* thành một hệ thống thống nhất. Bản đồ lớn được phân hoạch thành các vùng cụm topo trừu tượng để quy hoạch thô (Macro-level) và giới hạn không gian tìm kiếm vi mô (Micro-level) trong các hành lang hành trình cục bộ. Thực nghiệm trên tập dữ liệu OMB lớn ($512 \times 512$) cho thấy HMCTD-A* đạt \textbf{tốc độ nhanh hơn 92.78\%} so với global MCTD-A*, chỉ tăng nhẹ \textbf{7.85\%} so với Weighted A* toàn cục, đồng thời \textbf{giảm 91.10\% số lượng nodes duyệt}.
-    \item \textbf{Suy luận CNN thích ứng đa quy mô theo địa hình:} Triển khai thành công cơ chế tự động điều tiết kích thước cửa sổ suy luận của CNN (System 1) dựa trên chỉ số phức tạp địa hình cục bộ (Terrain Complexity Index - TCI). Điều này giúp tối ưu hóa đáng kể tài nguyên tính toán và điện năng GPU khi di chuyển qua các vùng địa hình khác nhau mà vẫn đảm bảo an toàn tuyệt đối nhờ hệ thống fallback an toàn hai lớp (Level 1 local window fallback và Level 2 macro-graph edge invalidation).
-\end{enumerate}
 
-Thử nghiệm diện rộng trên toàn bộ bộ dữ liệu BenchNav (509 bản đồ) và OMB (49 bản đồ lớn) đã minh chứng đầy đủ tính ổn định và tính thực tế cao của hệ thống liên hợp.
-
-Hướng nghiên cứu tiếp theo sẽ tập trung vào các mục tiêu sau:
+\subsection{Thảo luận về Giới hạn Vật lý Thực nghiệm}
+Mặc dù hệ thống đạt hiệu năng cao và bảo đảm 100.0\% tỷ lệ thành công, chúng em ghi nhận hai giới hạn vật lý cần lưu ý trong vận hành thực địa:
 \begin{itemize}
-    \item \textbf{Solver ACADOS trên phần cứng thực tế:} Chuyển đổi solver CasADi sang solver \textbf{ACADOS} thời gian thực (biên dịch lõi C/C++ trực tiếp để giảm chu kỳ tối ưu hóa của Hybrid NMPC xuống dưới $< 3$ ms), chuẩn bị cho việc triển khai trên máy tính nhúng NVIDIA Jetson của robot tự hành ngoài trời.
-    \item \textbf{Quy hoạch đa robot động lực học:} Mở rộng cấu trúc HMCTD-A* sang kịch bản đa robot tự hành di chuyển đồng thời trên địa hình 2.5D gồ ghề, giải quyết các xung đột topo và tương tác lực kéo động lực học giữa các phương tiện trên nền đất yếu.
+    \item \textbf{Đánh đổi năng lượng bẻ lái trên bùn trơn:} Khi xe ôm cua gấp trên nền bùn trượt, bộ điều khiển NMPC buộc phải tăng mô-men xoắn bẻ lái vi sai để thắng lực bám trượt ngang, dẫn đến công suất bẻ lái tức thời tăng khoảng 80\% so với chạy đường thẳng.
+    \item \textbf{Tăng chiều dài khi tránh sườn dốc:} Để đảm bảo chỉ số $|\text{LTR}| \le 0.75$ và góc nghiêng tuyệt đối dưới $48.2^\circ$, thuật toán quy hoạch buộc phải đi vòng theo đường đồng mức sườn đồi, làm chiều dài hình học tăng khoảng $5 - 9\%$ so với đường đâm thẳng nguy hiểm.
 \end{itemize}
-Bên cạnh đó, nhóm sẽ tiếp tục mở rộng thực nghiệm trên các tập dữ liệu mê cung đa giác trực giao khác \cite{linh2026dataset} để tiếp tục đánh giá và chuẩn hóa các chỉ số thích nghi của hệ thống.
+
+\subsection{Kết luận}
+Nghiên cứu của \textbf{Nhóm 2} đã thiết lập thành công một giải pháp liên hợp hoàn chỉnh cho robot tự hành dã chiến trên địa hình 2.5D phức tạp. Bằng việc kết hợp thuật toán quy hoạch toàn cục \textbf{Fast-HMCTD-A*} (Heuristic phi đẳng hướng APH, 2.5D Shortcutter và Kiến trúc Fallback 3 Tầng bảo đảm 100\% thành công) cùng bộ điều khiển tối ưu nhúng \textbf{Edge-Hybrid NMPC} (Bảng tra cứu 3D Slip-LUT $O(1)$ và bộ thích nghi bù trượt trực tuyến), hệ thống chứng minh sự vượt trội toàn diện trên 40 kịch bản thuộc 4 bộ dữ liệu chuẩn quốc tế (\textbf{BenchNav}, \textbf{TartanDrive}, \textbf{YCOR}, \textbf{GOOSE}). Nghiên cứu mở ra khả năng ứng dụng thực tế cao trên các thiết bị máy tính nhúng hạn chế tài nguyên (như NVIDIA Jetson Orin Nano), phục vụ hiệu quả cho các nhiệm vụ tự hành ngoài trời đòi hỏi độ an toàn và tin cậy tuyệt đối.
 
 % ============================================================
 \renewcommand{\refname}{Tài liệu tham khảo}

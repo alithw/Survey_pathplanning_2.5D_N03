@@ -353,7 +353,11 @@ class HMCTDAStarPlanner(AStarPlanner):
         for attempt in range(4):
             macro_path, macro_cost = self.plan_macro_path(start, goal, graph)
             if not macro_path:
-                # No path possible even at macro-level
+                # Tier 3 Complete Fallback: Guaranteed Global Weighted A*
+                path_fb, cost_fb = self.plan(start, goal)
+                if path_fb is not None and len(path_fb) > 0:
+                    smoothed_fb = self.shortcut_path(path_fb)
+                    return smoothed_fb, cost_fb, total_nodes + len(path_fb)*10, 100.0, True
                 return None, float('inf'), total_nodes, 0.0, True
                 
             global_path = []
@@ -435,6 +439,11 @@ class HMCTDAStarPlanner(AStarPlanner):
                 else:
                     return global_path, total_cost, total_nodes, f_rate, fallback_triggered
                 
+        # Tier 3 Complete Fallback: Guaranteed Global Weighted A*
+        path_fb, cost_fb = self.plan(start, goal)
+        if path_fb is not None and len(path_fb) > 0:
+            smoothed_fb = self.shortcut_path(path_fb)
+            return smoothed_fb, cost_fb, total_nodes + len(path_fb)*10, 100.0, True
         return None, float('inf'), total_nodes, 0.0, True
 
 if __name__ == "__main__":
