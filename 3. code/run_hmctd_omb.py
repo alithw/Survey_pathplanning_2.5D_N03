@@ -28,9 +28,10 @@ from train_system1 import System1CNN
 from run_benchmarks_omb import load_maze, build_valid_filelist, OMBAStarPlanner, predict_corridor_omb, path_length, smoothness
 
 # Configurations
-DATASET_DIR = "dataset_omb/mazes"
-LOG_DIR = "../4. logs"
-MODEL_PATH = "system1_model.pth"
+CURR_DIR = os.path.dirname(os.path.abspath(__file__))
+DATASET_DIR = os.path.join(CURR_DIR, "dataset_omb", "mazes")
+LOG_DIR = os.path.normpath(os.path.join(CURR_DIR, "..", "4. logs"))
+MODEL_PATH = os.path.join(CURR_DIR, "system1_model.pth")
 NUM_PLANNING = 50
 RANDOM_SEED = 42
 
@@ -42,7 +43,11 @@ np.random.seed(RANDOM_SEED)
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 cnn_model = System1CNN().to(device)
 if os.path.exists(MODEL_PATH):
-    cnn_model.load_state_dict(torch.load(MODEL_PATH, map_location=device))
+    try:
+        state_dict = torch.load(MODEL_PATH, map_location=device, weights_only=True)
+    except TypeError:
+        state_dict = torch.load(MODEL_PATH, map_location=device)
+    cnn_model.load_state_dict(state_dict)
     cnn_model.eval()
     print(f"-> Loaded System 1 CNN from: {MODEL_PATH}")
 else:

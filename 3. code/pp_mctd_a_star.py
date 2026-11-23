@@ -28,7 +28,8 @@ GOAL_MANUAL = (40, 58)
 
 # THƯ MỤC DATASET
 base_dir = "/home/ali/ros2_ws/src/benchnav/datasets/dataset01/train/"
-MODEL_PATH = "system1_model.pth"
+CURR_DIR = os.path.dirname(os.path.abspath(__file__))
+MODEL_PATH = os.path.join(CURR_DIR, "system1_model.pth")
 
 class MCTDAStarPlanner(AStarPlanner):
     def __init__(self, heights, slopes, t_classes, grid_size, corridor_mask=None, corridor_threshold=0.2, **kwargs):
@@ -129,9 +130,14 @@ def predict_corridor(heights, slopes, t_classes, start, goal, model):
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 model = System1CNN().to(device)
 if os.path.exists(MODEL_PATH):
-    model.load_state_dict(torch.load(MODEL_PATH, map_location=device))
+    try:
+        state_dict = torch.load(MODEL_PATH, map_location=device, weights_only=True)
+    except TypeError:
+        state_dict = torch.load(MODEL_PATH, map_location=device)
+    model.load_state_dict(state_dict)
     model.eval()
-    print(f"-> Đã load thành công trọng số System 1 CNN từ: {MODEL_PATH}")
+    if __name__ == "__main__":
+        print(f"-> Đã load thành công trọng số System 1 CNN từ: {MODEL_PATH}")
 else:
     print(f"-> [CẢNH BÁO] Không tìm thấy {MODEL_PATH}. Quy hoạch hành lang sẽ giả lập...")
 

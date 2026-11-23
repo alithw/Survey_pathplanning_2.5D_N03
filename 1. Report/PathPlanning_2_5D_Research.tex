@@ -34,7 +34,7 @@
 }
 \lstset{style=mystyle}
 
-\title{\textbf{NGHIÊN CỨU LIÊN HỢP QUY HOẠCH PHÂN CẤP LAI ĐỊA TRẮC 4 TẦNG HMCTD-A*\_v2 VÀ BỘ ĐIỀU KHIỂN DỰ BÁO NHÚNG KINODYNAMIC RICCATI-RTI NMPC BÙ TRƯỢT ĐỊA HÌNH TRÊN BẢN ĐỒ 2.5D}}
+\title{\textbf{NGHIÊN CỨU HỆ THỐNG LIÊN HỢP QUY HOẠCH ĐA PHÂN GIẢI HGB-A* VÀ BỘ ĐIỀU KHIỂN DỰ BÁO NHÚNG KINODYNAMIC RICCATI-RTI NMPC BÙ TRƯỢT ĐỊA HÌNH TRÊN BẢN ĐỒ 2.5D}}
 \author{
     \textbf{Nhóm 2: Động lực học \& Điều khiển} \\
     \textit{Giảng viên hướng dẫn: TS. Nguyễn Kiều Linh}
@@ -46,441 +46,347 @@
 \maketitle
 
 \begin{abstract}
-Nghiên cứu này trình bày việc thiết kế, hiện thực hóa và đánh giá thực nghiệm một hệ thống liên hợp (Joint Planning and Control) thế hệ mới chuyên biệt cho xe tự hành mặt đất (Unmanned Ground Vehicle - UGV) vận hành trên địa hình dã chiến 2.5D phi cấu trúc từ quy mô cục bộ đến quy mô lớn. Trên cơ sở phân tích nguyên nhân gốc rễ gây suy thoái hiệu năng của các thuật toán tiền nhiệm (\textbf{Weighted A*}, \textbf{MCTD-A*}, \textbf{HMCTD-A* v1} ở tầng quy hoạch và \textbf{Traditional NMPC}, \textbf{Hybrid NMPC}, \textbf{Edge-Hybrid NMPC} ở tầng điều khiển), chúng em giới thiệu hai nghiên cứu đột phá. Ở tầng quy hoạch toàn cục, chúng em đề xuất thuật toán quy hoạch phân cấp lai 4 tầng \textbf{HMCTD-A*\_v2} kết hợp: (1) Khuếch tán địa trắc đa tỷ lệ bất biến vật lý thay thế mạng học sâu CNN nhạy cảm lệch phân phối; (2) Đồ thị cổng yên ngựa tô-pô và tìm kiếm cây Monte Carlo \textbf{MCTS-PUCT}; (3) Tìm kiếm hai chiều trên hàng đợi xô \textbf{Dial Radix} dẫn hướng bằng trường thế hành lang mềm phi đẳng hướng; và (4) Quy hoạch động kéo căng dây địa trắc (\textbf{Geodesic String-Pulling DP}) trên nền nhân biên dịch \textbf{C++17 SIMD} và \textbf{Python Vectorized}. Ở tầng điều khiển cục bộ, chúng em đề xuất bộ điều khiển dự báo nhúng thời gian thực \textbf{Kinodynamic Riccati-RTI NMPC} tích hợp bộ phát quỹ đạo nội suy đa thức \textbf{PCHIP} $C^1$ Hermite, bảng tra trượt mở rộng \textbf{FullRangeSlipLUT} ($[0.01, 0.85]$, dốc $0^\circ\text{--}85^\circ$), bộ quan sát trượt nhân quả 1-bước (\textbf{Causal Terrain Slip Observer}), bù tiền hồi nghịch đảo trượt bậc hai giải tích và bộ giải lặp thời gian thực khối tam đường chéo \textbf{Block-Tridiagonal Riccati-ADMM}. Kiểm nghiệm định lượng trên \textbf{549 bản đồ 2.5D} (509 bản đồ chuẩn \textbf{BenchNav GT} và 40 kịch bản thực địa thuộc 4 tập dữ liệu \textbf{BenchNav}, \textbf{TartanDrive}, \textbf{YCOR}, \textbf{GOOSE}) cùng \textbf{69 kịch bản bản đồ lớn} ($128\times128 \to 1024\times1024$ 2.5D DEM và 49 mê cung \textbf{OMB} $512\times512$) chứng minh: \textbf{HMCTD-A*\_v2} tăng tốc độ quy hoạch gấp \textbf{261.8 lần} ($0.73$ ms so với $191.28$ ms của HMCTD-A* v1), xóa bỏ hoàn toàn tỷ lệ suy thoái hành lang từ \textbf{73.38\% xuống 0.0\%}, tiết kiệm \textbf{61.3\%} năng lượng tiêu hao, giảm \textbf{95.5\%} độ nhấp nhô góc hướng và đạt \textbf{100.0\%} an toàn chống lật; trong khi \textbf{Kinodynamic Riccati-RTI NMPC} rút ngắn chu kỳ giải \textbf{132.2 lần} ($33.67\ \mu\text{s} \approx 29,849\ \text{Hz}$ so với $4,451.38\ \mu\text{s}$ của Edge-Hybrid NMPC) và giảm \textbf{93.8\%} sai số bám vết RMSE (từ $3.68$ cm xuống \textbf{0.227 cm}).
+Nghiên cứu này trình bày thiết kế, cơ sở vật lý, cài đặt thực tế và kết quả đối chuẩn toàn diện của một hệ thống liên hợp (Joint Planning and Control) dành cho xe tự hành mặt đất (Unmanned Ground Vehicle -- UGV) vận hành trên địa hình dã chiến 2.5D (bản đồ độ cao số kết hợp phân lớp nền đất) hoàn toàn trên bộ xử lý CPU phổ thông (không yêu cầu GPU). Sau khi phân tích nguyên nhân gốc rễ gây hạn chế ở thế hệ nguyên mẫu trước (\textbf{HMCTD-A* v1} dùng mạng CNN khóa cứng hành lang dễ đứt đường và \textbf{Edge-Hybrid NMPC} dùng bộ giải Ipopt bị cắt trần trượt tại $0.40$), chúng em đề xuất và chuẩn hóa lại hai thành phần lõi theo đúng bản chất toán học của chúng:
+(1) Ở tầng quy hoạch toàn cục, thuật toán tìm kiếm đồ thị cổ điển 4 tầng \textbf{HGB-A*} (\textit{Hierarchical Geodesic-Guided Bidirectional A*}) kết hợp: tính thế trắc địa lưỡng hướng trên lưới thô kèm chỉ số gồ ghề địa hình (\textbf{Block TCI}); trích xuất cổng yên ngựa trên biên khối và tô dải ống hành lang mềm bằng \textbf{PUCT}; tìm kiếm \textbf{A* hai chiều cân bằng Pohl} với hàm phạt mềm ngoài hành lang và cơ chế thoát khẩn \textbf{auto-CBF}; và hậu xử lý \textbf{Quy hoạch động tầm nhìn 2.5D} kèm làm tròn an toàn \textbf{Safe Chaikin} trên lõi biên dịch \textbf{C++17 SIMD} (song hành với bản Python vector hóa tương đương 1:1).
+(2) Ở tầng điều khiển cục bộ, bộ điều khiển \textbf{Kinodynamic Riccati-RTI NMPC} kết hợp bộ phát quỹ đạo cong mượt đơn điệu \textbf{PCHIP $C^1$}, bảng tra trượt toàn dải \textbf{FullRangeSlipLUT} ($0^\circ\text{--}85^\circ$, trượt $[0.01, 0.84]$), bộ quan sát trượt nhân quả trực tuyến (\textbf{CausalTerrainSlipObserver}), công thức bù truyền thẳng nghịch đảo trượt bậc hai, tuyến tính hóa Jacobian cơ học đất chính xác và bộ giải \textbf{Block-Tridiagonal Riccati-ADMM} cấp phát tĩnh.
+
+Thực nghiệm đo trực tiếp trên \textbf{AMD Ryzen 7 6800H (CPU-only, RAM độc lập 149.10 MB)} qua \textbf{549 bản đồ 2.5D} ($509$ bản đồ BenchNav GT + $40$ kịch bản thực địa thuộc \textbf{BenchNav}, \textbf{TartanDrive}, \textbf{YCOR}, \textbf{GOOSE}), dải bản đồ đa tỷ lệ \textbf{$128^2 \to 1024^2$} ($1,048,576$ ô có hố nước sâu $\tau=8$) và \textbf{49 mê cung OMB} chứng minh: \textbf{HGB-A* (C++17)} đạt tốc độ trung bình \textbf{1.38 ms} ($725.2\ \text{Hz}$) ở $64^2$, \textbf{42.60 ms} ở $512^2$ và \textbf{209.15 ms} ở $1024^2$, tỷ lệ thành công và an toàn chống lật đạt \textbf{100.0\%} ($\theta_{\max} \le 47.07^\circ < 48.19^\circ$), tỷ lệ Fallback \textbf{0.0\%} và \textbf{0} vi phạm hố nước trên toàn bộ bản đồ thực địa và đa tỷ lệ. Ở tầng điều khiển, \textbf{Kinodynamic Riccati-RTI NMPC} đạt chu kỳ giải \textbf{72.74 $\mu$s} ($\approx \mathbf{14.0\ \text{kHz}}$), sai số bám vết \textbf{RMSE = 0.227 cm}, \textbf{Max CTE = 3.911 cm}, sai số ước lượng trượt \textbf{Slip MAE = 0.000333} và thành công \textbf{40/40 (100.0\%)} (so với $80.0\%$ ở bản cắt lớp không dùng Jacobian trượt bậc hai). Cuối cùng, báo cáo tiến hành đối chiếu với các hệ thống quy hoạch và điều khiển 2.5D gần đây gồm \textbf{Nav2 Smac}, \textbf{PUTN}, \textbf{ART Planner}, \textbf{TERP}, \textbf{Verti-Bench}, \textbf{acados}, \textbf{FATROP}, \textbf{OCS2}, \textbf{NMPC-DCBF}, \textbf{WayFASTER} và \textbf{nav2\_mppi}.
 \end{abstract}
 
 \vspace{0.5em}
-\noindent\textbf{Từ khóa:} Quy hoạch đường đi 2.5D, Robot tự hành dã chiến (Field UGV), Cơ học đất Terramechanics, Phân cấp lai 4 tầng HMCTD-A*\_v2, Khuếch tán địa trắc, Cổng yên ngựa, Kinodynamic Riccati-RTI NMPC, Nội suy PCHIP Hermite, Bù tiền hồi nghịch đảo trượt bậc hai, Quan sát trượt nhân quả.
+\noindent\textbf{Từ khóa:} Quy hoạch đường đi 2.5D, HGB-A*, Tìm kiếm hai chiều đa phân giải, Cơ học đất Bekker-Wong, Năng lượng Minetti, Chống lật tĩnh LTR/SSF, Kinodynamic Riccati-RTI NMPC, PCHIP $C^1$, Bù trượt bậc hai, Đối chuẩn 2.5D SOTA.
 
 % ============================================================
 \section{Giới thiệu}
 % ============================================================
-Trong các nhiệm vụ tự hành ngoài trời như tìm kiếm cứu nạn, khảo sát địa chất, tuần tra biên giới và nông nghiệp thông minh, phương tiện mặt đất không người lái (UGV) bắt buộc phải di chuyển qua các địa hình tự nhiên gồ ghề và biến dạng phức tạp \cite{liu2023}. Khác với môi trường trong nhà hay đường giao thông đô thị có thể giả định mặt phẳng 2D lý tưởng, bề mặt dã chiến 2.5D (Elevation Map) đặt ra hai thách thức phi tuyến cốt lõi:
+Trong các ứng dụng robot mặt đất ngoài trời như tìm kiếm cứu nạn, khảo sát địa chất, tuần tra địa hình phức tạp và nông nghiệp tự hành, phương tiện mặt đất không người lái (UGV) phải di chuyển qua địa hình tự nhiên có độ cao biến đổi liên tục và nền đất biến dạng \cite{liu2023}. Khác với bài toán robot trong nhà hoặc xe tự lái đô thị có thể xem mặt đường là mặt phẳng 2D lý tưởng, môi trường dã chiến \textbf{2.5D} (mỗi tọa độ mặt bằng $(x,y)$ gắn với một độ cao $z = h(x,y)$ và loại nền đất $\tau(x,y)$) đặt ra ba thách thức vật lý trực tiếp:
 \begin{enumerate}
-    \item \textbf{Độ dốc địa hình và nguy cơ lật xe (Rollover Hazard):} Sườn dốc nghiêng lớn làm thay đổi mạnh mẽ phân bố tải trọng lên các bánh xe. Khi góc nghiêng ngang vượt quá giới hạn ổn định tĩnh ($\text{SSF} = T / (2h)$), UGV đối mặt với nguy cơ lật đổ thảm khốc \cite{chen2012ltr}. Đồng thời, việc leo dốc liên tục làm tiêu hao năng lượng cơ học rất lớn theo mô hình phi tuyến Minetti \cite{minetti2002}.
-    \item \textbf{Tương tác bánh xe - nền đất biến dạng (Terramechanics):} Nền đất dã chiến bao gồm nhiều phân lớp vật lý đa dạng như bùn nhão, sỏi đá, cát lún và thảm mùn xốp \cite{bekker1956}. Lực bám ma sát hạn chế gây ra hiện tượng trượt dọc (wheel slip) và trượt ngang (side slip), làm mất liên kết động học giữa lệnh điều khiển vận tốc và chuyển động thực của xe.
+    \item \textbf{Nguy cơ lật xe và tiêu hao năng lượng khi leo dốc:} Khi xe đi ngang sườn dốc lớn, trọng tâm bị lệch khiến tải trọng dồn sang một bên bánh xe. Nếu độ dốc vượt quá giới hạn ổn định tĩnh của khung gầm, xe có thể bị lật đổ \cite{chen2012ltr}. Đồng thời, việc leo dốc cao hoặc lên xuống thất thường làm tiêu hao cơ năng tăng mạnh theo quy luật phi tuyến \cite{minetti2002}.
+    \item \textbf{Hiện tượng lún đất và trượt bánh xe (Terramechanics):} Nền đất tự nhiên như bùn lầy, cát rời hay cỏ ướt vừa tạo lực cản lún làm nặng xe \cite{bekker1956, wong2008}, vừa khiến bánh xe quay nhưng xe tiến chậm hơn tốc độ mong muốn (gọi là \textit{độ trượt dọc}). Nếu bộ điều khiển không bù phần trượt này, xe sẽ bị tụt lại phía sau và lệch khỏi quỹ đạo.
+    \item \textbf{Yêu cầu chạy thời gian thực trên máy tính nhúng CPU thuần:} Nhiều phương pháp 2.5D gần đây phụ thuộc mạnh vào mạng học sâu trên GPU hoặc bộ giải tối ưu nặng tốn hàng chục đến hàng trăm mili-giây \cite{wellhausen2023art, grandia2023}, gây khó khăn khi triển khai trên robot nhỏ gọn giới hạn công suất.
 \end{enumerate}
 
-Phần lớn các công trình nghiên cứu hiện nay thường tiếp cận bài toán một cách rời rạc: tầng quy hoạch toàn cục (A*, RRT*) chỉ tối ưu hóa chiều dài hình học phẳng mà bỏ qua độ dốc và cơ học đất, dẫn đến quỹ đạo răng cưa nguy hiểm \cite{hart1968, karaman2011}; trong khi tầng điều khiển bám vết (NMPC) nếu tích hợp mạng nơ-ron sâu trực tiếp trong vòng lặp thời gian thực sẽ gây trễ tính toán nghiêm trọng và có nguy cơ tràn bộ nhớ trên các máy tính nhúng biên \cite{grandia2023}.
-
-Nhằm giải quyết triệt để sự mất cân đối này, nghiên cứu của \textbf{Nhóm 2 (Động lực học \& Điều khiển)} tập trung xây dựng một hệ thống liên hợp khép kín từ quy hoạch toàn cục nhận thức hai giai đoạn đến điều khiển tối ưu nhúng có xét đầy đủ cơ học đất Bekker-Wong. Các đóng góp khoa học chính của bài báo bao gồm:
+Nhằm giải quyết đồng bộ cả hai tầng quy hoạch và điều khiển trên phần cứng CPU phổ thông, \textbf{Nhóm 2 (Động lực học \& Điều khiển)} đã hoàn thiện và chuẩn hóa hệ thống liên hợp gồm hai nghiên cứu chính:
 \begin{itemize}
-    \item \textbf{Đề xuất thuật toán quy hoạch toàn cục HMCTD-A*\_v2:} Kiến trúc phân cấp lai 4 tầng kết hợp trường khuếch tán địa trắc bất biến tỷ lệ, đồ thị cổng yên ngựa MCTS-PUCT, tìm kiếm hai chiều Dial Radix dẫn hướng bằng trường thế mềm phi đẳng hướng và quy hoạch động kéo căng dây địa trắc (Geodesic String-Pulling DP), xóa bỏ hoàn toàn điểm nghẽn suy thoái hành lang (0.0\% Fallback) và đạt tỷ lệ thành công cùng an toàn chống lật 100.0\% trên cả bản đồ tiêu chuẩn lẫn bản đồ lớn tới hơn 1 triệu ô lưới.
-    \item \textbf{Phát triển bộ điều khiển dự báo nhúng thời gian thực Kinodynamic Riccati-RTI NMPC:} Tích hợp bộ phát quỹ đạo động học nội suy PCHIP $C^1$ Hermite, bảng tra cứu trượt toàn dải \texttt{FullRangeSlipLUT} ($[0.01, 0.85]$), bộ quan sát trượt nhân quả 1-bước, bù tiền hồi nghịch đảo trượt bậc hai giải tích và bộ giải đệ quy khối tam đường chéo Riccati-ADMM đạt chu kỳ giải siêu tốc $33.67\ \mu\text{s}$ ($\sim 29,849\ \text{Hz}$).
-    \item \textbf{Khảo sát và đối chuẩn toàn diện trên 549 bản đồ chuẩn và 69 bản đồ quy mô lớn:} Toàn bộ hệ thống được thử nghiệm đối sánh trực tiếp với các nghiên cứu nền tảng (Weighted A*, MCTD-A*, HMCTD-A* v1, Traditional NMPC, Hybrid NMPC, Edge-Hybrid NMPC) trên 509 bản đồ BenchNav GT, 40 kịch bản thực địa thuộc 4 bộ dữ liệu quốc tế (\textbf{BenchNav}, \textbf{TartanDrive}, \textbf{YCOR}, \textbf{GOOSE}) và các bản đồ lớn ($128^2 \to 1024^2$ 2.5D DEM cùng 49 mê cung \textbf{OMB} $512^2$).
+    \item \textbf{Tầng Quy hoạch Toàn cục \textbf{HGB-A*} (\textit{Hierarchical Geodesic-Guided Bidirectional A*}):} Kế thừa bài học từ nguyên mẫu \textbf{HMCTD-A* v1}, chúng em loại bỏ hoàn toàn sự phụ thuộc bắt buộc vào mạng học sâu CNN khóa cứng hành lang và tái thiết kế thành thuật toán tìm kiếm đồ thị cổ điển 4 tầng chạy bằng \textbf{C++17 SIMD} (có bản Python vector hóa tương đương 1:1). Thuật toán luôn bảo toàn các khe đèo an toàn, khóa cứng hố nước sâu ($\tau=8$) và vách dốc gây lật ($\theta > 47.07^\circ$), đạt \textbf{0.0\% Fallback} và mở rộng mượt mà tới bản đồ $1024 \times 1024$ ($>1$ triệu ô lưới).
+    \item \textbf{Tầng Điều khiển Cục bộ \textbf{Kinodynamic Riccati-RTI NMPC}:} Thay thế bộ giải nặng CasADi/Ipopt bằng bộ giải cấu trúc khối tam đường chéo \textbf{Riccati-ADMM} cấp phát tĩnh trong C++17, kết hợp quỹ đạo mượt \textbf{PCHIP $C^1$}, bảng tra trượt toàn dải $0^\circ\text{--}85^\circ$, bộ quan sát trượt trực tuyến và bù truyền thẳng bậc hai chính xác.
+    \item \textbf{Đánh giá định lượng diện rộng và trực quan hóa theo tỷ lệ vật lý 1:1:1:} Đo kiểm trực tiếp trên \textbf{549 bản đồ $64^2$}, \textbf{4 tập thực địa}, \textbf{dải đa tỷ lệ $128^2 \to 1024^2$}, \textbf{49 mê cung OMB}, kèm đối chiếu với các hệ thống \textbf{2.5D SOTA} và biểu diễn bề mặt 3D đúng tỷ lệ $1{:}1{:}1$ (không kéo dãn trục độ cao $Z$).
 \end{itemize}
 
-Phần còn lại của bài báo được tổ chức như sau: Mục 2 trình bày bảng ký hiệu; Mục 3 tổng quan các công trình liên quan và phân tích hạn chế của các phiên bản tiền nhiệm; Mục 4 mô hình hóa động lực học, cơ học đất và thủy văn tích thủy 2.5D; Mục 5 và Mục 6 trình bày chi tiết lý thuyết toán học, sơ đồ khối và mã giả của hai nghiên cứu mới (\textbf{HMCTD-A*\_v2} và \textbf{Kinodynamic Riccati-RTI NMPC}); Mục 7 báo cáo kết quả thực nghiệm đối chuẩn diện rộng; Mục 8 mô tả tích hợp hệ thống trên ROS 2; và Mục 9 đưa ra các thảo luận cùng kết luận.
+Cấu trúc các mục tiếp theo của báo cáo gồm: Mục 2 hệ thống hóa ký hiệu và ý nghĩa vật lý của các đại lượng; Mục 3 tổng quan tài liệu và phân tích hạn chế của phiên bản v1; Mục 4 mô hình hóa vật lý 2.5D; Mục 5 và Mục 6 trình bày chi tiết thuật toán \textbf{HGB-A*} và \textbf{Kinodynamic Riccati-RTI NMPC}; Mục 7 báo cáo kết quả thực nghiệm và đối chuẩn với 2.5D SOTA; Mục 8 trình bày khả năng tích hợp ROS 2; và Mục 9 phân tích các đánh đổi kỹ thuật cùng kết luận.
 
 % ============================================================
-\section{Bảng Ký hiệu và Danh mục Từ viết tắt}
+\section{Bảng Ký hiệu và Ý nghĩa Vật lý}
 % ============================================================
-Bảng \ref{tab:nomenclature} tổng hợp các ký hiệu toán học và thuật ngữ viết tắt được sử dụng xuyên suốt báo cáo.
+Để thuận tiện theo dõi các công thức và biểu đồ, Bảng \ref{tab:nomenclature} tổng hợp ký hiệu toán học và ý nghĩa vật lý của từng đại lượng được sử dụng trong báo cáo.
 
 \begin{table}[htbp]
 \centering
-\caption{Danh mục ký hiệu toán học và từ viết tắt trong hệ thống quy hoạch - điều khiển 2.5D}
+\caption{Danh mục ký hiệu toán học và giải thích trực quan các thuật ngữ kỹ thuật}
 \label{tab:nomenclature}
 \resizebox{\textwidth}{!}{%
 \begin{tabular}{ll|ll}
     \toprule
-    \textbf{Ký hiệu} & \textbf{Ý nghĩa vật lý / Định nghĩa toán học} & \textbf{Viết tắt} & \textbf{Thuật ngữ đầy đủ} \\
+    \textbf{Ký hiệu / Thuật ngữ} & \textbf{Giải thích trực quan (ý nghĩa thực tế)} & \textbf{Viết tắt} & \textbf{Tên đầy đủ \& vai trò} \\
     \midrule
-    $h(x,y), \theta(x,y)$ & Độ cao mặt đất (m) và góc dốc cục bộ ($^\circ$) & UGV & Unmanned Ground Vehicle (Robot tự hành mặt đất) \\
-    $\tau \in \{0,\dots,8\}$ & Mã phân lớp địa chất ngữ nghĩa ($\tau=8$: hố sụt/nước sâu) & DEM & Digital Elevation Map (Bản đồ độ cao số 2.5D) \\
-    $k_c, k_\phi, n, R_c$ & Tham số cơ học đất Bekker-Wong và lực cản lún (N) & LTR / SSF & Lateral Load Transfer Ratio / Static Stability Factor \\
-    $C(\tan\theta)$ & Hàm năng lượng cơ học Minetti bậc 5 (J/kg/m) & MCTS-PUCT & Monte Carlo Tree Search - Predictor Upper Confidence Tree \\
-    $\Phi_{\text{terr}}(p)$ & Trường kháng trở cơ học địa hình tại ô $p$ & OOD & Out-of-Distribution (Ngoài phân phối huấn luyện) \\
-    $U(I, J)$ & Trường thế khoảng cách địa trắc trên lưới thô & PCHIP & Piecewise Cubic Hermite Interpolating Polynomial \\
-    $\mathcal{V}_p, \mathcal{E}_p$ & Tập đỉnh cổng yên ngựa và cạnh đồ thị vĩ mô & SQP-RTI & Sequential Quadratic Programming - Real-Time Iteration \\
-    $P_{\text{corr}}(r,c)$ & Trường thế dẫn hướng hành lang mềm Gaussian $[0,1]$ & ADMM & Alternating Direction Method of Multipliers \\
-    $s_0, c_v, s(u_v)$ & Trượt tĩnh, hệ số trượt động và tổng độ trượt bánh xe & LUT & Look-Up Table (Bảng tra cứu nội suy đa chiều) \\
-    $u_{v,\text{ff}}, u_{\omega,\text{ff}}$ & Lệnh vận tốc dài và góc bù tiền hồi nghịch đảo trượt & CTE / RMSE & Cross-Track Error / Root Mean Square Error \\
-    $A_k, B_k, d_k$ & Ma trận trạng thái, điều khiển và phần dư động học RTI & SIMD & Single Instruction, Multiple Data (Vector hóa phần cứng) \\
+    $h(r,c),\; \theta(r,c)$ & Độ cao mặt đất (m) và góc nghiêng mặt đất ($^\circ$) tại ô $(r,c)$ & DEM & Digital Elevation Map (bản đồ độ cao 2.5D) \\
+    $\tau \in \{0,\dots,8\}$ & Loại nền đất ($\tau=3$: bùn lún; $\tau=8$: hố nước sâu cấm đi) & HGB-A* & Hierarchical Geodesic-Guided Bidirectional A* \\
+    $\text{SSF},\; \text{LTR}$ & Độ vững khung xe ($\text{SSF}=1.118$) và chỉ số nguy cơ lật ngang & TCI & Terrain Complexity Index (độ gồ ghề của từng khối) \\
+    $C_{\text{Minetti}}(g)$ & Năng lượng tiêu tốn trên 1 m đường khi leo/xuống dốc $g$ & PUCT & Quy tắc chọn nhánh cân bằng khai thác -- thăm dò \\
+    $\bar{R}_{\text{Bekker}}$ & Lực cản lún trung bình của nền đất (đã lọc mượt $5\times 5$) & APH & Anisotropic Physical Heuristic (ước lượng chi phí có hướng dốc) \\
+    $d_f, d_b,\; \varphi$ & Chi phí đi từ Start ($d_f$), từ Goal ($d_b$) và tổng thế $\varphi=d_f+d_b$ & CBF & Control Barrier Function (hàm rào chắn an toàn) \\
+    $P_{\text{corr}}(r,c)$ & Độ ưu tiên nằm trong hành lang mềm $[0,1]$ (1 = tâm hành lang) & PCHIP $C^1$ & Đường cong nội suy mượt liên tục đạo hàm, không rung lắc \\
+    $z_{\text{clearance}}$ & Khe hở độ cao cho phép giữa dây nối thẳng và mặt đất DEM & SQP-RTI & Giải xấp xỉ bậc hai mỗi bước chạy thời gian thực \\
+    $s_0,\; c_v,\; s(u_v)$ & Độ trượt tĩnh theo dốc/đất, hệ số trượt theo tốc độ và tổng trượt & Riccati-ADMM & Bộ giải tối ưu chuỗi thời gian nhanh cấp phát tĩnh \\
+    $\gamma_{\text{eff}}$ & Độ nhạy vận tốc thực theo tốc độ bánh xe ($\partial v_{\text{eff}}/\partial u_v$) & CTE / RMSE & Sai số lệch ngang khỏi quỹ đạo / sai số căn bậc hai trung bình \\
+    $u_{v,\text{ff}},\; u_{\omega,\text{ff}}$ & Lệnh vận tốc tính sẵn để bù trượt và bám độ cong đường đi & Peak RSS & Lượng bộ nhớ RAM cực đại tiến trình tiêu thụ \\
     \bottomrule
 \end{tabular}%
 }
 \end{table}
 
 % ============================================================
-\section{Tổng quan Tài liệu và Phân tích Hạn chế của Nghiên cứu Cũ}
+\section{Tổng quan Tài liệu và Đánh giá Hạn chế của Nguyên mẫu v1}
 % ============================================================
 
-\subsection{Biểu diễn Môi trường 2.5D và các Bộ Dữ liệu Địa hình Dã chiến}
-Biểu diễn bề mặt là nền tảng quyết định độ tin cậy của hệ thống dẫn đường tự hành. Triebel et al. \cite{triebel2006} đề xuất cấu trúc Multi-Level Surface (MLS) Maps mở rộng bản đồ độ cao cho bề mặt đa tầng. Jiang et al. \cite{jiang2021rellis} công bố tập dữ liệu RELLIS-3D cung cấp đám mây điểm LiDAR gán nhãn ngữ nghĩa môi trường bùn lầy. Nhằm chuẩn hóa việc đánh giá định lượng, Endo et al. \cite{endo2024} phát triển nền tảng \textbf{BenchNav} dựa trên bản đồ độ cao kết hợp phân lớp địa chất. Bên cạnh đó, các tập dữ liệu thu thập từ xe thực địa đóng vai trò tiêu chuẩn vàng: \textbf{TartanDrive} của CMU \cite{triest2022tartandrive} ghi nhận động lực học xe ATV Yamaha Viking trên đường rừng lầy lội; \textbf{YCOR} (Yamaha-CMU Off-Road) \cite{maturana2018ycor} tập trung vào sườn dốc Appalachian hiểm trở ($15^\circ\text{--}35^\circ$); \textbf{GOOSE} của Viện Fraunhofer IOSB \cite{mortimer2024goose} cung cấp địa hình đồi núi đứt gãy, hố trũng tích thủy châu Âu; và bộ dữ liệu mê cung đa giác trực giao quy mô lớn \textbf{OMB} ($512\times 512$) của TS. Nguyễn Kiều Linh \cite{linh2026dataset} đặt ra bài toán bẫy tô-pô đa hành lang cực kỳ khắc nghiệt.
+\subsection{Bản đồ Địa hình 2.5D và các Bộ Dữ liệu Chuẩn Quốc tế}
+Biểu diễn địa hình 2.5D (Elevation Grid Map) là chuẩn thực tế phổ biến cho robot mặt đất ngoài trời nhờ cân bằng giữa thông tin hình học và tốc độ truy xuất $\mathcal{O}(1)$ so với lưới voxel 3D \cite{triebel2006, miki2022elevation}. Nghiên cứu sử dụng năm tập dữ liệu địa hình chuẩn để đánh giá:
+\begin{itemize}
+    \item \textbf{BenchNav} \cite{endo2024}: Nền tảng đối chuẩn dẫn đường địa hình có gán nhãn độ cao và phân lớp vật lý đất (509 bản đồ tổng hợp GT + tập mẫu thực địa; độ phân giải thực $0.5\ \text{m/ô}$ tương ứng vùng $31.5\ \text{m}\times 31.5\ \text{m}$).
+    \item \textbf{TartanDrive} \cite{triest2022tartandrive} và \textbf{YCOR} \cite{maturana2018ycor}: Dữ liệu thực địa của CMU từ xe ATV chạy qua đồi dốc rừng núi lầy lội ($0.5\ \text{m/ô}$, chênh cao $\Delta Z$ tới $10.6\text{--}12.5\ \text{m}$, tồn tại các vách dốc $59^\circ\text{--}68^\circ$).
+    \item \textbf{GOOSE} \cite{mortimer2024goose}: Tập dữ liệu địa hình phi cấu trúc châu Âu (Fraunhofer IOSB) chứa nhiều vách đất dựng đứng (đến $82.9^\circ$) và vùng hố trũng hiểm trở.
+    \item \textbf{OMB (Orthogonal Maze Benchmark)} \cite{linh2026dataset}: 49 mê cung đa giác trực giao quy mô lớn ($14$ bản đồ $128^2$, $6$ bản đồ $256^2$, $29$ bản đồ $512^2$) nhằm kiểm thử khả năng thoát bẫy hình học nhiều ngõ cụt.
+\end{itemize}
 
-\subsection{Phân tích Nguyên nhân Gốc rễ Hạn chế của Các Thuật toán Quy hoạch Cũ}
-Trong các nghiên cứu giai đoạn trước, nhóm đã khảo sát ba thuật toán quy hoạch: \textbf{Weighted A*} \cite{hart1968}, \textbf{MCTD-A*} \cite{yoon2025} và \textbf{HMCTD-A* (v1)}. Qua kiểm nghiệm chuyên sâu trên 549 bản đồ tiêu chuẩn và các bản đồ thực địa phức tạp, chúng em phát hiện 4 điểm nghẽn toán học nghiêm trọng ở các phiên bản cũ:
+\subsection{Các Hướng tiếp cận Quy hoạch và Điều khiển 2.5D Gần đây}
+Các hệ thống quy hoạch và điều khiển 2.5D hiện nay chia thành bốn nhóm chính:
 \begin{enumerate}
-    \item \textbf{Hiện tượng suy biến chuẩn hóa cực đại trong mạng \texttt{System1CNN} (\textbf{Scale-Distortion Bug}):}
-    Trong \textbf{MCTD-A*} và \textbf{HMCTD-A* (v1)}, đầu vào độ dốc của mạng học sâu U-Net được chuẩn hóa tương đối theo giá trị cực đại của từng bản đồ: $\tilde{s} = s / (s_{\max} + 10^{-5})$. Trên tập huấn luyện BenchNav GT, độ dốc cực đại chỉ dao động quanh $15^\circ\text{--}25^\circ$. Tuy nhiên, trên tập thực địa \textbf{GOOSE} (\texttt{goose\_000.pt}), tồn tại các vách đá dựng đứng đạt $s_{\max} = 76.2^\circ$. Phép chia cho $76.2^\circ$ làm toàn bộ các sườn đồi nguy hiểm $35^\circ\text{--}49^\circ$ bị nén thành giá trị $\tilde{s} \approx 0.45$, khiến mạng CNN nhìn nhầm vách đá lật xe là vùng bằng phẳng ($P_{\text{CNN}} = 0.39$), trong khi khe đèo yên ngựa an toàn duy nhất tại tọa độ $(20, 16)$ bị gán xác suất $P_{\text{CNN}} = 0.00$ (xem Hình \ref{fig:goose_anatomy}A).
-    \item \textbf{Mặt nạ hành lang nhị phân cứng và tâm cụm hình học gây tỷ lệ Fallback 73.38\%:}
-    \textbf{HMCTD-A* (v1)} cắt ngưỡng cứng $P_{\text{CNN}} > 0.1$ để tạo mặt nạ nhị phân và ép các điểm mốc trung gian (Waypoints) nằm tại tâm hình học của cụm $32\times 32$. Khi tâm cụm rơi vào sườn núi dốc hoặc mặt nạ bị đứt gãy tô-pô, tìm kiếm cục bộ thất bại hoàn toàn, buộc thuật toán phải hủy bỏ kết quả phân cấp và chạy lại \textbf{Weighted A*} trên toàn bản đồ. Thực nghiệm trên 549 bản đồ cho thấy \textbf{HMCTD-A* (v1)} bị suy thoái (Fallback) tới \textbf{73.38\%} số bản đồ, làm số nút mở rộng trung bình vọt lên $2,517.7$ nút và thời gian giải chậm ($191.28$ ms).
-    \item \textbf{Hiệu ứng răng cưa lưới 8 hướng (Grid Aliasing):}
-    Đường đi sinh ra bởi tìm kiếm trên lưới 8 hướng chỉ có các góc hướng rời rạc bội số của $\pi/4$, gây ra độ nhấp nhô góc lái lớn ($\text{Smoothness} = 5.62\text{--}12.22\ \text{rad}^2$) và làm tăng chiều dài quỹ đạo thêm $4\text{--}8\%$ do bất đẳng thức khoảng cách Octile so với đường địa trắc Euclid liên tục.
-    \item \textbf{Ngắt sớm do trần chi phí tĩnh trên bản đồ quy mô lớn ($> 256\times 256$):}
-    Các bộ quy hoạch cũ cài đặt ngưỡng trần cố định \texttt{max\_total\_cost = 10000.0}. Khi mở rộng lên bản đồ $512\times 512$ và $1024\times 1024$ (chiều dài lộ trình $> 1,350$ ô), tổng chi phí tích lũy vượt quá $10,000$ ngay giữa chặng, khiến \textbf{HMCTD-A* (v1)} tự động ngắt tìm kiếm và trả về \texttt{None} (tỷ lệ thất bại 100\% ở quy mô $\ge 512^2$).
+    \item \textbf{Tìm kiếm đồ thị và bất kỳ góc (Graph / Any-Angle Search):} \textbf{Nav2 Smac Planner} (\texttt{Smac-Hybrid}, \texttt{Smac-Lattice}) \cite{macenski2024smac} tìm kiếm trong không gian hướng $SE(2)$ với cung Dubins/Reeds-Shepp rất mạnh cho xe bánh trên mặt phẳng 2D, nhưng chưa tích hợp cơ học đất hay ổn định lật 3D. \textbf{Lazy Theta*} \cite{nash2010lazytheta} và \textbf{Field D*} \cite{ferguson2006fieldd} giảm sai số bậc thang của lưới nhưng chưa có cấu trúc dẫn hướng đa phân giải cho địa hình gồ ghề lớn.
+    \item \textbf{Quy hoạch dựa trên lấy mẫu và học sâu cho địa hình dốc:} \textbf{PUTN} \cite{jian2022putn} kết hợp \texttt{PF-RRT*} (khớp mặt phẳng PCA cục bộ) với nội suy Gaussian Process (GPR) và NMPC bằng CasADi trên CPU; \textbf{ART Planner} \cite{wellhausen2023art} tối ưu hóa tư thế $SE(3)$ cho robot chân ANYmal kết hợp CNN trên GPU (\texttt{elevation\_mapping\_cupy} \cite{miki2022elevation}); \textbf{EIT*} \cite{strub2022eit} tối ưu tiệm cận bằng cây hai chiều bất đối xứng; còn \textbf{TERP} \cite{weerakoon2022terp} và \textbf{Verti-Bench (TAL/TNT)} \cite{vertibench2025} ứng dụng học tăng cường sâu (DRL) trên GPU cho sườn dốc dựng đứng.
+    \item \textbf{Điều khiển tối ưu khai thác cấu trúc (Structured NMPC / CBF-MPC):} \textbf{acados} \cite{verschueren2022} và \textbf{FATROP} \cite{vanroye2023fatrop} khai thác cấu trúc khối thưa kết hợp phân rã Riccati để giải bài toán tối ưu phi tuyến nhanh hơn nhiều lần so với Ipopt \cite{wachter2006}; \textbf{OCS2 Perceptive NMPC} \cite{grandia2023}, \textbf{Quadruped NMPC-DCBF} \cite{liao2023dcbf} và \textbf{Terrain-Aware CBF-MPC} \cite{yang2026terraincbf} đưa trực tiếp ràng buộc rào chắn an toàn (CBF) và tiếp xúc 3D vào bài toán điều khiển.
+    \item \textbf{Điều khiển lấy mẫu ngẫu nhiên (Sampling-based MPPI):} \textbf{WayFASTER} \cite{gasparino2024wayfaster} học mô hình vượt địa hình tự giám sát từ camera RGB-D kết hợp Neural-MPPI trên Jetson Xavier; \textbf{nav2\_mppi\_controller} dùng XTensor SIMD trên CPU; và \textbf{MPPI-Generic} \cite{vlahov2024mppi} chạy hàng nghìn quỹ đạo song song trên CUDA GPU.
 \end{enumerate}
 
-\subsection{Phân tích Nguyên nhân Gốc rễ Hạn chế của Các Bộ Điều khiển NMPC Cũ}
-Tương tự, việc khảo sát ba thế hệ bộ điều khiển trước đó gồm \textbf{Traditional NMPC} (không bù trượt), \textbf{Hybrid NMPC} (nhúng mạng \texttt{SlipMLP} vào đồ thị CasADi) và \textbf{Edge-Hybrid NMPC} (dùng \texttt{SlipLUT} + \texttt{OnlineSlipAdapter} giải bằng CasADi/Ipopt) bộc lộ 4 rào cản vật lý và tính toán:
+\subsection{Phân tích Hạn chế của Phiên bản Tiền nhiệm (v1) và Cấu trúc HGB-A*}
+Trong giai đoạn đầu, nhóm xây dựng nguyên mẫu \textbf{HMCTD-A* v1} (\texttt{pp\_hmctd\_a\_star.py}) kết hợp \textbf{Edge-Hybrid NMPC} (\texttt{edge\_hybrid\_nmpc.py}). Quá trình kiểm chứng bộc lộ năm hạn chế chính:
 \begin{enumerate}
-    \item \textbf{Xung đạo hàm góc hướng tại các đỉnh gấp khúc $G^0$ (\texttt{interp1d(kind='linear')}):}
-    Cả ba bộ điều khiển cũ đều nội suy quỹ đạo tham chiếu bằng đoạn thẳng tuyến tính từng khúc. Tại mỗi điểm nối waypoint, góc hướng tham chiếu $\theta_{\text{ref}}(s) = \arctan 2(y'(s), x'(s))$ bị nhảy bậc thang gián đoạn (xung Dirac của độ cong $\kappa(s)$), kích thích dao động điều khiển và tạo ra các đỉnh vọt lố sai số bám ngang ($\text{Max CTE} = 14.81$ cm).
-    \item \textbf{Cắt ngưỡng trượt cứng $\alpha \le 0.40$ trong \texttt{SlipLUT} và \texttt{OnlineSlipAdapter} cũ:}
-    Bảng tra \texttt{SlipLUT} cũ bị giới hạn độ dốc ở $30^\circ$ và kẹp cứng hệ số trượt tối đa ở $0.40$. Trên địa hình bùn lầy kết hợp dốc lớn của TartanDrive và GOOSE, độ trượt thực tế đạt $s_{\text{act}} \in [0.55, 0.78]$, khiến bộ điều khiển đánh giá thấp nghiêm trọng độ mất vận tốc của xe.
-    \item \textbf{Thiếu hụt vận tốc tiến và đạo hàm cơ học đất khi tuyến tính hóa:}
-    Khi bánh xe quay với vận tốc lệnh $u_v$, vận tốc tiến thực tế trên mặt đất là $v_{\text{eff}}(u_v) = u_v (1 - s(u_v))$ với $s(u_v) = s_0 + c_v u_v$. Các bộ điều khiển cũ đặt lệnh tham chiếu $u_{v,\text{ref}} = v_{\text{nom}}$ mà không giải phương trình nghịch đảo trượt bậc hai, làm xe luôn chạy chậm hơn điểm tham chiếu một lượng $\Delta v = -v_{\text{nom}} s(v_{\text{nom}})$, gây tích lũy sai số pha dọc đường. Hơn nữa, đạo hàm riêng cơ học đất $\frac{\partial v_{\text{eff}}}{\partial u_v} = 1 - s_0 - 2 c_v u_v$ bị bỏ qua phần $-2 c_v u_v$.
-    \item \textbf{Độ trễ khung giải nội điểm CasADi + Ipopt ($4.45$ ms -- $52.27$ ms):}
-    Mặc dù \textbf{Edge-Hybrid NMPC} đã thay mạng MLP ($52.27$ ms) bằng bảng tra LUT, việc gọi bộ giải nội điểm đa năng Ipopt qua giao diện CasADi ở mỗi bước điều khiển vẫn tiêu tốn trung bình $4,451.38\ \mu\text{s}$ ($4.45$ ms), chưa khai thác được cấu trúc ma trận thưa khối tam đường chéo (Block-Tridiagonal) đặc thù của chuỗi Markov thời gian rời rạc.
+    \item \textbf{Phân tách rõ giữa mô hình sinh học sâu và tìm kiếm đồ thị đa phân giải:} Mặc dù cấu trúc hai tầng ban đầu tham khảo ý tưởng tách System 1/System 2 từ \cite{yoon2025}, phiên bản cải tiến không sử dụng mạng sinh khuếch tán (Denoising Diffusion) mà vận hành hoàn toàn bằng tìm kiếm đồ thị cổ điển đa phân giải kết hợp thế trắc địa Dijkstra thô, đồ thị cổng và A* hai chiều. Thuật toán do đó được định danh theo đúng cấu trúc toán học là \textbf{HGB-A*} (\textit{Hierarchical Geodesic-Guided Bidirectional A*}).
+    \item \textbf{Hành lang cứng từ mạng \texttt{System1CNN} dễ đứt đường và kéo lệch quỹ đạo:} Ở v1, \texttt{System1CNN} chuẩn hóa độ dốc theo $s / s_{\max}$ của từng bản đồ và khóa cứng mặt nạ (\textit{Hard Mask}: cấm mọi ô có xác suất $<0.2$). Khi gặp bản đồ có vách đá cao như GOOSE ($s_{\max} = 82.9^\circ$), mạng CNN nhận diện sai khe đèo khiến v1 phải rơi về A* toàn cục (\textit{Fallback}). Ngay cả khi trộn mờ $25\%$ mạng CNN cũ này vào \textbf{HGB-A*}, thực nghiệm trên 549 bản đồ cho thấy thời gian giải chậm gấp \textbf{7.3 lần} ($10.04\ \text{ms}$ so với $1.38\ \text{ms}$) mà không cải thiện năng lượng ($257.51\ \text{J}$ so với $257.43\ \text{J}$).
+    \item \textbf{Cắt tắt 2D của v1 vi phạm giới hạn lật và khe gầm 2.5D:} Hàm \texttt{shortcut\_path} ở v1 chỉ kiểm tra va chạm 2D đơn giản, không kiểm tra độ võng độ cao $Z$ và chưa đồng bộ ngưỡng lật, dẫn tới quỹ đạo trên \texttt{tartan\_000.pt} và \texttt{goose\_000.pt} cắt ngang qua sườn dốc tới $61.0^\circ$ và $58.6^\circ$ (vượt xa ngưỡng lật $48.19^\circ$).
+    \item \textbf{Ngắt tìm kiếm trên bản đồ lớn:} v1 viết bằng Python thuần và đặt trần tổng chi phí tĩnh \texttt{max\_total\_cost = 10000.0}, nên chạy chậm và không mở rộng được lên bản đồ $512^2\text{--}1024^2$.
+    \item \textbf{Trần trượt $0.40$ và bộ giải nặng Ipopt ở Edge-Hybrid NMPC (v1):} \texttt{SlipLUT} cũ chỉ phủ dốc tới $45^\circ$ và kẹp cứng độ trượt $\le 0.40$ (trong khi địa hình bùn dốc thực tế trượt tới $0.85$), nội suy tuyến tính $G^0$ gây giật góc lái, còn CasADi/Ipopt tốn hàng mili-giây mỗi bước.
 \end{enumerate}
 
-Hình \ref{fig:system_arch} trình bày kiến trúc liên hợp tổng thể của hai nghiên cứu mới được thiết kế nhằm giải quyết triệt để toàn bộ 8 hạn chế nêu trên.
+Hình \ref{fig:system_arch} minh họa tổng thể kiến trúc liên hợp mới nhằm khắc phục các hạn chế nêu trên.
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=0.99\textwidth]{figures/hmctd_v2_architecture.png}
-  \caption{Kiến trúc tổng thể hệ thống quy hoạch và điều khiển 2.5D thế hệ mới: Liên hợp chặt chẽ giữa Nghiên cứu 1 (Thuật toán quy hoạch phân cấp lai 4 tầng \textbf{HMCTD-A*\_v2}) và Nghiên cứu 2 (Bộ điều khiển dự báo nhúng siêu tốc \textbf{Kinodynamic Riccati-RTI NMPC}).}
+  \includegraphics[width=0.99\textwidth]{figures/hgb_a_star_architecture.png}
+  \caption{Kiến trúc tổng thể hệ thống liên hợp 2.5D: Tầng Quy hoạch 4 tầng cổ điển \textbf{HGB-A*} (xanh lá) liên kết trực tiếp với Tầng Điều khiển nhúng bù trượt bậc hai \textbf{Kinodynamic Riccati-RTI NMPC} (cam) và động lực học UGV phản hồi vòng kín.}
   \label{fig:system_arch}
 \end{figure}
 
 % ============================================================
-\section{Mô hình hóa Động lực học, Cơ học Đất \& Thủy văn 2.5D}
+\section{Mô hình hóa Vật lý Địa hình 2.5D và Động học Trượt}
 % ============================================================
 
-\subsection{Mô hình Động học UGV có Xét Trượt Địa hình Phụ thuộc Vận tốc}
-Phương tiện thử nghiệm là xe tự hành dẫn động vi sai / skid-steer vận hành trên bề mặt 2.5D $z = h(x, y)$. Trạng thái phẳng của robot được biểu diễn bởi vector $x_k = [X_k, Y_k, \theta_k]^T \in \mathbb{R}^2 \times \mathbb{S}^1$ và vector tín hiệu điều khiển là $u_k = [u_{v,k}, u_{\omega,k}]^T$ (vận tốc dài bánh xe và vận tốc góc). Theo lý thuyết cơ học đất Bekker-Wong \cite{bekker1956}, hệ số trượt dọc $s_k$ là hàm của phân lớp địa chất $\tau_k$, góc dốc cục bộ $\theta_{\text{slope},k}$ và chính vận tốc quay bánh xe $u_{v,k}$:
+\subsection{Năng lượng Leo dốc Minetti, Lực cản Đất Bekker-Wong và Ổn định Chống lật LTR}
+Mỗi bước di chuyển trên bề mặt 2.5D từ ô $p=(r_1,c_1)$ sang ô lân cận $q=(r_2,c_2)$ chịu chi phối bởi ba hiện tượng cơ học:
+\begin{enumerate}
+    \item \textbf{Chỉ số chuyển tải trọng ngang tĩnh (LTR -- đo nguy cơ lật xe):} Với hệ số ổn định khung xe $\text{SSF} = T/(2h_{\text{CoG}}) = 1.118$ (góc lật tới hạn vật lý $\theta_{\text{crit}} = \arctan(1.118) = 48.19^\circ$) \cite{chen2012ltr, larish2013ltr}, hệ thống định nghĩa chỉ số rủi ro lật và ngưỡng an toàn thiết kế $\text{LTR}_{\text{lim}} = 0.735$:
+    \begin{equation}
+        \text{LTR}(r,c) = \frac{\theta_{\text{rad}}(r,c)}{\text{SSF}} \le 0.735 \iff \theta(r,c) \le 47.07^\circ < \theta_{\text{crit}} = 48.19^\circ
+        \label{eq:ltr_safe}
+    \end{equation}
+    Ngoài ra, mọi ô thuộc \textbf{vũng nước sâu / hố sụt thủy văn} ($\tau = 8$) được khóa cứng trong bản đồ bằng phép gán $\text{LTR}(r,c) \leftarrow \max(\text{LTR}(r,c),\, \text{LTR}_{\text{lim}} + 0.35)$ để cả 4 tầng quy hoạch không bao giờ dẫn xe đi qua đáy hồ phẳng nhưng ngập sâu.
+    \item \textbf{Lực cản lún nền đất Bekker-Wong:} Từng phân lớp đất $\tau \in \{0,\dots,8\}$ được ánh xạ qua bảng tra lực cản $R_{\text{soil}}(\tau) = \{0{:}1.0,\; 1{:}1.2,\; 2{:}2.2,\; 3{:}8.5,\; 4{:}4.0,\; 5{:}2.5,\; 6{:}6.0,\; 7{:}1.5,\; 8{:}45.0\}$ (với hệ số khuếch đại trượt bùn $s_f = 1.6$ tại lớp bùn $\tau=3$, còn lại $s_f = 1.0$) \cite{bekker1956, wong2008}. Bản đồ cản đất sau đó đi qua bộ lọc trung bình hộp tách biệt $5\times 5$ (bán kính $r_s = 2$) để thu được trường cản mượt $\bar{R}_{\text{Bekker}}(r,c)$, phản ánh diện tích tiếp xúc thực của vết bánh xe.
+    \item \textbf{Chi phí năng lượng theo độ dốc dọc Minetti bậc 5:} Gọi $g = \Delta z / \Delta d_{\text{2D}}$ là độ dốc dọc theo hướng đi. Công thức đa thức bậc 5 thực nghiệm của Minetti \cite{minetti1993, minetti2002} mô tả cơ năng tiêu hao trên một đơn vị quãng đường:
+    \begin{equation}
+        C_{\text{Minetti}}(g) = 155.4 g^5 - 30.4 g^4 - 43.3 g^3 + 46.3 g^2 + 19.5 g + 3.6
+        \label{eq:minetti_poly}
+    \end{equation}
+    Trong quá trình tìm kiếm đồ thị (Tầng 1--3), $g$ được kẹp trong $[-0.35, 0.35]$ và $C_{\text{Minetti}} \in [0.5, 30.0]$ để đảm bảo tính ổn định số học; ở bước làm mượt Tầng 4 và bộ đánh giá năng lượng thực, đa thức được giữ nguyên không kẹp $g$ với chặn dưới $\max(0.5, C_{\text{Minetti}}(g))$. Về mặt trực giác, đi xuống dốc nhẹ ($g \approx -0.15$) tốn ít năng lượng nhất, còn leo dốc lớn làm chi phí tăng theo lũy thừa bậc cao.
+\end{enumerate}
+
+\subsection{Mô hình Động học UGV có Xét Trượt Phi tuyến theo Vận tốc}
+Trạng thái phẳng của robot vi sai / skid-steer được mô tả bởi $x_k = [X_k, Y_k, \theta_k]^T$ và tín hiệu điều khiển là $u_k = [u_{v,k}, u_{\omega,k}]^T$ (vận tốc quay dài của bánh xe và vận tốc góc). Theo mô hình tương tác bánh xe -- nền đất trong bộ mô phỏng và điều khiển, hệ số trượt dọc $s_k$ tăng theo cả loại đất, độ dốc và chính vận tốc bánh xe:
 \begin{equation}
-    s(u_{v,k}, \theta_{\text{slope},k}, \tau_k) = \text{clip}\Big( s_0(\tau_k, \theta_{\text{slope},k}) + c_v u_{v,k},\; s_{\min},\; s_{\max} \Big)
-    \label{eq:slip_model}
+    s(u_{v,k}, \theta_k, \tau_k) = \text{clip}\big( s_0(\tau_k, \theta_k) + c_v u_{v,k},\; 0.01,\; 0.85 \big), \qquad s_0(\tau, \theta) = \alpha_0(\tau) + 0.35 \sin\theta
+    \label{eq:slip_physics}
 \end{equation}
-trong đó $s_0(\tau, \theta_{\text{slope}}) = \alpha_0(\tau) + c_g \sin\theta_{\text{slope}}$ là độ trượt tĩnh do biến dạng cắt nền đất và lực cản dốc trọng trường ($c_g = 0.35$), còn $c_v = 0.02\ \text{s/m}$ là hệ số suy giảm bám động học theo vận tốc dài. Vận tốc tiến hiệu dụng của khung xe trên mặt đất là:
+trong đó $c_v = 0.05\ \text{s/m}$ là hệ số trượt động học theo vận tốc, còn $\alpha_0(\tau)$ là độ trượt cơ sở của từng loại đất (ví dụ $\alpha_0(0)=0.05$ với đất cứng, $\alpha_0(3)=0.40$ với bùn nhão). Do bánh xe bị quay trơn một phần $s_k$, vận tốc tiến thực sự của thân xe trên mặt đất là hàm \textbf{bậc hai} theo $u_{v,k}$:
 \begin{equation}
-    v_{\text{eff}}(u_{v,k}) = u_{v,k} \big[ 1 - s(u_{v,k}, \theta_{\text{slope},k}, \tau_k) \big] = u_{v,k}(1 - s_{0,k}) - c_v u_{v,k}^2
-    \label{eq:veff}
+    v_{\text{eff}}(u_{v,k}) = u_{v,k}\big(1 - s_{0,k} - c_v u_{v,k}\big)
+    \label{eq:veff_quad}
 \end{equation}
-Phương trình trạng thái rời rạc hóa với chu kỳ lấy mẫu $\Delta t$ và nhiễu trôi góc hướng $b_{\omega,k}$ do bất đối xứng lực kéo hai bên sườn nghiêng được viết dưới dạng:
+và phương trình trạng thái rời rạc hóa với chu kỳ lấy mẫu $\Delta t = 0.1\ \text{s}$ là:
 \begin{equation}
     x_{k+1} = f(x_k, u_k) = \begin{bmatrix}
-        X_k + \Delta t \, u_{v,k} \big(1 - s_{0,k} - c_v u_{v,k}\big) \cos\theta_k \\
-        Y_k + \Delta t \, u_{v,k} \big(1 - s_{0,k} - c_v u_{v,k}\big) \sin\theta_k \\
-        \theta_k + \Delta t \, (u_{\omega,k} - b_{\omega,k})
+        X_k + \Delta t \, u_{v,k}(1 - s_{0,k} - c_v u_{v,k})\cos\theta_k \\
+        Y_k + \Delta t \, u_{v,k}(1 - s_{0,k} - c_v u_{v,k})\sin\theta_k \\
+        \theta_k + \Delta t \, u_{\omega,k}
     \end{bmatrix}
-    \label{eq:discrete_kinematics}
+    \label{eq:ugv_kinematics}
 \end{equation}
 
-\subsection{Cơ học Nền đất Bekker-Wong, Năng lượng Minetti và Chống lật LTR}
-Khi bánh xe di chuyển trên nền đất biến dạng, áp suất pháp tuyến $p(z) = (k_c/b + k_\phi) z^n$ sinh ra lực cản lún $R_c = \frac{b}{n+1}(k_c/b + k_\phi)z_0^{n+1}$ \cite{bekker1956}. Trong hàm mục tiêu quy hoạch, mỗi phân lớp địa chất $\tau \in \{0,\dots,8\}$ được ánh xạ sang hệ số cản lún tương đương $R_{\text{soil}}(\tau)$ và được làm mượt không gian bằng bộ lọc trung bình cửa sổ $(2 r_s + 1)\times(2 r_s + 1)$ để tạo trường cản Bekker mượt $\bar{R}_{\text{Bekker}}(r,c)$, phản ánh kích thước vệt bánh xe hữu hạn.
+% ============================================================
+\section{Nghiên cứu 1: Thuật toán Quy hoạch 4 Tầng HGB-A*}
+% ============================================================
+Thuật toán \textbf{HGB-A*} (\texttt{HGBAStarPlanner} trong \texttt{3. code/pp\_hgb\_a\_star.py} và nhân biên dịch C++17 \texttt{3. code/hgb\_a\_star\_core.cpp} $\to$ \texttt{libhgb\_a\_star.so}) là một bộ quy hoạch đồ thị cổ điển đa phân giải gồm 4 tầng nối tiếp nhau. Hình \ref{fig:hgb_anatomy} trực quan hóa đầu ra toán học của từng tầng trên địa hình thực địa GOOSE ($64^2$) và bản đồ đa tỷ lệ $256^2$.
 
-Chi phí năng lượng cơ học trên một đơn vị quãng đường 3D được tính theo đa thức bậc 5 Minetti \cite{minetti2002} theo độ dốc tiếp tuyến $g = \tan\theta_{\text{step}} = \Delta z / \Delta d_{\text{2D}} \in [-0.8, 0.8]$:
-\begin{equation}
-    C_{\text{Minetti}}(g) = \max\Big(0.5,\; 155.4 g^5 - 30.4 g^4 - 32.8 g^3 + 44.4 g^2 + 11.9 g + 6.1\Big)
-    \label{eq:minetti_poly}
-\end{equation}
-Tỷ số chuyển tải trọng ngang tĩnh trên sườn dốc địa phương có góc nghiêng $\theta(r,c)$ đối với xe có hệ số ổn định tĩnh $\text{SSF} = T/(2h) = 1.118$ là:
-\begin{equation}
-    \text{LTR}(r, c) = \frac{\tan\theta(r, c)}{\text{SSF}}
-    \label{eq:static_ltr}
-\end{equation}
-Một ô lưới $(r,c)$ được xác định là vượt ngưỡng lật tĩnh khi $\text{LTR}(r,c) \ge 1.0 \iff \theta(r,c) \ge \arctan(\text{SSF}) = 48.19^\circ$. Chi phí chuyển trạng thái cơ sở giữa hai ô lân cận $p = (r_1, c_1)$ và $q = (r_2, c_2)$ là:
-\begin{equation}
-    c_{\text{step}}(p, q) = \Delta d_{\text{3D}}(p, q) \cdot C_{\text{Minetti}}(g_{pq}) + 1.5 \bar{R}_{\text{Bekker}}(q) + 50.0 \, \text{LTR}(q)
-    \label{eq:step_cost}
-\end{equation}
-với điều kiện cắt cứng an toàn: nếu $\text{LTR}(q) \ge 1.0$ hoặc $c_{\text{step}}(p,q) > c_{\text{step},\max} = 350.0$, thì $c_{\text{step}}(p,q) = +\infty$.
-
-\subsection{Mô hình Thủy văn Tích thủy và Vũng lún Sâu ($\tau = 8$) trên Bản đồ Lớn}
-Trên các bản đồ địa hình thực địa quy mô lớn ($128\times 128 \to 1024\times 1024$), các vùng trũng thấp nhất của bề mặt DEM (phân vị độ cao $h(x,y) \le P_{14.5\%}$, hiển thị màu xanh dương đậm trên thang màu địa hình) là các lòng hồ tích thủy hoặc hố sụt bùn sâu không thể vượt qua. Nếu chỉ sử dụng độ dốc hình học $\theta(x,y)$, đáy lòng hồ thường phẳng ($\theta \approx 0^\circ$), dễ đánh lừa các thuật toán quy hoạch truyền thống lao thẳng xuống vũng nước sâu và làm xe bị sa lầy đứt quãng. Để mô hình hóa chính xác bản chất thủy văn:
+\subsection{Tầng 1: Thế Trắc địa Lưỡng hướng trên Lưới Thô \& Chỉ số Gồ ghề TCI}
+Mục tiêu của Tầng 1 là \textit{nhìn toàn cảnh bản đồ nhanh} để biết vùng hành lang nào đi qua dễ nhất và vùng nào gồ ghề cần nới rộng biên an toàn, hoàn toàn không dùng mạng học sâu CNN:
 \begin{itemize}
-    \item Tâm vùng tích thủy ($h \le P_{14.5\%}$) được gán mã địa chất $\tau = 8$ (\textbf{Deep-Water Basin / Sinkhole}) với hệ số cản đất $R_{\text{soil}}(8) = 45.0$ và áp đặt rào cản lật/chìm tương đương $\text{LTR}_{\text{hydro}}(\tau=8) \ge \text{LTR}_{\text{lim}} + 0.35$.
-    \item Vành đai chuyển tiếp quanh lòng hồ ($P_{14.5\%} < h \le P_{22.0\%}$) được gán nhãn $\tau = 3$ (bùn lầy bão hòa nước, $R_{\text{soil}}(3) = 8.5$).
-    \item Vùng lân cận điểm xuất phát và đích được hòa trộn độ cao bằng hàm mũ Gaussian khả vi vô hạn $C^\infty$: $w_{\text{sg}}(x,y) = \exp\big(-\frac{\|p - p_{\text{sg}}\|^2}{2\sigma_{\text{sg}}^2}\big)$, đảm bảo robot khởi hành trên nền đất khô ráo mà không tạo vách đứng nhân tạo.
+    \item \textbf{Gom cụm bảo toàn khe hẹp (Min-Impedance Pooling):} Bản đồ $H \times W$ được chia thành các khối thô kích thước $c_s = 4$ nếu $\max(H,W) \le 64$, hoặc $c_s = \max(4, \lfloor \max(H,W)/32 \rfloor)$ với bản đồ lớn. Tại mỗi khối $(I,J)$, hệ thống tính độ phức tạp địa hình \textbf{Block TCI} bằng độ lệch chuẩn của $\text{LTR}$ trong khối ($\text{TCI}_{I,J} = \sqrt{\text{Var}(\text{LTR})}$), đồng thời chọn ô dễ đi nhất trong khối (\textit{cực tiểu trở kháng} $3.6 s_f + 0.35\bar{R}_{\text{Bekker}} + 8.0\,\text{LTR}^2$ với $\text{LTR} \le 0.735$) làm đại diện. Nhờ lấy cực tiểu thay vì trung bình cộng, một khe đèo hẹp chỉ rộng $1\text{--}2$ ô giữa hai vách đá vẫn không bao giờ bị làm mờ mất khi thu nhỏ lưới.
+    \item \textbf{Hai lượt Dijkstra thô và phân bố Gibbs:} Hệ thống chạy Dijkstra xuôi từ khối Start (thu được $d_f$) và Dijkstra ngược từ khối Goal (thu được $d_b$) trên lưới thô $(CH \times CW)$ theo chi phí Minetti + trở kháng. Tổng $\varphi(I,J) = d_f(I,J) + d_b(I,J)$ cho biết tổng chi phí tối thiểu nếu buộc phải đi qua khối $(I,J)$. Khi nội suy song tuyến về lưới mịn và chuyển qua hàm mũ Gibbs:
+    \begin{equation}
+        P_{\text{geo}}(r,c) = \exp\left( -\frac{\max\big(0,\, \varphi(r,c) - \varphi_{\min}\big)}{\tau_{\text{geo}}} \right), \qquad \tau_{\text{geo}} = \max\!\left(35.0,\; \frac{0.18\,\varphi_{\min}}{\sqrt{\max(1, \max(H,W)/64)}}\right)
+        \label{eq:gibbs_geo}
+    \end{equation}
+    những ô nằm gần tuyến đường tối ưu toàn cục sẽ có $P_{\text{geo}} \approx 1$, còn những vùng đi vòng tốn sức giảm mượt về $0$.
 \end{itemize}
 
-% ============================================================
-\section{Nghiên cứu Mới 1: Thuật toán Quy hoạch Phân cấp Lai 4 Tầng HMCTD-A*\_v2}
-% ============================================================
+\subsection{Tầng 2: Đồ thị Cổng Yên ngựa và Ống Hành lang Mềm PUCT}
+Tầng 2 dựng bộ khung định hướng cấp vùng giống HPA* \cite{botea2004} nhưng đặt nút thông minh hơn:
+\begin{itemize}
+    \item \textbf{Cổng yên ngựa (Saddle Portals):} Chia bản đồ thành các vùng lớn kích thước $B_S = 16$ (khi $\max(H,W) \le 64$) hoặc $B_S = \max(16, \lfloor \max(H,W)/6 \rfloor)$. Trên mỗi đoạn thông nhau nằm dọc biên giữa hai vùng liền kề, thuật toán chọn đúng điểm có trở kháng trung bình hai bên nhỏ nhất làm \textit{cổng yên ngựa}. Hai cổng được nối cạnh nếu đường thẳng giữa chúng không cắt qua ô có $\text{LTR} > 0.735$, trọng số cạnh tích hợp năng lượng Minetti + cản đất dọc đoạn nối.
+    \item \textbf{Chọn tuyến cổng và tô dải hành lang mềm Gaussian:} Với bản đồ lớn ($>64^2$), thuật toán chạy trước một lượt Reverse Dijkstra trên đồ thị cổng để lấy chi phí chính xác tới đích $p_{\text{cost\_to\_goal}}$, sau đó thực hiện $48$ lượt chọn nhánh \textbf{PUCT} ($c_{\text{puct}} = 35.0$) \cite{rosin2011, silver2017} nhằm chọn chuỗi cổng tối ưu $\Pi_{\text{portal}}$. Quanh các đoạn nối cổng của $\Pi_{\text{portal}}$, hệ thống phủ một dải ống mềm Gaussian $P_{\text{corr}}(r,c) = \max\big(P_{\text{geo}}(r,c),\, \exp(-d_{\perp}^2 / (2\sigma^2))\big)$ với bán kính tự co giãn theo độ gồ ghề địa phương:
+    \begin{equation}
+        \sigma(\text{TCI}) = \big(4.5 + 14.0\,\min(0.4,\, \text{TCI})\big)\sqrt{\frac{B_S}{16}}
+        \label{eq:adaptive_tube}
+    \end{equation}
+    Vùng càng gồ ghề ($\text{TCI}$ lớn), ống dẫn càng mở rộng để tìm kiếm tinh có không gian lách chướng ngại vật.
+\end{itemize}
 
-Để khắc phục triệt để sự suy biến của mạng học sâu \texttt{System1CNN}, xóa bỏ hoàn toàn tỷ lệ Fallback $73.38\%$ và loại bỏ hiện tượng răng cưa lưới, chúng em thiết kế thuật toán \textbf{HMCTD-A*\_v2} (\texttt{HMCTDAStarV2Planner} trong \texttt{3. code/pp\_hmctd\_a\_star\_v2.py} và nhân biên dịch \texttt{3. code/hmctd\_v2\_core.cpp}). Thuật toán vận hành qua 4 tầng toán học chặt chẽ.
-
-\subsection{Tầng 1: Trường Thế Khuếch tán Địa trắc Đa Tỷ lệ (Multi-Scale Geodesic Potential Field)}
-Thay vì sử dụng mạng CNN phụ thuộc dữ liệu huấn luyện và bị lỗi chuẩn hóa tương đối $s/s_{\max}$, Tầng 1 xây dựng trực tiếp một trường kháng trở cơ học địa hình $\Phi_{\text{terr}}(r, c)$ phản ánh chính xác vật lý lật xe và cơ học đất tại mọi điểm $(r,c)$:
+\subsection{Tầng 3: Tìm kiếm A* Hai chiều Hành lang Mềm Cân bằng Pohl}
+Tầng 3 chạy trực tiếp trên lưới mịn $H \times W$ bằng thuật toán \textbf{Bidirectional A*} (mở rộng đồng thời từ Start và Goal) theo quy tắc cân bằng kích thước tập mở của Pohl \cite{pohl1971} (luôn mở rộng phía có ít nút chờ hơn). Điểm then chốt xóa bỏ hoàn toàn lỗi Fallback của v1 là \textbf{trọng số dẫn hướng hành lang mềm}:
 \begin{equation}
-    \Phi_{\text{terr}}(r, c) = \begin{cases}
-        +\infty, & \text{nếu } \text{LTR}(r,c) \ge 0.99 \text{ hoặc } \tau(r,c) = 8 \\[6pt]
-        1.5 \bar{R}_{\text{Bekker}}(r,c) + 50.0\,\text{LTR}(r,c) + 22.0\tan^2\theta(r,c) + 6.1, & \text{ngược lại}
+    w_{\text{eff}}(r,c) = w_{\text{base}} \cdot \Big(1 + \lambda_{\text{eff}} \big(1 - P_{\text{corr}}(r,c)\big)^2\Big), \qquad
+    \lambda_{\text{eff}} = \begin{cases}
+        \lambda_{\text{corr}}, & \max(H,W) \le 64 \\
+        \lambda_{\text{corr}}\big(1 + 0.95\log_2(\max(H,W)/64)\big), & \max(H,W) > 64
     \end{cases}
-    \label{eq:phi_terr}
+    \label{eq:soft_weight}
 \end{equation}
-Bản đồ kích thước $H \times W$ được phân hoạch thành lưới ô vĩ mô kích thước bước nhảy thích nghi theo quy mô bản đồ:
-\begin{equation}
-    B = \begin{cases}
-        6, & \text{nếu } \max(H, W) \le 96 \\
-        8, & \text{nếu } 96 < \max(H, W) \le 192 \\
-        16, & \text{nếu } 192 < \max(H, W) \le 384 \\
-        24, & \text{nếu } 384 < \max(H, W) \le 768 \\
-        32, & \text{nếu } \max(H, W) > 768
-    \end{cases}
-    \label{eq:adaptive_stride}
-\end{equation}
-Trên mỗi khối vĩ mô $(I, J)$ kích thước $B \times B$, kháng trở hiệu dụng $\bar{\Phi}(I, J)$ được tổng hợp từ phân vị thứ 25 ($\text{Percentile}_{25}$) và giá trị cực tiểu của $\Phi_{\text{terr}}$ trong khối đó:
-\begin{equation}
-    \bar{\Phi}(I, J) = 0.65 \, \text{Percentile}_{25}\big(\Phi_{\text{terr}}\big|_{B_{I,J}}\big) + 0.35 \, \min\big(\Phi_{\text{terr}}\big|_{B_{I,J}}\big)
-    \label{eq:coarse_phi}
-\end{equation}
-Việc sử dụng phân vị thứ 25 có ý nghĩa vật lý sâu sắc: nếu một khối $B\times B$ chứa cả vách đá dựng đứng lẫn một khe đèo hẹp an toàn đi xuyên qua, $\text{Percentile}_{25}$ sẽ trích xuất đúng kháng trở của khe đèo thay vì bị làm nhiễu bởi trung bình cộng của vách đá. Tiếp theo, phương trình Eikonal rời rạc được giải trên lưới thô ngược từ khối chứa đích $(I_{\text{goal}}, J_{\text{goal}})$ bằng thuật toán Dijkstra mặt sóng để thu được trường thế địa trắc $U(I, J)$:
-\begin{equation}
-    U(I, J) = \min_{(I', J') \in \mathcal{N}_8(I, J)} \left\{ U(I', J') + d_{\text{coarse}}\big((I,J), (I',J')\big) \cdot \frac{\bar{\Phi}(I, J) + \bar{\Phi}(I', J')}{2} \right\}
-    \label{eq:eikonal_coarse}
-\end{equation}
+với $w_{\text{base}} = 1.18$ và $\lambda_{\text{corr}} = 1.35$. Khác với mặt nạ cứng (cấm hẳn ô bên ngoài), trọng số mềm chỉ \textit{ưu tiên} duyệt trong hành lang; nếu lối hẹp bị chắn bất ngờ, sóng tìm kiếm tự nhiên lan nhẹ ra ngoài mà không bị đứt đường (\textbf{Fallback = 0.0\%}). Ước lượng heuristic $h(n)$ kết hợp khoảng cách vật lý Minetti-Bekker có hướng dốc (\textit{Anisotropic Physical Heuristic -- APH}) với giới hạn dưới trắc địa từ lưới thô Tầng 1 ($0.82\max(0, h_{\text{geo}} - 2.2 c_s)$ trên bản đồ $>64^2$). Trong trường hợp đặc biệt mà điểm xuất phát hoặc đích bị bao vây kín bởi vách dốc vượt $47.07^\circ$, cơ chế thoát khẩn \textbf{auto-CBF} tự động kích hoạt với hình phạt bậc hai rất lớn ($2500 + 18000\cdot\text{excess}^2$, $\text{LTR}_{\text{esc}} = 1.50$) để vẫn tìm ra lối thoát ít nguy hiểm nhất.
 
-\subsection{Tầng 2: Đồ thị Cổng Yên ngựa Tô-pô (Saddle Portals) và Tìm kiếm Cây MCTS-PUCT}
-Khác với \textbf{HMCTD-A* (v1)} đặt điểm mốc cố định tại tâm hình học của cụm (dễ rơi vào đỉnh núi hoặc hố sụt), Tầng 2 xác định các \textbf{Cổng Yên ngựa (Topological Saddle Portals)} trên biên chung giữa hai khối vĩ mô liền kề $B_{I,J}$ và $B_{I',J'}$. Xét dải biên chung $\Gamma_{(I,J)\leftrightarrow(I',J')}$, vị trí cổng $p^*_{\text{portal}}$ được định nghĩa tại điểm có tổng kháng trở cặp ô đối diện đạt cực tiểu:
-\begin{equation}
-    p^*_{\text{portal}} = \arg\min_{(p_1, p_2) \in \Gamma} \Big[ \Phi_{\text{terr}}(p_1) + \Phi_{\text{terr}}(p_2) \Big]
-    \label{eq:saddle_portal}
-\end{equation}
-Công thức (\ref{eq:saddle_portal}) đảm bảo cổng liên cụm luôn tự động bám vào đáy thung lũng hoặc cổ đèo yên ngựa có độ dốc thấp nhất. Khi nối các cổng yên ngựa trong cùng một khối vĩ mô bằng chi phí xấp xỉ tích phân Simpson 3 điểm dọc đoạn nối kết hợp độ chênh độ cao $\Delta z$, ta thu được đồ thị cổng tô-pô $\mathcal{G}_p = (\mathcal{V}_p, \mathcal{E}_p)$.
+\subsection{Tầng 4: Quy hoạch Động Tầm nhìn 2.5D và Bo góc An toàn Safe Chaikin}
+Quỹ đạo thô $\Pi_{\text{raw}}$ từ Tầng 3 chạy theo 8 hướng lưới nên còn gấp khúc. Tầng 4 thực hiện 3 bước hậu xử lý chuẩn vật lý 2.5D:
+\begin{enumerate}
+    \item \textbf{Nén neo thích nghi:} Nếu số đỉnh $K_{\text{raw}} > 160$, lấy mẫu thưa lại theo bước $\text{stride} = \max(2, \lfloor K_{\text{raw}}/120 \rfloor)$ để giữ chi phí quy hoạch động ở mức rất nhỏ.
+    \item \textbf{Quy hoạch động tầm nhìn 2.5D (\texttt{window = 96}):} Kiểm tra nối thẳng giữa hai đỉnh $(i \to j)$ trong cửa sổ $96$ đỉnh. Một đoạn nối thẳng chỉ hợp lệ khi \textit{tất cả} điểm mẫu dọc đoạn nối thỏa mãn đồng thời an toàn lật ($\text{LTR} \le 0.735$) và \textbf{khe sáng gầm 2.5D}: $|h_{\text{DEM}}(t) - z_{\text{dây}}(t)| \le z_{\text{clearance}} = 0.18\ \text{m}$ (tránh cắt xuyên qua mô đất hoặc bắc cầu qua hố sâu). Hàm mục tiêu Bellman tối ưu đồng thời năng lượng Minetti + cản đất thực tế và phạt bẻ góc ($8.0\,\Delta\theta^2 + 0.15$).
+    \item \textbf{Bo góc kiểm chứng cục bộ (Safe Chaikin):} Thực hiện 2 vòng cắt góc Chaikin \cite{chaikin1974} thử giảm dần hệ số bo $\alpha \in \{0.25, 0.15, 0.08\}$; mỗi đoạn bo chỉ được chấp nhận nếu thỏa mãn kiểm tra an toàn 2.5D với khe gầm $z_{\text{clearance}} + 0.04$.
+\end{enumerate}
 
-Trên đồ thị $\mathcal{G}_p$, thuật toán tìm kiếm cây Monte Carlo có dẫn hướng tiên nghiệm (\textbf{MCTS-PUCT}) thực hiện $K_{\text{mcts}} = 32$ lượt phóng thử (Rollouts) từ đỉnh $v_{\text{start}}$ tới $v_{\text{goal}}$. Xác suất tiên nghiệm $P(u \to v)$ của cạnh nối từ cổng $u$ sang cổng $v$ được dẫn hướng bởi độ giảm trường thế địa trắc Tầng 1:
-\begin{equation}
-    P(u \to v) = \frac{\exp\big( - [w_{\mathcal{E}}(u, v) + 0.55 \, U(v)] / \tau_p \big)}{\sum_{v' \in \mathcal{N}_{\mathcal{G}_p}(u)} \exp\big( - [w_{\mathcal{E}}(u, v') + 0.55 \, U(v')] / \tau_p \big)}
-    \label{eq:puct_prior}
-\end{equation}
-Tại mỗi bước chọn nhánh, MCTS cực đại hóa chỉ số PUCT:
-\begin{equation}
-    v^* = \arg\max_{v \in \mathcal{N}_{\mathcal{G}_p}(u)} \left\{ -\hat{Q}(u, v) + c_{\text{puct}} \, P(u \to v) \frac{\sqrt{\sum_{b} N(u, b)}}{1 + N(u, v)} \right\}
-    \label{eq:puct_score}
-\end{equation}
-Chuỗi cổng yên ngựa tốt nhất $\Pi_{\text{portal}} = \{p_0, p_1, \dots, p_M\}$ tạo thành bộ xương sống tô-pô. Thay vì khóa cứng trong mặt nạ nhị phân, $\Pi_{\text{portal}}$ được biến đổi khoảng cách Euclid sang trường thế hành lang mềm Gaussian liên tục $P_{\text{corr}}(r, c) \in [0, 1]$ với bán kính thích nghi $r_c = 1.15 B$:
-\begin{equation}
-    P_{\text{corr}}(r, c) = \exp\left( -\frac{\min_{q \in \Pi_{\text{portal}}} \| (r,c) - q \|_2^2}{2 r_c^2} \right)
-    \label{eq:soft_corridor}
-\end{equation}
-
-\subsection{Tầng 3: Tìm kiếm Hai chiều Dial Radix dẫn hướng bằng Trường Thế Mềm Phi Đẳng hướng}
-Tầng 3 thực hiện tìm kiếm hai chiều đồng thời (Forward từ $p_{\text{start}}$ và Backward từ $p_{\text{goal}}$) trên lưới mịn $H \times W$. Chi phí bước chuyển được điều biến mềm bởi trường thế hành lang $P_{\text{corr}}(r,c)$ và trường thưởng hướng tiếp tuyến địa hình (Tangent Alignment):
-\begin{equation}
-    \tilde{c}_{\text{step}}(p, q) = c_{\text{step}}(p, q) \cdot \Big[ 1 + \lambda_{\text{corr}} \big(1 - P_{\text{corr}}(q)\big) \Big] \cdot \Big[ 1 - \eta_{\text{tan}} \cos^2\angle(\vec{e}_{pq}, \vec{\tau}_{\text{contour}}(q)) \Big]
-    \label{eq:soft_aph_cost}
-\end{equation}
-với $\lambda_{\text{corr}} = 0.20$ là hệ số phạt mềm ngoài hành lang và $\vec{\tau}_{\text{contour}}(q) = (-\partial_y h, \partial_x h) / \|\nabla h\|$ là vector tiếp tuyến đường đồng mức tại $q$. Nhờ $1 + \lambda_{\text{corr}}(1 - P_{\text{corr}}(q)) \in [1.0, 1.20]$ hữu hạn trên toàn bản đồ, nếu một nhánh hành lang hẹp bị nghẽn cục bộ, mặt sóng tìm kiếm tự động phình nhẹ ra vùng lân cận mà \textbf{không bao giờ bị đứt gãy hay phải Fallback về A* toàn cục} (Fallback Rate $= 0.0\%$ tuyệt đối).
-
-Để đạt tốc độ dưới mili-giây, cấu trúc hàng đợi ưu tiên nhị phân chuẩn (\texttt{std::priority\_queue} hoặc \texttt{heapq} có độ phức tạp $O(\log N)$ kèm cấp phát bộ nhớ động) được thay thế hoàn toàn bằng \textbf{Hàng đợi Xô Vòng Dial Radix (Circular Bucket Queue)} kích thước $2^{16} = 65,536$ xô với lượng tử hóa chi phí $\Delta_{\text{bucket}} = 0.25$, cho phép thực hiện thao tác \texttt{push} và \texttt{pop} trong thời gian hằng số khấu hao $O(1)$. Điều kiện dừng tối ưu hai chiều được kích hoạt ngay khi tổng khóa cực tiểu của hai mặt sóng vượt quá đường nối tốt nhất hiện tại $\mu_{\text{best}}$:
-\begin{equation}
-    \min_{u \in \text{Open}_F} f_F(u) + \min_{v \in \text{Open}_B} f_B(v) \ge \mu_{\text{best}}
-    \label{eq:bidir_stop}
-\end{equation}
-
-\subsection{Tầng 4: Quy hoạch Động Kéo căng Dây Địa trắc (Geodesic String-Pulling DP)}
-Quỹ đạo thô $\Pi_{\text{raw}} = \{q_0, q_1, \dots, q_L\}$ sinh ra từ Tầng 3 vẫn nằm trên các cạnh lưới 8 hướng. Tầng 4 giải bài toán quy hoạch động toàn cục trên chuỗi đỉnh đã lấy mẫu để tìm tập con các điểm nút tối ưu $\Pi^* = \{q_{i_0}, q_{i_1}, \dots, q_{i_K}\}$ ($0 = i_0 < i_1 < \dots < i_K = L$). Chi phí đoạn nối thẳng liên tục giữa hai điểm bất kỳ $q_i$ và $q_j$ được tính bằng tích phân đường siêu mịn (Sub-grid Ray Integration với bước lấy mẫu $0.5$ ô):
-\begin{equation}
-    J_{\text{seg}}(q_i, q_j) = \sum_{m=0}^{M_{ij}-1} c_{\text{step}}\big(\gamma(t_m), \gamma(t_{m+1})\big)
-    \label{eq:geodesic_seg}
-\end{equation}
-nếu mọi điểm nội suy $\gamma(t_m) = q_i + \frac{m}{M_{ij}}(q_j - q_i)$ đều thỏa mãn ràng buộc chống lật $\text{LTR}(\gamma(t_m)) < 1.0$ và không đi vào vùng tích thủy $\tau \ne 8$; ngược lại $J_{\text{seg}}(q_i, q_j) = +\infty$. Phương trình Bellman quy hoạch động có xét phạt độ trơn góc chuyển hướng tại đỉnh nối là:
-\begin{equation}
-    V(j) = \min_{0 \le i < j} \Big\{ V(i) + J_{\text{seg}}(q_i, q_j) + \gamma_{\text{turn}} \, |\Delta\psi(p_{\text{prev}}(i), q_i, q_j)|^2 \Big\}
-    \label{eq:dp_bellman}
-\end{equation}
-Tầng 4 loại bỏ hoàn toàn hiệu ứng răng cưa lưới 8 hướng, rút ngắn chiều dài hình học về sát đường địa trắc liên tục và giảm \textbf{95.5\%} năng lượng uốn cong góc hướng so với \textbf{HMCTD-A* (v1)}. Thuật toán \ref{alg:hmctd_v2} trình bày mã giả hoàn chỉnh của \textbf{HMCTD-A*\_v2}.
+Thuật toán \ref{alg:hgb_astar} tóm tắt chu trình hoàn chỉnh của \textbf{HGB-A*}.
 
 \begin{algorithm}[htbp]
-\caption{Thuật toán Quy hoạch Phân cấp Lai 4 Tầng HMCTD-A*\_v2}
-\label{alg:hmctd_v2}
+\caption{Thuật toán Quy hoạch 4 Tầng Đa phân giải HGB-A*}
+\label{alg:hgb_astar}
 \begin{algorithmic}[1]
-\Require Bản đồ độ cao $h(x,y)$, Độ dốc $\theta(x,y)$, Lớp đất $\tau(x,y)$, Điểm đầu $p_{\text{start}}$, Điểm đích $p_{\text{goal}}$
-\Ensure Quỹ đạo địa trắc tối ưu chống lật $\Pi^* = \{p_0, p_1, \dots, p_K\}$
-\State \textbf{Tầng 1 (Khuếch tán Địa trắc Đa Tỷ lệ):}
-\State Tính trường kháng trở cơ học $\Phi_{\text{terr}}(r,c)$ theo (\ref{eq:phi_terr}) và chọn bước lưới thô $B$ theo (\ref{eq:adaptive_stride})
-\State Tổng hợp kháng trở khối $\bar{\Phi}(I,J) = 0.65\,\text{Percentile}_{25}(\Phi_{\text{terr}}) + 0.35\,\min(\Phi_{\text{terr}})$
-\State Giải phương trình Eikonal rời rạc (\ref{eq:eikonal_coarse}) từ $(I_{\text{goal}}, J_{\text{goal}})$ để thu được trường thế địa trắc $U(I,J)$
-\State \textbf{Tầng 2 (Đồ thị Cổng Yên ngựa \& Tìm kiếm Cây MCTS-PUCT):}
-\State Trích xuất các cổng yên ngựa $p^*_{\text{portal}} = \arg\min_{\Gamma} [\Phi_{\text{terr}}(p_1) + \Phi_{\text{terr}}(p_2)]$ trên mọi biên khối liền kề
-\State Xây dựng đồ thị cổng $\mathcal{G}_p = (\mathcal{V}_p, \mathcal{E}_p)$ và thực thi $K_{\text{mcts}} = 32$ vòng lặp MCTS-PUCT theo (\ref{eq:puct_score})
-\State Biến đổi chuỗi cổng tốt nhất $\Pi_{\text{portal}}$ thành trường thế hành lang mềm Gaussian $P_{\text{corr}}(r,c)$ theo (\ref{eq:soft_corridor})
-\State \textbf{Tầng 3 (Tìm kiếm Hai chiều Dial Radix dẫn hướng bằng Trường Thế Mềm):}
-\State Khởi tạo hai hàng đợi xô vòng 65,536-bucket $\text{Open}_F \leftarrow \{p_{\text{start}}\}$, $\text{Open}_B \leftarrow \{p_{\text{goal}}\}$, $\mu_{\text{best}} \leftarrow +\infty$
-\While{$\text{Open}_F \ne \emptyset$ \textbf{and} $\text{Open}_B \ne \emptyset$}
-    \If{$\min(\text{Open}_F) + \min(\text{Open}_B) \ge \mu_{\text{best}}$} \textbf{break} \EndIf
-    \State Mở rộng bước mặt sóng có khóa nhỏ hơn với chi phí điều biến mềm $\tilde{c}_{\text{step}}(p,q)$ theo (\ref{eq:soft_aph_cost})
-    \State Cập nhật điểm gặp nhau tối ưu $p_{\text{meet}}$ và $\mu_{\text{best}} \leftarrow \min(\mu_{\text{best}}, g_F(u) + g_B(u))$
-\EndWhile
-\State Truy vết quỹ đạo lưới 8 hướng $\Pi_{\text{raw}} \leftarrow \text{Backtrack}(p_{\text{start}}, p_{\text{meet}}, p_{\text{goal}})$
-\State \textbf{Tầng 4 (Quy hoạch Động Kéo căng Dây Địa trắc):}
-\State Giải quy hoạch động Bellman $V(j) = \min_{i < j} \{V(i) + J_{\text{seg}}(q_i, q_j) + \gamma_{\text{turn}}|\Delta\psi|^2\}$ theo (\ref{eq:dp_bellman})
-\State \Return $\Pi^* \leftarrow \text{ReconstructDP}(V)$
+\Require Độ cao $h$, Độ dốc $\theta$, Lớp đất $\tau$, Điểm đầu $p_{\text{start}}$, Điểm đích $p_{\text{goal}}$
+\Ensure Quỹ đạo 2.5D an toàn chống lật và tối ưu năng lượng $\Pi^*$
+\State \textbf{Tiền xử lý:} Tính $\text{LTR} = \theta_{\text{rad}}/\text{SSF}$; khóa cứng ô $\tau=8$ vượt $\text{LTR}_{\text{lim}}=0.735$; lọc Bekker $5\times 5$.
+\State \textbf{Tầng 1:} Chia khối $c_s = \max(4, \lfloor \max(H,W)/32 \rfloor)$; tính Block TCI và trở kháng cực tiểu từng khối.
+\State Chạy Dijkstra thô xuôi ($d_f$) và ngược ($d_b$); tính $\varphi = d_f + d_b$ và xác suất Gibbs $P_{\text{geo}}$ theo (\ref{eq:gibbs_geo}).
+\State \textbf{Tầng 2:} Trích xuất cổng yên ngựa trên biên khối $B_S = \max(16, \lfloor \max(H,W)/6 \rfloor)$.
+\State Chạy Reverse Dijkstra (nếu $\max(H,W)>64$) và $48$ lượt chọn nhánh PUCT; tô dải ống mềm Gaussian $P_{\text{corr}}$ có bán kính $\sigma(\text{TCI})$ theo (\ref{eq:adaptive_tube}).
+\State \textbf{Tầng 3:} Chạy Bidirectional A* cân bằng Pohl trên lưới mịn với trọng số mềm $w_{\text{eff}}$ theo (\ref{eq:soft_weight}) và heuristic APH + $h_{\text{geo}}$ (kích hoạt \texttt{auto-CBF} nếu bị vây kín) $\to \Pi_{\text{raw}}$.
+\State \textbf{Tầng 4:} Nén neo ($K_{\text{raw}}>160$); giải Quy hoạch động tầm nhìn 2.5D (\texttt{window=96}, kiểm tra $\text{LTR} \le 0.735$ và $|z_{\text{DEM}} - z_{\text{dây}}| \le 0.18$); bo góc 2 vòng Safe Chaikin $\to \Pi^*$.
+\State \Return $\Pi^*$
 \end{algorithmic}
 \end{algorithm}
-
-% ============================================================
-\section{Nghiên cứu Mới 2: Bộ Điều khiển Dự báo Nhúng Kinodynamic Riccati-RTI NMPC}
-% ============================================================
-
-Để đạt độ chính xác bám quỹ đạo cỡ milimét dưới điều kiện trượt địa hình khắc nghiệt đồng thời rút ngắn thời gian giải xuống dưới $40\ \mu\text{s}$, chúng em phát triển bộ điều khiển \textbf{Kinodynamic Riccati-RTI NMPC} (\texttt{KinodynamicRiccatiRTIController} trong \texttt{3. code/riccati\_rti\_controller.py}).
-
-\subsection{\texorpdfstring{Bộ Phát Quỹ đạo Tham chiếu Động học Nội suy PCHIP $C^1$ Hermite}{Bộ Phát Quỹ đạo Tham chiếu Động học Nội suy PCHIP C1 Hermite}}
-Thay vì nội suy đoạn thẳng tuyến tính $G^0$ gây xung nhảy đạo hàm góc hướng tại các điểm nối như các bộ điều khiển cũ, lớp \texttt{KinodynamicReferenceGenerator} tham số hóa chuỗi điểm mốc $\Pi^* = \{(X_i, Y_i)\}_{i=0}^K$ theo độ dài cung tích lũy $s_i = \sum_{m=1}^i \|p_m - p_{m-1}\|_2$ bằng đa thức bậc ba bảo toàn tính đơn điệu \textbf{PCHIP} (Piecewise Cubic Hermite Interpolating Polynomial) \cite{grandia2023}:
-\begin{equation}
-    X_{\text{ref}}(s) = \mathcal{H}_x(s), \qquad Y_{\text{ref}}(s) = \mathcal{H}_y(s), \qquad s \in [0, L_{\text{total}}]
-    \label{eq:pchip_interp}
-\end{equation}
-Nội suy PCHIP đảm bảo đạo hàm bậc nhất $(X'_{\text{ref}}(s), Y'_{\text{ref}}(s))$ liên tục tuyệt đối ($C^1$) và không bao giờ tạo ra dao động vọt lố Runge như Cubic Spline tự nhiên khi khoảng cách giữa các điểm nút không đều. Từ đó, góc hướng tham chiếu $\theta_{\text{ref}}(s)$ và độ cong hình học $\kappa(s)$ được xác định giải tích:
-\begin{equation}
-    \theta_{\text{ref}}(s) = \text{unwrap}\Big(\arctan 2\big(Y'_{\text{ref}}(s), X'_{\text{ref}}(s)\big)\Big), \qquad
-    \kappa(s) = \frac{X'_{\text{ref}}(s) Y''_{\text{ref}}(s) - Y'_{\text{ref}}(s) X''_{\text{ref}}(s)}{\big(X'_{\text{ref}}(s)^2 + Y'_{\text{ref}}(s)^2\big)^{3/2}}
-    \label{eq:ref_curvature}
-\end{equation}
-Để ngăn ngừa bão hòa vận tốc góc và trượt văng ngang khi vào cua gấp hoặc leo dốc gắt, vận tốc dài tham chiếu $v_{\text{ref}}(s)$ được điều biến tự động theo độ cong $\kappa(s)$ và độ dốc địa hình $\theta_{\text{slope}}(s)$:
-\begin{equation}
-    v_{\text{ref}}(s) = \text{clip}\left( \min\left\{ v_{\text{nom}},\; \frac{0.72\,\omega_{\max}}{|\kappa(s)| + 0.05},\; v_{\text{nom}}\big(1 - 0.30\sin\theta_{\text{slope}}(s)\big) \right\},\; 0.35,\; v_{\text{nom}} \right)
-    \label{eq:vel_profiling}
-\end{equation}
-Quỹ đạo thời gian thực được lấy mẫu bằng cách tích phân tiến độ dài cung $\dot{s}(t) = v_{\text{ref}}(s(t))$, tạo ra chuỗi trạng thái tham chiếu $(X_{\text{ref},k}, Y_{\text{ref},k}, \theta_{\text{ref},k}, v_{\text{ref},k}, \omega_{\text{ref},k})$ hoàn toàn khả thi về mặt động học.
-
-\subsection{Bảng Tra Trượt Toàn dải \texttt{FullRangeSlipLUT} và Bộ Quan sát Trượt Nhân quả 1-Bước}
-Để khắc phục lỗi cắt trần $s \le 0.40$ của \texttt{SlipLUT} cũ, lớp \texttt{FullRangeSlipLUT} mở rộng không gian tra cứu lên toàn bộ dải độ dốc $[0^\circ, 85^\circ]$ (86 nút chia độ mịn $1^\circ$) và giải phóng trần hệ số trượt lên $[0.01, 0.85]$ cho đầy đủ 9 phân lớp địa chất $\tau \in \{0,\dots,8\}$.
-
-Hơn nữa, khi robot vận hành trên thực địa, độ ẩm đất và nhiễu địa hình biến thiên liên tục. Lớp \texttt{CausalTerrainSlipObserver} thực hiện ước lượng nhân quả 1-bước ngay từ sai lệch giữa dịch chuyển thực tế đo được $(\Delta X_{\text{meas}}, \Delta Y_{\text{meas}}, \Delta\theta_{\text{meas}})$ và lệnh điều khiển bước trước $(u_{v,k-1}, u_{\omega,k-1})$:
-\begin{align}
-    s_{\text{obs},k} &= \text{clip}\left( 1.0 - \frac{\sqrt{\Delta X_{\text{meas}}^2 + \Delta Y_{\text{meas}}^2}}{\Delta t \, u_{v,k-1}},\; 0.01,\; 0.85 \right) \label{eq:obs_slip} \\
-    \Delta\hat{s}_{0,k} &= (1 - \alpha_s) \Delta\hat{s}_{0,k-1} + \alpha_s \Big[ (s_{\text{obs},k} - c_v u_{v,k-1}) - s_{0,\text{LUT},k-1} \Big] \label{eq:obs_update}
-\end{align}
-Với hệ số học nhân quả $\alpha_s = 0.65$, bộ quan sát hội tụ tới độ trượt thực tế của bùn lầy chỉ sau $1\text{--}2$ chu kỳ lấy mẫu (xem Hình \ref{fig:goose_anatomy}F), đồng thời ước lượng phần trôi góc hướng $\hat{b}_{\omega,k}$ với hệ số lọc $\alpha_\omega = 0.45$.
-
-\subsection{Bù Tiền hồi Nghịch đảo Trượt Bậc hai và Tuyến tính hóa Cơ học Đất Chính xác}
-Để robot đạt được vận tốc tiến mục tiêu $v_{\text{goal},k} = v_{\text{ref},k}$ trên mặt đất có độ trượt tĩnh ước lượng $\hat{s}_{0,k} = s_{0,\text{LUT},k} + \Delta\hat{s}_{0,k}$, lệnh vận tốc bánh xe tiền hồi $u_{v,\text{ff},k}$ phải thỏa mãn phương trình vật lý bậc hai (\ref{eq:veff}):
-\begin{equation}
-    u_{v,\text{ff},k} \big( 1 - \hat{s}_{0,k} - c_v u_{v,\text{ff},k} \big) = v_{\text{goal},k} \iff c_v u_{v,\text{ff},k}^2 - (1 - \hat{s}_{0,k}) u_{v,\text{ff},k} + v_{\text{goal},k} = 0
-    \label{eq:quad_inv_slip}
-\end{equation}
-Giải nghiệm vật lý nhỏ hơn điểm bão hòa lực kéo $u_{v,\text{crit}} = \frac{1 - \hat{s}_{0,k}}{2 c_v}$, ta thu được \textbf{Công thức Bù Tiền hồi Nghịch đảo Trượt Bậc hai}:
-\begin{equation}
-    u_{v,\text{ff},k} = \text{clip}\left( \frac{(1 - \hat{s}_{0,k}) - \sqrt{\max\big(0,\; (1 - \hat{s}_{0,k})^2 - 4 c_v v_{\text{goal},k}\big)}}{2 c_v},\; v_{\min},\; v_{\max} \right)
-    \label{eq:uv_ff_solution}
-\end{equation}
-và lệnh vận tốc góc tiền hồi có bù đạo hàm đường cong cùng trôi góc là:
-\begin{equation}
-    u_{\omega,\text{ff},k} = \text{clip}\left( \frac{\text{wrap}(\theta_{\text{ref},k+1} - \theta_{\text{ref},k})}{\Delta t} + \hat{b}_{\omega,k},\; -\omega_{\max},\; \omega_{\max} \right)
-    \label{eq:uw_ff_solution}
-\end{equation}
-Khi tuyến tính hóa phương trình động học (\ref{eq:discrete_kinematics}) quanh quỹ đạo danh định $(\bar{x}_k, \bar{u}_k)$ theo phương pháp Lặp Thời gian Thực (\textbf{SQP-RTI}), đạo hàm riêng của vận tốc tiến theo lệnh bánh xe được tính chính xác có xét số hạng bậc hai của cơ học đất:
-\begin{equation}
-    \gamma_{\text{eff},k} = \frac{\partial v_{\text{eff}}}{\partial u_v}\bigg|_{\bar{u}_{v,k}} = 1 - \hat{s}_{0,k} - 2 c_v \bar{u}_{v,k}
-    \label{eq:terramech_jacobian}
-\end{equation}
-Từ đó, các ma trận Jacobian trạng thái $A_k \in \mathbb{R}^{3\times 3}$, ma trận điều khiển $B_k \in \mathbb{R}^{3\times 2}$ và vector phần dư động học $d_k \in \mathbb{R}^3$ tại bước $k \in \{0,\dots,N-1\}$ là:
-\begin{equation}
-    A_k = \begin{bmatrix}
-        1 & 0 & -\Delta t \, \bar{v}_{\text{eff},k} \sin\bar{\theta}_k \\
-        0 & 1 & \phantom{-}\Delta t \, \bar{v}_{\text{eff},k} \cos\bar{\theta}_k \\
-        0 & 0 & 1
-    \end{bmatrix}, \quad
-    B_k = \begin{bmatrix}
-        \Delta t \, \gamma_{\text{eff},k} \cos\bar{\theta}_k & 0 \\
-        \Delta t \, \gamma_{\text{eff},k} \sin\bar{\theta}_k & 0 \\
-        0 & \Delta t
-    \end{bmatrix}, \quad
-    d_k = f(\bar{x}_k, \bar{u}_k) - \bar{x}_{k+1}
-    \label{eq:rti_jacobians}
-\end{equation}
-
-\subsection{Bộ Giải Đệ quy Khối Tam Đường chéo (Block-Tridiagonal Riccati-ADMM)}
-Thay vì khởi tạo đồ thị ký hiệu CasADi và gọi bộ giải nội điểm đa năng Ipopt (tốn $4,451\ \mu\text{s}$), chúng em khai thác cấu trúc chuỗi Markov của hệ thống để giải trực tiếp bài toán quy hoạch toàn phương lồi chặt (Strictly Convex QP) trên tầm nhìn $N = 20$ bằng thuật toán phân rã \textbf{Riccati-ADMM}:
-\begin{align}
-    \min_{\{x_k, u_k, z_k\}} \quad & \frac{1}{2} \sum_{k=0}^{N-1} \Big( \|x_k - x_{\text{ref},k}\|_Q^2 + \|u_k - u_{\text{ff},k}\|_R^2 + \rho \|u_k - z_k + \lambda_k\|_2^2 \Big) + \frac{1}{2} \|x_N - x_{\text{ref},N}\|_{Q_f}^2 \label{eq:riccati_admm_qp} \\
-    \text{s.t.} \quad & x_{k+1} = A_k (x_k - \bar{x}_k) + B_k (u_k - \bar{u}_k) + f(\bar{x}_k, \bar{u}_k), \qquad z_k \in [u_{\min}, u_{\max}] \nonumber
-\end{align}
-với ma trận trọng số $Q = \text{diag}(110.0, 110.0, 16.0)$, $Q_f = 6.0\,Q$, $R = \text{diag}(0.18, 0.12)$ và hệ số phạt tăng cường $\rho = 4.0$. Vì ma trận $\tilde{R} = R + \rho I_2$ là hằng số đường chéo đối với mọi bước lặp ADMM, toàn bộ giai đoạn \textbf{Factorization ngược Riccati} tính các ma trận nghịch đảo $M_k = (\tilde{R} + B_k^T P_{k+1} B_k)^{-1}$, $K_k = -M_k B_k^T P_{k+1} A_k$ và $P_k = Q + A_k^T P_{k+1}(A_k + B_k K_k)$ chỉ cần thực hiện \textbf{duy nhất 1 lần} ngoài vòng lặp với chi phí đúng $N=20$ phép nghịch đảo ma trận $2\times 2$ giải tích. Bên trong 3 vòng lặp ADMM, chỉ có vector gradient phụ thuộc vào biến chiếu hộp $z_k - \lambda_k$ được cập nhật qua phép nhân vector nhẹ nhàng. Nhờ đó, toàn bộ thời gian giải mỗi bước điều khiển chỉ mất trung bình \textbf{33.67 $\mu$s} (tương đương tần số \textbf{29,849 Hz}), nhanh gấp \textbf{132.2 lần} so với \textbf{Edge-Hybrid NMPC}. Thuật toán \ref{alg:riccati_rti} tóm tắt chu trình điều khiển.
-
-\begin{algorithm}[htbp]
-\caption{Bộ Điều khiển Dự báo Nhúng Thời gian Thực Kinodynamic Riccati-RTI NMPC}
-\label{alg:riccati_rti}
-\begin{algorithmic}[1]
-\Require Quỹ đạo PCHIP $\mathcal{R}(s)$, Trạng thái hiện tại $x_k$, Bản đồ độ dốc $\theta_{\text{slope}}$, Lớp đất $\tau$
-\Ensure Lệnh điều khiển tối ưu $u^*_0 = [u^*_{v,0}, u^*_{\omega,0}]^T$
-\State \textbf{Bước 1 (Cập nhật Quan sát Trượt Nhân quả 1-Bước):}
-\State Tính độ trượt thực tế bước trước $s_{\text{obs},k}$ theo (\ref{eq:obs_slip}) và cập nhật $\Delta\hat{s}_{0,k}, \hat{b}_{\omega,k}$ theo (\ref{eq:obs_update})
-\State \textbf{Bước 2 (Trích xuất Tầm nhìn \& Bù Tiền hồi Nghịch đảo Trượt Bậc hai):}
-\State Tra cứu $\text{FullRangeSlipLUT}(\tau_h, \theta_{\text{slope},h})$ và cộng bù $\Delta\hat{s}_{0,k}$ để thu được $\hat{s}_{0,0:N-1}$
-\State Tính lệnh tiền hồi nghịch đảo trượt bậc hai $u_{v,\text{ff},0:N-1}$ theo (\ref{eq:uv_ff_solution}) và $u_{\omega,\text{ff},0:N-1}$ theo (\ref{eq:uw_ff_solution})
-\State \textbf{Bước 3 (Tuyến tính hóa Cơ học Đất \& Phân rã Ngược Riccati 1 Lần):}
-\State Tính đạo hàm cơ học đất $\gamma_{\text{eff},h} = 1 - \hat{s}_{0,h} - 2 c_v \bar{u}_{v,h}$ và lập $(A_h, B_h, d_h)_{h=0}^{N-1}$ theo (\ref{eq:rti_jacobians})
-\State Khởi tạo $P_N \leftarrow Q_f$; Với $h = N-1 \dots 0$: tính và lưu trữ $M_h, K_h, P_h$ (chỉ 1 lần)
-\State \textbf{Bước 4 (Lặp Chiếu Hộp ADMM Siêu tốc — $I_{\text{admm}} = 3$ vòng):}
-\For{$i = 1 \dots I_{\text{admm}}$}
-    \State Quét ngược vector tuyến tính $p_h, k_h$ với $r_{u,h} = -R u_{\text{ff},h} - \rho(z_h - \lambda_h) + (R + \rho I)\bar{u}_h$
-    \State Quét xuôi trạng thái $\delta x_{h+1} = A_h \delta x_h + B_h \delta u_h + d_h$ để thu được $u_h = \bar{u}_h + k_h + K_h \delta x_h$
-    \State Chiếu hộp: $z_h \leftarrow \text{clip}(u_h + \lambda_h, u_{\min}, u_{\max})$; Cập nhật nhân tử: $\lambda_h \leftarrow \lambda_h + u_h - z_h$
-\EndFor
-\State Lưu quỹ đạo khởi động ấm $(\bar{x}, \bar{u}) \leftarrow (x^*, z^*)$ và xuất lệnh đầu tiên $u^*_0 \leftarrow z^*_0$
-\State \Return $u^*_0$
-\end{algorithmic}
-\end{algorithm}
-
-% ============================================================
-\section{Kết quả Thực nghiệm Đối chuẩn Toàn diện}
-% ============================================================
-
-\subsection{Phân tích Chi tiết trên Bản đồ Thực địa GOOSE (goose\_000.pt): Xử lý HMCTD-A* 100\% Fallback và Tối ưu hóa cho HMCTD-A*\_v2 cùng Riccati-RTI NMPC}
-Để minh chứng trực quan việc xử lý hiện tượng \textbf{HMCTD-A*} bị $100\%$ Fallback hoặc vượt ngưỡng lật xe và quá trình tối ưu hóa cho \textbf{HMCTD-A*\_v2} cùng \textbf{Riccati-RTI NMPC}, Hình \ref{fig:goose_anatomy} trình bày phân tích chi tiết 6 khung trên kịch bản hiểm trở \texttt{goose\_000.pt} ($\text{Start} = (0, 10) \to \text{Goal} = (56, 58)$).
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=0.99\textwidth]{figures/hmctd_v2_goose_anatomy.png}
-  \caption{Phân tích chi tiết trên bản đồ thực địa GOOSE (\texttt{goose\_000.pt}) — Xử lý HMCTD-A* 100\% Fallback và tối ưu hóa cho HMCTD-A*\_v2 cùng Riccati-RTI NMPC: (A) Lỗi suy biến chuẩn hóa của \texttt{System1CNN} trong \textbf{HMCTD-A* (v1)} khiến thuật toán gán xác suất 0 cho đèo yên ngựa $(20,16)$ và bị 100\% Fallback; (B) \textbf{HMCTD-A*\_v2} đặt đúng 54 cổng yên ngựa tô-pô và tạo trường thế dẫn hướng mềm $P_{\text{corr}}$ đi xuyên qua khe đèo an toàn (0\% Fallback); (C) Đối sánh mặt sóng duyệt hai chiều và quỹ đạo (tăng tốc $>540$ lần so với v1); (D) Biên dạng độ dốc dọc hành trình (\textbf{HMCTD-A*\_v2} giữ góc dốc cực đại $46.9^\circ < \theta_{\text{crit}} = 48.19^\circ$, trong khi Weighted A* và HMCTD-A* v1 vọt lên $58.6^\circ$ gây lật xe); (E) Sai số bám ngang CTE của \textbf{Kinodynamic Riccati-RTI} ($\text{RMSE} = 0.27$ cm ở $28,917$ Hz so với $1.87$ cm của Edge-Hybrid NMPC); (F) Bộ quan sát trượt nhân quả 1-bước bám khít độ trượt thực tế vượt qua trần cắt lỗi $0.40$ của LUT cũ.}
-  \label{fig:goose_anatomy}
+  \includegraphics[width=0.99\textwidth]{figures/hgb_fig2_4tier_math_operations.png}
+  \caption{Giải phẫu trực quan 4 tầng phép toán cổ điển của \textbf{HGB-A*} trên địa hình thực địa GOOSE ($64\times 64$) và bản đồ đa tỷ lệ $256\times 256$ có hố nước sâu ($\tau=8$) và bùn ($\tau=3$): Từ bản đồ vật lý đầu vào $\to$ thế trắc địa Gibbs \& đường đồng mức Block TCI $\to$ cổng yên ngựa \& ống hành lang mềm PUCT $\to$ hai mặt sóng A* thuận/nghịch gặp nhau và quỹ đạo làm mượt 2.5D.}
+  \label{fig:hgb_anatomy}
 \end{figure}
 
-Kết quả phân tích chi tiết trên Hình \ref{fig:goose_anatomy} chỉ rõ:
+% ============================================================
+\section{Nghiên cứu 2: Bộ Điều khiển Dự báo Nhúng Kinodynamic Riccati-RTI NMPC}
+% ============================================================
+Bộ điều khiển \textbf{Kinodynamic Riccati-RTI NMPC} (\texttt{3. code/riccati\_rti\_controller.py} kết nối lõi C++17 trong \texttt{hgb\_a\_star\_core.cpp}) được thiết kế để bám sát quỹ đạo 2.5D ở tần số rất cao mà vẫn thích nghi kịp thời với độ trượt phi tuyến trên bùn dốc.
+
+\subsection{\texorpdfstring{Bộ Phát Quỹ đạo Tham chiếu Mượt PCHIP $C^1$}{Bộ Phát Quỹ đạo Tham chiếu Mượt PCHIP C1}}
+Nếu nối thẳng các điểm waypoint bằng đoạn thẳng (nội suy tuyến tính $G^0$ như ở v1), góc hướng tại mỗi đỉnh nối sẽ bị nhảy đột ngột, làm bộ điều khiển bị giật lái. Lớp \texttt{KinodynamicReferenceGenerator} khắc phục bằng cách nội suy đa thức bậc ba bảo toàn đơn điệu \textbf{PCHIP} \cite{fritsch1980} theo độ dài cung (bước mịn $ds_{\text{fine}} = 0.05$): đường cong vừa đảm bảo liên tục đạo hàm bậc nhất ($C^1$, không nhảy góc lái), vừa không bị vồng lố biên độ như spline thông thường. Từ độ cong hình học $\kappa(s)$, gia tốc cực đại $a_{\max} = 1.2\ \text{m/s}^2$, giới hạn quay $0.72\,\omega_{\max}$ và giới hạn trượt địa hình ($0.88\,v_{\max}$), bộ phát tự động hạ vận tốc tham chiếu $v_{\text{ref}}(s) \in [0.22,\, v_{\text{nom}}]$ trước khi vào cua gắt hoặc đi qua vùng đất trơn.
+
+\subsection{Bảng Tra Trượt Toàn dải và Bộ Quan sát Trượt Nhân quả}
 \begin{itemize}
-    \item \textbf{Ở tầng quy hoạch:} Do \texttt{System1CNN} bị mù trước vách đá $76.2^\circ$, \textbf{HMCTD-A* (v1)} bị đứt hành lang (Fallback $100\%$), phải mở rộng tới $4,824$ nút trong $384\ \text{ms}$ và sinh ra đường đi leo qua sườn dốc $58.6^\circ > 48.19^\circ$ (vượt ngưỡng lật tĩnh SSF). Ngược lại, \textbf{HMCTD-A*\_v2} phát hiện chính xác khe đèo yên ngựa $(20, 16)$, chỉ mở rộng $705$ nút trong \textbf{0.70 ms} (nhanh gấp \textbf{548 lần}), giữ góc dốc cực đại ở $46.9^\circ$ (an toàn tuyệt đối) và giảm năng lượng tiêu hao từ $688\ \text{J}$ xuống còn $638\ \text{J}$.
-    \item \textbf{Ở tầng điều khiển:} \textbf{Kinodynamic Riccati-RTI NMPC} bám sát quỹ đạo tham chiếu trên địa hình GOOSE với sai số $\text{RMSE} = \mathbf{0.27\ \text{cm}}$ (giảm \textbf{85.6\%} so với $1.87\ \text{cm}$ của \textbf{Edge-Hybrid NMPC}), đồng thời giải bài toán tối ưu trong $34.6\ \mu\text{s}$ ($28,917\ \text{Hz}$), nhanh gấp \textbf{148.5 lần} so với $5.14\ \text{ms}$ của bộ giải CasADi/Ipopt.
+    \item \textbf{\texttt{FullRangeSlipLUT} ($8 \times 86$):} Thay thế hoàn toàn bảng tra bị kẹp trần $45^\circ / 0.40$ của v1 bằng bảng tra toàn dải độ dốc $0^\circ\text{--}85^\circ$ và hệ số trượt tĩnh $s_0 \in [0.01, 0.84]$ (tách riêng thành phần trượt động $c_v u_v$ với $c_v = 0.05$).
+    \item \textbf{\texttt{CausalTerrainSlipObserver}:} Từ quãng đường thực tế xe đi được ở bước vừa rồi so với lệnh tốc độ bánh xe đã phát, bộ quan sát tính ngay phần dư trượt ngoài mô hình danh định và cập nhật bằng bộ lọc trung bình mũ EMA nhân quả phản ứng nhanh (\texttt{gain = 0.50}, dải bù $[-0.35, +0.45]$). Khi xe đột ngột đi vào vũng bùn trơn hơn dự kiến, bộ quan sát tự động nhận ra chỉ sau vài bước điều khiển.
 \end{itemize}
 
-\subsection{Đối chuẩn Thống kê trên 549 Bản đồ 2.5D (509 BenchNav GT + 40 Kịch bản Thực địa)}
-Hệ thống được đánh giá định lượng trên toàn bộ \textbf{549 bản đồ 2.5D kích thước $64\times 64$}, bao gồm 509 bản đồ chuẩn BenchNav Ground-Truth và 40 kịch bản thực địa từ 4 tập dữ liệu quốc tế (\textbf{BenchNav}, \textbf{TartanDrive}, \textbf{YCOR}, \textbf{GOOSE}). Bảng \ref{tab:benchmark_549_planners} và Bảng \ref{tab:benchmark_40_controllers} tổng hợp đầy đủ các chỉ số thống kê (Mean $\pm$ Std, Median, IQR). Hình \ref{fig:4datasets_showcase} và Hình \ref{fig:benchmark_549} trực quan hóa toàn bộ kết quả.
+\subsection{Bù Truyền thẳng Bậc hai và Tuyến tính hóa Cơ học Đất Chính xác}
+Để thân xe đạt tốc độ mặt đất $v_{\text{goal},k}$ dưới độ trượt ước lượng $\hat{s}_{0,k}$, lệnh tốc độ bánh xe truyền thẳng $u_{v,\text{ff},k}$ được giải trực tiếp từ phương trình bậc hai $u_v(1 - \hat{s}_{0,k} - c_v u_v) = v_{\text{goal},k}$:
+\begin{equation}
+    u_{v,\text{ff},k} = \text{clip}\!\left( \frac{(1 - \hat{s}_{0,k}) - \sqrt{\max\!\big(0,\; (1 - \hat{s}_{0,k})^2 - 4 c_v v_{\text{goal},k}\big)}}{2 c_v},\; 0,\; v_{\max} \right)
+    \label{eq:quad_ff}
+\end{equation}
+Khi tuyến tính hóa động học (\ref{eq:ugv_kinematics}) theo lược đồ \textbf{SQP-RTI} \cite{diehl2005}, hệ thống sử dụng \textbf{đạo hàm riêng cơ học đất chính xác} thay vì xem trượt là hằng số:
+\begin{equation}
+    \gamma_{\text{eff},k} = \max\!\big(0.08,\; 1 - \hat{s}_{0,k} - 2 c_v \bar{u}_{v,k}\big)
+    \label{eq:gamma_eff}
+\end{equation}
+Hệ số $-2 c_v \bar{u}_{v,k}$ phản ánh một quy luật vật lý thực tế quan trọng: khi bánh xe quay quá nhanh trên bùn, lực bám giảm mạnh nên tăng thêm ga sẽ mang lại ít gia tốc thực hơn. Nhờ đưa đúng $\gamma_{\text{eff},k}$ vào ma trận điều khiển $B_k$, bộ giải không bị điều khiển quá đà gây trượt xoáy.
+
+\subsection{Bộ Giải Khối Tam Đường chéo Riccati-ADMM Cấp phát Tĩnh}
+Trên tầm nhìn dự báo $N = 20$ bước ($\Delta t = 0.1\ \text{s} \Rightarrow T_h = 2.0\ \text{s}$) với giới hạn hộp $u_{\min} = [0.0, -1.0]^T$, $u_{\max} = [1.8, 1.0]^T$, bài toán tối ưu bậc hai lồi chặt được thiết lập với ma trận trọng số $Q = \text{diag}(160, 160, 28)$, $Q_N = 6Q = \text{diag}(960, 960, 168)$ và $R = \text{diag}(0.8, 0.4)$:
+\begin{align}
+    \min_{\{x_k, u_k, z_k\}} \quad & \frac{1}{2} \sum_{k=0}^{N-1} \Big( \|x_k - x_{\text{ref},k}\|_Q^2 + \|u_k - u_{\text{ff},k}\|_R^2 + \rho \|u_k - z_k + \lambda_k\|_2^2 \Big) + \frac{1}{2} \|x_N - x_{\text{ref},N}\|_{Q_N}^2 \label{eq:riccati_admm} \\
+    \text{s.t.} \quad & \delta x_{k+1} = A_k \delta x_k + B_k \delta u_k + d_k, \qquad z_k \in [u_{\min}, u_{\max}] \nonumber
+\end{align}
+với hệ số phạt tăng cường $\rho = 8.0$, tối đa $25$ vòng lặp ADMM và ngưỡng dừng sai số $10^{-6}$ \cite{boyd2011, odonoghue2013}. Toàn bộ bộ đệm được cấp phát tĩnh trên stack C++17 (\texttt{MAX\_N = 64}, không gọi \texttt{malloc}/\texttt{new} hay CasADi/Ipopt). Vì ma trận $\tilde{R} = R + \rho I_2$ không đổi qua các vòng ADMM, phép \textbf{phân rã ngược Riccati} $\mathcal{O}(N)$ chỉ cần chạy \textbf{đúng 1 lần duy nhất mỗi chu kỳ điều khiển}; các vòng lặp ADMM chỉ cập nhật vector tuyến tính và chiếu hộp nên đạt tốc độ giải trung bình \textbf{72.74 $\mu$s} ($\approx 14.0\ \text{kHz}$ ngay cả khi gọi qua giao diện Python).
 
 \begin{table}[htbp]
 \centering
-\caption{Đối chuẩn thống kê các thuật toán quy hoạch toàn cục trên toàn bộ 549 bản đồ địa hình 2.5D (509 BenchNav GT + 40 Thực địa)}
-\label{tab:benchmark_549_planners}
+\caption{Tổng hợp thông số cấu hình chuẩn của hệ thống liên hợp HGB-A* và Kinodynamic Riccati-RTI NMPC}
+\label{tab:system_params}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{ll|ll}
+    \toprule
+    \textbf{Tầng Quy hoạch HGB-A*} & \textbf{Giá trị cài đặt thực tế} & \textbf{Tầng Điều khiển Riccati-RTI} & \textbf{Giá trị cài đặt thực tế} \\
+    \midrule
+    Ổn định lật tĩnh ($\text{SSF},\; \text{LTR}_{\text{lim}}$) & $1.118$ ($\theta_{\text{crit}}=48.19^\circ$),\; $0.735$ ($\le 47.07^\circ$) & Tầm nhìn \& Bước mẫu ($N,\; \Delta t,\; T_h$) & $N=20$,\; $\Delta t=0.1\ \text{s}$,\; $T_h=2.0\ \text{s}$ \\
+    Khe gầm 2.5D ($z_{\text{clearance}}$) & $0.18\ \text{m}$ (DP),\; $0.22\ \text{m}$ (Safe Chaikin) & Giới hạn điều khiển ($u_{\min},\; u_{\max}$) & $[0.0, -1.0]^T$,\; $[1.8\ \text{m/s},\; 1.0\ \text{rad/s}]^T$ \\
+    Khối thô Tầng 1 ($c_s$) & $4$ ($\le 64^2$) hoặc $\max(4, \lfloor D/32 \rfloor)$ & Trọng số ($Q,\; Q_N,\; R$) & $\text{diag}(160,160,28)$,\; $6Q$,\; $\text{diag}(0.8, 0.4)$ \\
+    Khối cổng Tầng 2 ($B_S$, PUCT) & $16$ ($\le 64^2$) hoặc $\max(16, \lfloor D/6 \rfloor)$;\; $48$ sims, $c=35$ & Bộ giải ADMM ($\rho$, max iter, tol) & $\rho=8.0$,\; max $25$ vòng,\; tol $=10^{-6}$,\; \texttt{MAX\_N=64} \\
+    Tìm kiếm Tầng 3 ($w_{\text{base}}, \lambda_{\text{corr}}$) & $w_{\text{base}}=1.18$,\; $\lambda_{\text{corr}}=1.35$,\; Pohl 2 chiều & Bảng trượt \texttt{FullRangeSlipLUT} & $8\times 86$ ($0^\circ\text{--}85^\circ$), trượt $[0.01, 0.84]$, $c_v=0.05$ \\
+    Hậu xử lý Tầng 4 & DP \texttt{window=96}, phạt $8\Delta\theta^2+0.15$, Chaikin 2 vòng & Quan sát trượt \& Quỹ đạo PCHIP & EMA \texttt{gain=0.50} ($[-0.35,0.45]$), $a_{\max}=1.2$, $v_{\text{nom}}=1.0$ \\
+    \bottomrule
+\end{tabular}%
+}
+\end{table}
+
+% ============================================================
+\section{Kết quả Thực nghiệm và Đối chuẩn Toàn diện với 2.5D SOTA}
+% ============================================================
+
+\subsection{Thiết lập Phần cứng, Giao thức Đo và Quy ước Đánh giá}
+Toàn bộ số liệu của \textbf{HGB-A*} và \textbf{Kinodynamic Riccati-RTI NMPC} được đo trực tiếp trên cùng một máy tính cấu hình \textbf{AMD Ryzen 7 6800H (16 luồng, môi trường WSL2 CPU-only, không dùng NVIDIA GPU, 7.4 GiB RAM)}, biên dịch C++17 với cờ \texttt{-O3 -march=native -ffast-math -funroll-loops}. Tiêu thụ bộ nhớ \textbf{Peak RSS} khi chạy độc lập \textbf{HGB-A* + Riccati-RTI} (không nạp PyTorch, tới quy mô $1024\times 1024$) chỉ là \textbf{149.10 MB} (toàn bộ bộ kiểm thử nạp cả PyTorch CNN và toàn bộ dữ liệu dùng $1,107.22\ \text{MB}$ trong $303.56\ \text{s}$). Ở vòng kín điều khiển, một kịch bản đạt tiêu chuẩn thành công khi đồng thời thỏa mãn $\text{RMSE} < 25.0\ \text{cm}$ và sai số cuối $< 1.5\ \text{ô}$.
+
+\subsection{Trực quan hóa Đúng Tỷ lệ Vật lý 1:1:1 trên 4 Mẫu Bản đồ Thực địa}
+Hình \ref{fig:4field_truescale} biểu diễn 4 mẫu bản đồ thực địa tiêu biểu (\texttt{BenchNav 000\_000.pt}, \texttt{TartanDrive tartan\_000.pt}, \texttt{YCOR ycor\_000.pt} và \texttt{GOOSE goose\_000.pt}) theo \textbf{đúng tỷ lệ kích thước thực 1:1:1} ($0.5\ \text{m/ô} \Rightarrow 31.5\ \text{m} \times 31.5\ \text{m}$, chung khung trục $Z \in [0, 14\ \text{m}]$, hệ số phóng đại đứng $\text{VE} = 1.0\times$) và dùng bảng màu đất để tách biệt rõ vùng trũng khô với ô ngập nước $\tau=8$.
+\begin{itemize}
+    \item Trên địa hình thoai thoải \texttt{BenchNav} ($\Delta Z = 1.43\ \text{m}$, dốc tối đa $21.3^\circ$), cả \textbf{HGB-A*} và \textbf{v1} đều an toàn ($16.2^\circ$), tuy nhiên \textbf{HGB-A*} chỉ tốn \textbf{1.45 ms} so với \textbf{516 ms} của v1 (v1 cắt thẳng 2D không kiểm tra khe gầm nên có năng lượng $397\ \text{J}$ so với $421\ \text{J}$ của \textbf{HGB-A*}).
+    \item Trên địa hình hiểm trở \texttt{TartanDrive} ($\Delta Z = 10.65\ \text{m}$, vách $67.9^\circ$) và \texttt{GOOSE} ($\Delta Z = 9.10\ \text{m}$, vách $82.9^\circ$), sự khác biệt an toàn thể hiện rõ rệt ở hàng đồ thị mặt cắt độ dốc: \textbf{v1 vi phạm nghiêm trọng ngưỡng lật tĩnh} ($61.0^\circ$ trên TartanDrive và $58.6^\circ$ trên GOOSE), trong khi \textbf{HGB-A*} giữ chặt dưới ngưỡng an toàn ($44.6^\circ$ và $46.9^\circ \le 47.07^\circ$) với thời gian quy hoạch chỉ $1.04\text{--}1.41\ \text{ms}$ và được \textbf{Kinodynamic Riccati-RTI} bám sát với $\text{RMSE} = 0.15\text{--}0.26\ \text{cm}$.
+\end{itemize}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.99\textwidth]{figures/hgb_fig1_4field_maps_true_scale_25d.png}
+  \caption{Đối chiếu trực quan theo \textbf{tỷ lệ vật lý thực 1:1:1 ($\text{VE}=1.0\times$, $0.5\ \text{m/ô}$)} trên 4 mẫu thực địa $31.5\times 31.5\ \text{m}$: (Hàng 1) Bề mặt 3D không kéo dãn trục $Z$; (Hàng 2) Quỹ đạo 2D \textbf{HGB-A*} vs \textbf{v1} cùng đường bám \textbf{Riccati-RTI} và cắt lớp \textbf{Linear $G^0$}; (Hàng 3) Mặt cắt kép độ dốc $\theta(s)$ và độ cao thực $Z(s)$ trên cùng thang $0\text{--}14\ \text{m}$.}
+  \label{fig:4field_truescale}
+\end{figure}
+
+\subsection{Kết quả Đối chuẩn trên 549 Bản đồ 2.5D và 40 Kịch bản Điều khiển Vòng kín}
+Bảng \ref{tab:hgb_549} trình bày kết quả đo trực tiếp của 3 biến thể \textbf{HGB-A*} trên toàn bộ \textbf{549 bản đồ $64\times 64$} ($509$ BenchNav GT + $40$ thực địa) và phân tách chi tiết từng tập thực địa. Bảng \ref{tab:rti_40} tổng hợp hiệu năng điều khiển vòng kín trên 40 kịch bản thực địa kèm kiểm thử cắt lớp (\texttt{Riccati-Linear $G^0$}) và kiểm thử sốc trượt bùn bất ngờ $+0.20$. Hình \ref{fig:slip_ctrl} và Hình \ref{fig:metrics_summary} trực quan hóa chi tiết các phép toán trượt và toàn bộ chỉ số đo được.
+
+\begin{table}[htbp]
+\centering
+\caption{Kết quả đối chuẩn chi tiết của HGB-A* trên 549 bản đồ 2.5D ($64\times 64$) và phân tách 4 tập thực địa (Ryzen 7 6800H, CPU-only)}
+\label{tab:hgb_549}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{llcccccccc}
+    \toprule
+    \textbf{Biến thể HGB-A*} & \textbf{Tập dữ liệu} & \textbf{Thành công /} & \textbf{Fallback /} & \textbf{Thời gian (ms)} & \textbf{Tần số} & \textbf{Số nút duyệt} & \textbf{Năng lượng Minetti} & \textbf{Độ mượt} & \textbf{Dốc cực đại ($^\circ$)} \\
+    & (Số mẫu) & \textbf{An toàn lật} & \textbf{CBF-Esc.} & Mean $\pm$ Std (Med / P95) & (Hz) & Mean (\% lưới) & Mean $\pm$ Std (J/m) & ($\text{rad}^2$) & Mean [Max] \\
+    \midrule
+    \textbf{HGB-A* (C++17 SIMD)} & 549 tổng ($64^2$) & \textbf{100\% / 100\%} & \textbf{0.0\%} / 22.8\% & $\mathbf{1.38 \pm 0.68}$ ($\mathbf{1.19}$ / $2.69$) & \textbf{725.2} & $709.0$ ($17.31\%$) & $\mathbf{257.43 \pm 96.52}$ ($4.24$) & $0.402$ & $16.20^\circ$ [$\mathbf{47.07^\circ}$] \\
+    HGB-A* + Legacy CNN & 549 tổng ($64^2$) & 100\% / 100\% & 0.0\% / --- & $10.04 \pm 12.57$ ($8.05$ / $16.49$) & $99.6$ & $695.6$ ($16.98\%$) & $257.51 \pm 96.52$ (---) & $0.384$ & $16.22^\circ$ [$47.07^\circ$] \\
+    HGB-A* (Pure-Python Vec) & 549 tổng ($64^2$) & 100\% / 100\% & 0.0\% / --- & $82.55 \pm 23.64$ ($79.79$ / $127.7$) & $12.1$ & $709.0$ ($17.31\%$) & $257.49 \pm 96.49$ (---) & $0.403$ & $16.22^\circ$ [$47.07^\circ$] \\
+    \midrule
+    \textbf{HGB-A* (C++17 SIMD)} & \textbf{40 Thực địa} & \textbf{100\% / 100\%} & \textbf{0.0\% / 0.0\%} & $\mathbf{1.63 \pm 0.79}$ ($1.25$ / Max $3.56$) & \textbf{612.8} & $1019.5$ ($24.89\%$) & $517.03 \pm 174.21$ ($5.34$) & $1.686$ & $36.80^\circ$ [$\mathbf{47.07^\circ}$] \\
+    \quad $\hookrightarrow$ \textit{BenchNav Real} & Tập con thực địa & 100\% / 100\% & 0.0\% / 0.0\% & $1.40$ & $\sim 714$ & $484$ ($11.8\%$) & $378.5\ \text{J}$ & --- & $15.91^\circ$ (mean max) \\
+    \quad $\hookrightarrow$ \textit{TartanDrive Real} & Tập con thực địa & 100\% / 100\% & 0.0\% / 0.0\% & $1.71$ & $\sim 585$ & $1204$ ($29.4\%$) & $534.7\ \text{J}$ & --- & $45.34^\circ$ (mean max) \\
+    \quad $\hookrightarrow$ \textit{YCOR Real} & Tập con thực địa & 100\% / 100\% & 0.0\% / 0.0\% & $1.91$ & $\sim 524$ & $1307$ ($31.9\%$) & $468.0\ \text{J}$ & --- & $39.27^\circ$ (mean max) \\
+    \quad $\hookrightarrow$ \textit{GOOSE Real} & Tập con thực địa & 100\% / 100\% & 0.0\% / 0.0\% & $1.50$ & $\sim 667$ & $1083$ ($26.4\%$) & $686.9\ \text{J}$ & --- & $46.67^\circ$ (mean max) \\
+    \bottomrule
+\end{tabular}%
+}
+\end{table}
+
+\noindent\textit{Ghi chú thực nghiệm:} Trên tập tổng hợp \texttt{gt\_dataset} ($509$ bản đồ), cơ chế thoát khẩn \texttt{auto-CBF} kích hoạt ở $24.56\%$ mẫu (dẫn tới tổng cộng $4,778$ điểm chạm ô gắn nhãn nước trên tập tổng hợp này); ngược lại, trên toàn bộ \textbf{40 bản đồ thực địa} và toàn bộ dải bản đồ \textbf{$128^2 \to 1024^2$}, số lần kích hoạt \texttt{CBF-escape} và số lần chạm nước đều bằng \textbf{0}. Đồng thời, biến thể \texttt{PyVec} tái lập khớp kết quả của \texttt{C++17 SIMD} ($709.0$ nút, $257.49\ \text{J}$ so với $257.43\ \text{J}$), xác nhận tính tương đương thuật toán 1:1 với mức tăng tốc gần \textbf{60 lần} ở bản đồ $64^2$.
+
+\begin{table}[htbp]
+\centering
+\caption{Kết quả điều khiển vòng kín trên 40 kịch bản thực địa, cắt lớp Jacobian và thử nghiệm sốc trượt bùn $+0.20$}
+\label{tab:rti_40}
 \resizebox{\textwidth}{!}{%
 \begin{tabular}{lccccccc}
     \toprule
-    \textbf{Thuật toán Quy hoạch} & \textbf{Thời gian giải (ms)} & \textbf{Số Nút Mở rộng} & \textbf{Năng lượng Minetti (J)} & \textbf{Độ mượt góc ($\text{rad}^2$)} & \textbf{Tỷ lệ Fallback} & \textbf{Góc dốc Max ($^\circ$)} & \textbf{An toàn Chống lật} \\
-    & Mean $\pm$ Std (Med) & Mean $\pm$ Std (Med) & Mean $\pm$ Std (Med) & Mean $\pm$ Std (Med) & Mean (\%) & Mean [Max] & ($\theta_{\max} < 48.2^\circ$) \\
+    \textbf{Cấu hình Hệ thống / Kịch bản Thử nghiệm} & \textbf{Thành công} & \textbf{RMSE (cm)} & \textbf{Max CTE (cm)} & \textbf{Final Err (cm)} & \textbf{Chu kỳ giải ($\mu$s)} & \textbf{Tần số (Hz)} & \textbf{Slip MAE} \\
+    & (Đạt / Tổng) & Mean $\pm$ Std (Max) & Mean $\pm$ Std (Max) & Mean $\pm$ Std (Max) & Mean $\pm$ Std (P95 / P99) & Mean & Mean \\
     \midrule
-    \textbf{Weighted A* (Cổ điển)} & $266.03 \pm 60.34$ ($258.6$) & $900.0 \pm 0.0$ ($900$) & $492.01 \pm 5534.8$ ($233.3$) & $12.22 \pm 3.90$ ($12.34$) & $0.00\%$ & $14.51^\circ$ [$81.36^\circ$] & $96.90\%$ \\
-    \textbf{HMCTD-A* (v1 - Nghiên cứu cũ)} & $191.28 \pm 107.01$ ($188.0$) & $2517.7 \pm 1443.3$ ($2531$) & $639.28 \pm 6087.5$ ($264.0$) & $5.62 \pm 4.28$ ($4.74$) & $73.38\%$ & $15.00^\circ$ [$81.36^\circ$] & $96.90\%$ \\
+    \textbf{HGB-A* (C++) + Kinodynamic Riccati-RTI} & \textbf{40/40 (100\%)} & $\mathbf{0.227 \pm 0.062}$ ($0.396$) & $\mathbf{3.911 \pm 0.359}$ ($4.531$) & $\mathbf{5.26 \pm 3.12}$ ($10.15$) & $\mathbf{72.74 \pm 10.35}$ ($156.3$ / $433.7$) & $\mathbf{14,015.7}$ & $\mathbf{0.000333}$ \\
+    \quad $\hookrightarrow$ \textit{BenchNav / TartanDrive / YCOR / GOOSE} & 100\% mỗi tập & $0.184$ / $0.222$ / $0.184$ / $0.319$ & --- & --- & $79.0$ / $69.9$ / $67.8$ / $74.3$ & $12.7\text{--}14.7\ \text{kHz}$ & --- \\
+    HGB-A* (PyVec) + Kinodynamic Riccati-RTI & 40/40 (100\%) & $0.228 \pm 0.061$ & $3.912 \pm 0.359$ & --- & $75.48 \pm 16.96$ & $13,925.4$ & $0.000340$ \\
     \midrule
-    \textbf{HMCTD-A*\_v2 (PyVec 4-Tầng)} & $9.86 \pm 1.79$ ($9.35$) & $\mathbf{342.1 \pm 286.9}$ ($\mathbf{267}$) & $257.56 \pm 96.66$ ($236.2$) & $0.30 \pm 0.77$ ($0.11$) & $\mathbf{0.00\%}$ & $16.29^\circ$ [$\mathbf{47.07^\circ}$] & $\mathbf{100.00\%}$ \\
-    \textbf{HMCTD-A*\_v2 (C++17 SIMD)} & $\mathbf{0.73 \pm 0.14}$ ($\mathbf{0.70}$) & $357.4 \pm 290.2$ ($277$) & $\mathbf{247.19 \pm 94.37}$ ($\mathbf{228.8}$) & $\mathbf{0.26 \pm 0.61}$ ($\mathbf{0.11}$) & $\mathbf{0.00\%}$ & $15.98^\circ$ [$\mathbf{47.07^\circ}$] & $\mathbf{100.00\%}$ \\
+    \textit{Cắt lớp:} HGB-A* (C++) + \textbf{Riccati-Linear $G^0$} & \textbf{32/40 (80.0\%)} & $1.185 \pm 1.994$ ($9.884$) & $7.663 \pm 8.208$ & $135.60 \pm 333.0$ ($2000.9$) & $77.05 \pm 14.67$ & $13,380.9$ & --- \\
     \midrule
-    \textit{Mức độ cải tiến của HMCTD-A*\_v2} & \textbf{Nhanh gấp 261.8 lần v1} & \textbf{Giảm 85.8\% số nút} & \textbf{Tiết kiệm 61.3\% năng lượng} & \textbf{Mượt hơn 95.5\%} & \textbf{Xóa bỏ 100\% Fallback} & \textbf{Không vượt $48.2^\circ$} & \textbf{An toàn tuyệt đối} \\
-    \bottomrule
-\end{tabular}%
-}
-\end{table}
-
-\begin{table}[htbp]
-\centering
-\caption{Đối chuẩn các bộ điều khiển dự báo NMPC vòng kín trên 40 kịch bản địa hình thực địa đa tập dữ liệu (BenchNav, TartanDrive, YCOR, GOOSE)}
-\label{tab:benchmark_40_controllers}
-\resizebox{\textwidth}{!}{%
-\begin{tabular}{lcccccc}
-    \toprule
-    \textbf{Cấu hình Quy hoạch + Điều khiển} & \textbf{Sai số bám RMSE (cm)} & \textbf{Sai số cực đại Max CTE (cm)} & \textbf{Thời gian giải / bước ($\mu$s)} & \textbf{Tần số điều khiển (Hz)} & \textbf{Năng lượng điều khiển} & \textbf{Tỷ lệ Thành công} \\
-    & Mean $\pm$ Std (Median) & Mean $\pm$ Std (Median) & Mean $\pm$ Std (Median) & Mean $\pm$ Std (Median) & Mean $\pm$ Std & (\%) \\
-    \midrule
-    \textbf{Traditional NMPC (Không bù trượt)} & $25.80 \pm 9.42$ ($24.15$) & $68.40 \pm 18.50$ ($64.20$) & $22,580.0 \pm 3,120.0$ & $44.3 \pm 6.1$ & $245.6 \pm 42.1$ & $92.5\%$ \\
-    \textbf{Hybrid NMPC (Nhúng mạng SlipMLP)} & $24.10 \pm 8.85$ ($22.80$) & $61.20 \pm 16.40$ ($58.10$) & $52,270.0 \pm 6,840.0$ & $19.1 \pm 2.5$ & $231.4 \pm 38.5$ & $95.0\%$ \\
-    \textbf{HMCTD-A* v1 + Edge-Hybrid NMPC (Cũ)} & $3.68 \pm 1.66$ ($3.32$) & $14.81 \pm 4.36$ ($14.62$) & $4,451.38 \pm 410.02$ ($4,337.8$) & $226.3 \pm 18.5$ ($230.5$) & $189.8 \pm 27.6$ & $100.0\%$ \\
-    \midrule
-    \textbf{HMCTD-A*\_v2 + Riccati-Linear (Nội suy $G^0$)} & $1.19 \pm 1.99$ ($0.50$) & $7.66 \pm 8.21$ ($4.89$) & $\mathbf{33.09 \pm 2.14}$ ($\mathbf{32.46}$) & $\mathbf{30,339.4 \pm 1,781.9}$ & $191.1 \pm 39.0$ & $\mathbf{100.0\%}$ \\
-    \textbf{HMCTD-A*\_v2 + Kinodynamic Riccati-RTI (Đề xuất)} & $\mathbf{0.227 \pm 0.062}$ ($\mathbf{0.202}$) & $\mathbf{3.91 \pm 0.36}$ ($\mathbf{3.97}$) & $33.67 \pm 2.59$ ($32.77$) & $29,849.2 \pm 1,963.6$ ($30,513.7$) & $\mathbf{183.6 \pm 38.6}$ & $\mathbf{100.0\%}$ \\
-    \midrule
-    \textit{Cải tiến so với Edge-Hybrid NMPC} & \textbf{Giảm 93.8\% RMSE (gấp 16.2x)} & \textbf{Giảm 73.6\% Max CTE} & \textbf{Nhanh gấp 132.2 lần} & \textbf{Tăng từ 226 Hz lên 29.8 kHz} & \textbf{Tiết kiệm 3.3\%} & \textbf{Hoàn hảo 100\%} \\
+    \texttt{goose\_000.pt} — Chế độ Danh nghĩa & Đạt (True) & $0.272$ & $4.43$ & $6.35$ & $\sim 74$ & $\sim 13.5\ \text{kHz}$ & $0.000103$ \\
+    \texttt{goose\_000.pt} — Sốc bùn $+0.20$ giữa chặng & Hụt đích do hết $n_{\text{steps}}$ & $2.00$ & $9.72$ & $193.49$ (trễ đích) & $\sim 74$ & $\sim 13.5\ \text{kHz}$ & $0.001630$ \\
     \bottomrule
 \end{tabular}%
 }
@@ -488,35 +394,73 @@ Hệ thống được đánh giá định lượng trên toàn bộ \textbf{549 
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=0.99\textwidth]{figures/hmctd_v2_4datasets_showcase.png}
-  \caption{Đối sánh trực quan trên 4 tập dữ liệu địa hình dã chiến 2.5D (\textbf{BenchNav}, \textbf{TartanDrive}, \textbf{YCOR}, \textbf{GOOSE}): Quỹ đạo của \textbf{HMCTD-A*\_v2} (xanh lá) luôn bám theo thung lũng và đường đồng mức an toàn, được bộ điều khiển \textbf{Kinodynamic Riccati-RTI} (đường chấm đỏ) bám khít với sai số RMSE chỉ từ $0.15\text{--}0.27\ \text{cm}$ ở tần số $\sim 30\ \text{kHz}$.}
-  \label{fig:4datasets_showcase}
+  \includegraphics[width=0.99\textwidth]{figures/hgb_fig4_slip_physics_and_riccati_rti.png}
+  \caption{Phép toán cơ học trượt và kết quả điều khiển \textbf{Kinodynamic Riccati-RTI NMPC}: (A) So sánh \texttt{FullRangeSlipLUT} ($0^\circ\text{--}85^\circ$) với \texttt{SlipLUT} cũ bị kẹp trần $0.40$ và đồ thị Jacobian trượt $\gamma_{\text{eff}}$; (B) Tự động điều tốc \texttt{PCHIP $C^1$} và bù truyền thẳng bậc hai; (C) Đáp ứng của bộ quan sát trượt nhân quả dưới sốc bùn $+0.20$; (D) Đối chiếu 40 kịch bản thực địa cho thấy việc bỏ bù trượt bậc hai (\texttt{Linear $G^0$}) làm tỷ lệ đạt tụt từ $100\%$ xuống $80\%$.}
+  \label{fig:slip_ctrl}
+\end{figure}
+
+\subsection{\texorpdfstring{Khả năng Mở rộng Đa Tỷ lệ ($128^2 \to 1024^2$) và 49 Mê cung OMB}{Khả năng Mở rộng Đa Tỷ lệ (128x128 đến 1024x1024) và 49 Mê cung OMB}}
+Bảng \ref{tab:multiscale_omb} tổng hợp kết quả mở rộng quy mô của \textbf{HGB-A*} trên bản đồ DEM 2.5D có hố nước sâu $\tau=8$ từ $128\times 128$ đến $1024\times 1024$ ($5$ hạt giống cho C++17; $3/3/3/1$ hạt giống cho PyVec) cùng toàn bộ \textbf{49 mê cung OMB} ($14\times 128^2$, $6\times 256^2$, $29\times 512^2$). Khi kích thước bản đồ tăng gấp $64$ lần (từ $128^2$ lên $1024^2$), tỷ lệ ô lưới phải duyệt giảm dần từ $23.50\%$ xuống $15.10\%$, trong khi thời gian giải của bộ điều khiển \textbf{Riccati-RTI} giữ ổn định quanh $68\text{--}88\ \mu\text{s}$ và sai số bám $\text{RMSE} = 0.182\text{--}0.261\ \text{cm}$. Hình \ref{fig:multiscale_omb} minh họa trực tiếp các bản đồ đa tỷ lệ, mẫu OMB $512^2$ và đường cong mở rộng log-log.
+
+\begin{table}[htbp]
+\centering
+\caption{Hiệu năng mở rộng đa tỷ lệ trên DEM 2.5D ($128^2 \to 1024^2$, $\tau=8$) và 49 mê cung OMB}
+\label{tab:multiscale_omb}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{lc|cccc|cc|cc}
+    \toprule
+    \textbf{Bài kiểm thử /} & \textbf{Tổng số ô} & \multicolumn{4}{c|}{\textbf{HGB-A* (C++17 SIMD)}} & \multicolumn{2}{c|}{\textbf{HGB-A* (PyVec)}} & \multicolumn{2}{c}{\textbf{Kinodynamic Riccati-RTI}} \\
+    \textbf{Kích thước} & lưới & Time (ms) & Nút (\% lưới) & Max $\theta$ / Water & Năng lượng (J) & Time (ms) & Tăng tốc & RMSE (cm) & Chu kỳ ($\mu$s) \\
+    \midrule
+    DEM $128\times 128$ & $16,384$ & $\mathbf{4.64 \pm 0.93}$ & $3,850$ ($23.50\%$) & $46.64^\circ$ / $\mathbf{0}$ & $2,696.9$ & $394.57$ & $85.0\times$ & $\mathbf{0.261}$ & $81.58$ ($12.8\ \text{kHz}$) \\
+    DEM $256\times 256$ & $65,536$ & $\mathbf{15.76 \pm 5.41}$ & $12,711$ ($19.40\%$) & $46.30^\circ$ / $\mathbf{0}$ & $8,865.3$ & $906.73$ & $57.5\times$ & $\mathbf{0.228}$ & $72.27$ ($13.9\ \text{kHz}$) \\
+    DEM $512\times 512$ & $262,144$ & $\mathbf{42.60 \pm 18.48}$ & $45,128$ ($17.21\%$) & $46.89^\circ$ / $\mathbf{0}$ & $11,128.6$ & $6,097.33$ & $143.1\times$ & $\mathbf{0.212}$ & $87.73$ ($11.6\ \text{kHz}$) \\
+    DEM $1024\times 1024$ & $1,048,576$ & $\mathbf{209.15 \pm 48.96}$ & $158,356$ ($15.10\%$) & $46.97^\circ$ / $\mathbf{0}$ & $22,733.2$ & $28,229.34$ & $135.0\times$ & $\mathbf{0.182}$ & $68.22$ ($15.0\ \text{kHz}$) \\
+    \midrule
+    \textbf{49 Mê cung OMB} & $128^2\text{--}512^2$ & $\mathbf{15.72 \pm 11.58}$ & $7,822$ (Med $4,864$) & \textbf{49/49 (100\%)} & $L=370.1\ \text{px}$, Sm $6.34$ & $941.76$ & $\mathbf{59.9\times}$ & --- & --- \\
+    \bottomrule
+\end{tabular}%
+}
+\end{table}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.99\textwidth]{figures/hgb_fig3_multiscale_25d_true_scale_and_omb.png}
+  \caption{Mở rộng đa tỷ lệ của \textbf{HGB-A*} trên bản đồ DEM 2.5D ($128^2 \to 1024^2$, $0$ chạm hố nước $\tau=8$, $\theta_{\max} \le 47.0^\circ$), mẫu mê cung \textbf{OMB $512\times 512$}, đường cong mở rộng log-log (\texttt{C++17 SIMD} nhanh gấp $58\times\text{--}143\times$ so với \texttt{PyVec}) và hiệu suất cắt tỉa không gian duyệt.}
+  \label{fig:multiscale_omb}
 \end{figure}
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=0.99\textwidth]{figures/hmctd_v2_549_benchmark.png}
-  \caption{Đối chuẩn thống kê toàn diện trên 549 bản đồ 2.5D và 40 kịch bản điều khiển vòng kín: (a--d) Hiệu năng vượt trội của \textbf{HMCTD-A*\_v2} về thời gian giải, số nút mở rộng, năng lượng tiêu hao, độ mượt và tỷ lệ an toàn chống lật; (e--h) Độ trễ giải $\mu\text{s}$, sai số bám vết, nghiên cứu cắt lớp (Ablation) và mặt biên Pareto của \textbf{Kinodynamic Riccati-RTI NMPC}.}
-  \label{fig:benchmark_549}
+  \includegraphics[width=0.99\textwidth]{figures/hgb_fig6_benchmark_metrics_across_variants.png}
+  \caption{Tổng hợp trực quan toàn bộ chỉ số benchmark giữa các biến thể \textbf{HGB-A*} và \textbf{Riccati-RTI}: (A) 549 bản đồ $64^2$; (B) 40 kịch bản điều khiển thực địa; (C) 49 mê cung OMB và tiêu thụ RAM Peak RSS ($149.1\ \text{MB}$ độc lập vs $1,107.2\ \text{MB}$ khi nạp PyTorch); (D) Ma trận chỉ số trên cả 9 nhóm bản đồ 2.5D.}
+  \label{fig:metrics_summary}
 \end{figure}
 
-\subsection{\texorpdfstring{Mở rộng Quy mô Lớn: Bản đồ 2.5D Đa Tỷ lệ ($128^2 \to 1024^2$) và 49 Mê cung OMB $512\times 512$}{Mở rộng Quy mô Lớn: Bản đồ 2.5D Đa Tỷ lệ và 49 Mê cung OMB 512x512}}
-Để kiểm chứng khả năng mở rộng quy mô (Scalability) và năng lực né tránh vũng lún tích thủy sâu ($\tau = 8$), hệ thống được thử nghiệm trên dải bản đồ 2.5D DEM từ $128\times 128$ ($16,384$ ô) đến $1024\times 1024$ ($1,048,576$ ô) và toàn bộ \textbf{49 bản đồ mê cung lớn OMB} kích thước $512\times 512$ ($262,144$ ô) \cite{linh2026dataset}. Kết quả định lượng được tổng hợp trong Bảng \ref{tab:multiscale_25d} và Bảng \ref{tab:omb_49_mazes}, minh họa trực quan trên Hình \ref{fig:largemaps_showcase}.
+\subsection{Đối chuẩn Trực diện với Các Mô hình 2.5D SOTA Hiện nay}
+Bảng \ref{tab:sota_planners} và Bảng \ref{tab:sota_controllers} đối chiếu kết quả đo trực tiếp của hệ thống \textbf{HGB-A* + Kinodynamic Riccati-RTI NMPC} với số liệu công bố trong các công trình 2.5D (ghi rõ phần cứng, kích thước bản đồ và ký hiệu \texttt{N/A} khi bài gốc không công bố chỉ số tương ứng). Hình \ref{fig:hgb_vs_sota} trực quan hóa so sánh thang log và hồ sơ năng lực 6 chiều.
 
 \begin{table}[htbp]
 \centering
-\caption{Đối chuẩn mở rộng quy mô đa tỷ lệ trên bản đồ địa hình 2.5D DEM lớn ($128\times 128 \to 1024\times 1024$) có tích hợp hố sụt thủy văn ($\tau = 8$)}
-\label{tab:multiscale_25d}
+\caption{Đối chiếu tầng Quy hoạch 2.5D: HGB-A* (đo trực tiếp CPU-only) vs. Các Mô hình 2.5D SOTA (số liệu công bố)}
+\label{tab:sota_planners}
 \resizebox{\textwidth}{!}{%
-\begin{tabular}{cc|ccc|ccc|cc}
+\begin{tabular}{lccccc}
     \toprule
-    \textbf{Kích thước} & \textbf{Tổng số ô} & \multicolumn{3}{c|}{\textbf{HMCTD-A* (v1 - Nghiên cứu cũ)}} & \multicolumn{3}{c|}{\textbf{HMCTD-A*\_v2 (C++17 SIMD - Đề xuất)}} & \multicolumn{2}{c}{\textbf{Kinodynamic Riccati-RTI}} \\
-    \textbf{Lưới} & \textbf{bản đồ} & Thời gian (ms) & Tỷ lệ duyệt (\%) & An toàn lật (\%) & Thời gian (ms) & Tỷ lệ duyệt (\%) & Vi phạm nước ($\tau=8$) & RMSE (cm) & Chu kỳ giải ($\mu$s) \\
+    \textbf{Mô hình Quy hoạch} & \textbf{Phần cứng \& Bản đồ} & \textbf{Thời gian giải} & \textbf{Thành công / An toàn} & \textbf{Vật lý 2.5D} & \textbf{Đặc điểm nổi bật / Giới hạn} \\
     \midrule
-    $128 \times 128$ & $16,384$ & $1,772.66 \pm 143.4$ & $128.5\%$ (FB $100\%$) & $40.0\%$ & $\mathbf{3.16 \pm 0.56}$ & $\mathbf{25.5\%}$ & $\mathbf{0}$ ô ($100\%$ Safe) & $\mathbf{0.25 \pm 0.03}$ & $\mathbf{33.09\ \mu\text{s}}$ \\
-    $256 \times 256$ & $65,536$ & $6,931.76 \pm 399.3$ & $121.4\%$ (FB $100\%$) & $20.0\%$ & $\mathbf{11.71 \pm 0.72}$ & $\mathbf{21.8\%}$ & $\mathbf{0}$ ô ($100\%$ Safe) & $\mathbf{0.23 \pm 0.02}$ & $\mathbf{31.95\ \mu\text{s}}$ \\
-    $512 \times 512$ & $262,144$ & \textit{Thất bại (Ngắt Cost)} & --- ($0\%$ Success) & $0.0\%$ & $\mathbf{30.33 \pm 3.99}$ & $\mathbf{12.8\%}$ & $\mathbf{0}$ ô ($100\%$ Safe) & $\mathbf{0.20 \pm 0.02}$ & $\mathbf{33.83\ \mu\text{s}}$ \\
-    $1024 \times 1024$ & $1,048,576$ & \textit{Thất bại (Ngắt Cost)} & --- ($0\%$ Success) & $0.0\%$ & $\mathbf{100.48 \pm 3.36}$ & $\mathbf{8.7\%}$ & $\mathbf{0}$ ô ($100\%$ Safe) & $\mathbf{0.16 \pm 0.03}$ & $\mathbf{35.06\ \mu\text{s}}$ \\
+    \textbf{HGB-A* (Đề xuất)} & Ryzen 7 6800H (CPU-only), & $\mathbf{1.38\ \text{ms}}$ ($64^2$), $42.6\ \text{ms}$ ($512^2$), & \textbf{100\%} ($549/549$, $49/49$), & Minetti bậc 5 + Bekker & Không cần GPU, 0\% Fallback, $149.1\ \text{MB}$ RAM; \\
+    & $64^2 \to 1024^2$, 4 tập thực địa & $\mathbf{209.15\ \text{ms}}$ ($1024^2$, 1M ô) & $\theta_{\max} \le 47.07^\circ$, 0 chạm nước & + LTR + khóa $\tau=8$ & chưa tìm trực tiếp trong $SE(2)$ lùi xe \\
+    \midrule
+    \textbf{Nav2 Smac-Hybrid} \cite{macenski2024smac} & Ryzen 5 5600X ($100\times 100\ \text{m}$ 2D), & $38.77\text{--}40.73\ \text{ms}$ ($10\text{--}20\%$), & N/A (chuẩn 2D công nghiệp) & Không có (2D phẳng) & Thỏa mãn cung Dubins/Reeds-Shepp $SE(2)$; \\
+    \& \textbf{Smac-Lattice} & Warehouse $33,700\ \text{m}^2$ (i7) & Lattice: $39.4\text{--}43.3\ \text{ms}$ (WH $290/473\ \text{ms}$) & & & không xét độ dốc, lật xe hay cơ học đất \\
+    \textbf{Nav2 Smac-2D / NavFn / SBPL} & Như trên \cite{macenski2024smac} & $66\text{--}89\ \text{ms}$ / $61\text{--}71\ \text{ms}$ / $5.6\text{--}6.6\ \text{s}$ & N/A & Không có (2D phẳng) & \texttt{SBPL} chậm hơn $>140\times$ khi chướng ngại dày \\
+    \textbf{PUTN} (\texttt{PF-RRT*+GPR}) \cite{jian2022putn} & Intel NUC i5 (CPU-only), & Vòng cục bộ $10\text{--}50\ \text{Hz}$ & Thực nghiệm ổn định & PCA dốc/phẳng + & Xử lý đám mây điểm 3D trực tiếp; chưa có \\
+    & AgileX Scout 2.0 & ($\sim 20\text{--}100\ \text{ms}$) & trên dốc $< 30^\circ$ & phương sai GPR $(\tau,\sigma^2)$ & Minetti/Bekker hay mở rộng lưới $1024^2$ \\
+    \textbf{ART Planner} \cite{wellhausen2023art} & ANYmal + GPU ($8\times 8\ \text{m}$, & Ngân sách $2.0\ \text{s}$ (max $4.65\ \text{s}$); & \textbf{0 thất bại} / 90 phút & CNN dự đoán rủi ro + & Chuyên biệt cho robot chân $SE(3)$; đòi hỏi GPU \\
+    (+ \texttt{elev\_map\_cupy} \cite{miki2022elevation}) & Xavier map $6.86\ \text{ms}$) & ngưỡng thực $4.44\ \text{s}$ & DARPA SubT Finals & tầm với 4 chân $SE(3)$ & và quá chậm cho quy hoạch lại $>10\ \text{Hz}$ \\
+    \textbf{TERP} \cite{weerakoon2022terp} / \textbf{Verti-Bench} \cite{vertibench2025} & Husky / Project Chrono (GPU) & Thực thi cục bộ (N/A ms lưới lớn) & TERP $+35.2\%$; TAL/TNT \#1 & DRL độ cao / 6-DoF & Rất mạnh trên dốc đứng; phụ thuộc GPU \& dữ liệu \\
+    \textbf{Lazy Theta*} \cite{nash2010lazytheta} / \textbf{EIT*} \cite{strub2022eit} & CPU-only (bất kỳ góc / OMPL) & Giảm $10\times$ kiểm tra LOS / tối ưu tiệm cận & $0\%$ phạt dài / hội tụ tối ưu & Hình học tổng quát & Khử $8\text{--}13\%$ bậc thang; chưa tích hợp vật lý đất \\
     \bottomrule
 \end{tabular}%
 }
@@ -524,22 +468,22 @@ Hệ thống được đánh giá định lượng trên toàn bộ \textbf{549 
 
 \begin{table}[htbp]
 \centering
-\caption{Đối chuẩn trên 49 bản đồ mê cung đa giác trực giao quy mô lớn OMB $512\times 512$ ($262,144$ ô lưới)}
-\label{tab:omb_49_mazes}
+\caption{Đối chiếu tầng Điều khiển 2.5D: Kinodynamic Riccati-RTI NMPC vs. Các Bộ Điều khiển SOTA (số liệu công bố)}
+\label{tab:sota_controllers}
 \resizebox{\textwidth}{!}{%
-\begin{tabular}{lcccccc}
+\begin{tabular}{lccccc}
     \toprule
-    \textbf{Thuật toán Quy hoạch} & \textbf{Thời gian giải (ms)} & \textbf{Số Nút Mở rộng} & \textbf{Chiều dài Quỹ đạo (px)} & \textbf{Độ mượt góc ($\text{rad}^2$)} & \textbf{Tỷ lệ Fallback} & \textbf{Tỷ lệ Thành công} \\
-    & Mean $\pm$ Std (Median) & Mean $\pm$ Std (Median) & Mean $\pm$ Std (Median) & Mean $\pm$ Std (Median) & (\%) & (49/49 Maps) \\
+    \textbf{Bộ Điều khiển / Bộ giải} & \textbf{Phần cứng \& Cấu hình} & \textbf{Thời gian giải / bước} & \textbf{Tần số} & \textbf{Độ chính xác / Thành công} & \textbf{Mô hình Trượt \& Ràng buộc} \\
     \midrule
-    \textbf{Weighted A* (Baseline)} & $1,376.80 \pm 3,122.0$ ($160.3$) & $47,624.0 \pm 100,497$ ($7,851$) & $397.02 \pm 221.8$ ($412.5$) & $45.22 \pm 40.62$ ($29.61$) & $0.00\%$ & $100.0\%$ \\
-    \textbf{MCTD-A* (Toàn cục)} & $20,566.35 \pm 86,300.6$ ($364.4$) & $486,918.0 \pm 2,009,000$ ($13,360$) & $397.02 \pm 221.8$ ($412.5$) & $45.24 \pm 40.60$ ($29.61$) & $34.69\%$ & $100.0\%$ \\
-    \textbf{HMCTD-A* (v1 - Nghiên cứu cũ)} & $1,484.82 \pm 1,696.8$ ($758.0$) & $43,340.4 \pm 58,313$ ($20,387$) & $378.26 \pm 212.2$ ($405.2$) & $18.02 \pm 15.66$ ($13.58$) & $71.43\%$ & $100.0\%$ \\
+    \textbf{Kinodynamic Riccati-RTI} & Ryzen 7 6800H (CPU-only), & $\mathbf{72.74\ \mu\text{s}}$ ($0.073\ \text{ms}$), & $\mathbf{14.0\ \text{kHz}}$ & \textbf{100\%} ($40/40$), \textbf{RMSE 0.227 cm}, & Bù trượt bậc hai + Jacobian $\gamma_{\text{eff}}$ + EMA; \\
+    \textbf{(Đề xuất)} & $N=20$, $\Delta t=0.1\ \text{s}$ & P99: $433.69\ \mu\text{s}$ & & Slip MAE $0.000333$ & chỉ kẹp hộp $u \in [u_{\min}, u_{\max}]$ (chưa có CBF) \\
     \midrule
-    \textbf{HMCTD-A*\_v2 (PyVec 4-Tầng)} & $109.77 \pm 76.05$ ($132.8$) & $8,519.5 \pm 8,755$ ($7,084$) & $\mathbf{367.55 \pm 206.8}$ ($\mathbf{377.2}$) & $\mathbf{6.34 \pm 5.29}$ ($\mathbf{5.31}$) & $\mathbf{0.00\%}$ & $\mathbf{100.0\%}$ \\
-    \textbf{HMCTD-A*\_v2 (C++17 SIMD)} & $\mathbf{9.01 \pm 5.79}$ ($\mathbf{10.25}$) & $\mathbf{7,821.9 \pm 8,225}$ ($\mathbf{4,864}$) & $370.12 \pm 208.0$ ($381.3$) & $\mathbf{6.34 \pm 5.36}$ ($\mathbf{5.43}$) & $\mathbf{0.00\%}$ & $\mathbf{100.0\%}$ \\
-    \midrule
-    \textit{Mức độ cải tiến của HMCTD-A*\_v2} & \textbf{Nhanh gấp 164.9x v1 (2,283x MCTD)} & \textbf{Giảm 82.0\% số nút duyệt} & \textbf{Ngắn hơn 26.9 px so với A*} & \textbf{Mượt hơn 86.0\% so với A*} & \textbf{0.0\% Fallback} & \textbf{Hoàn hảo 49/49} \\
+    \textbf{acados SQP-RTI} \cite{verschueren2022, vanroye2023fatrop} & Desktop i7 đơn nhân (HPIPM+BLASFEO) & $0.59\ \text{ms}$ (Pend.) / $5.31\ \text{ms}$ (Quad.) / $9.76\ \text{ms}$ (3D) & $102\text{--}1,695\ \text{Hz}$ & Chuẩn tham chiếu công nghiệp & Hỗ trợ bất đẳng thức phi tuyến tổng quát, cần sinh mã C \\
+    \textbf{FATROP} \cite{vanroye2023fatrop} & Desktop i7 đơn nhân (Structure IPM) & $0.54\ \text{ms}$ / $1.71\ \text{ms}$ / $17.62\ \text{ms}$ / $30.32\ \text{ms}$ & $33\text{--}1,852\ \text{Hz}$ & Nhanh hơn $4.5\text{--}6\times$ Ipopt & Mạnh cho ràng buộc phi tuyến \& bài toán min-time \\
+    \textbf{OCS2 Perceptive NMPC} \cite{grandia2023} & ANYmal ($T_h=1.0\ \text{s}$, WBC $400\ \text{Hz}$) & $6.6\ \text{ms}$ TB / $9.8\ \text{ms}$ tối đa & $100\ \text{Hz}$ & Bám cầu thang/đá thực tế & Nón ma sát 3D, SDF 3D \& đa giác chân lồi \\
+    \textbf{NMPC-DCBF} \cite{liao2023dcbf} / \textbf{Terrain CBF} \cite{yang2026terraincbf} & Intel NUC 11th / Proprioceptive EKF & $< 5.0\ \text{ms}$ (DCBF) & tới $200\ \text{Hz}$ & EKF giảm $-64.8\%$ MAE vị trí & Đảm bảo bất biến an toàn toán học chính thức (CBF) \\
+    \textbf{WayFASTER} \cite{gasparino2024wayfaster} & Jetson AGX Xavier GPU, RGB-D, $N=20$ & $10\text{--}25\ \text{ms}$ (Neural-MPPI) & $40\text{--}100\ \text{Hz}$ & Thực địa \textbf{5/5 (100\%)} ($118\ \text{s}$) & Học thích nghi tự giám sát từ ảnh RGB-D thời gian thực \\
+    \textbf{nav2\_mppi} / \textbf{MPPI-Generic} \cite{vlahov2024mppi} & CPU XTensor (2000 mẫu) / CUDA GPU & $6.8\text{--}15\ \text{ms}$ (CPU) / sub-ms (GPU) & $50\text{--}100\ \text{Hz}$ (CPU) & Chuẩn tránh vật cản phi lồi & Không cần đạo hàm; tốn tài nguyên hơn Riccati-RTI \\
     \bottomrule
 \end{tabular}%
 }
@@ -547,34 +491,33 @@ Hệ thống được đánh giá định lượng trên toàn bộ \textbf{549 
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=0.99\textwidth]{figures/hmctd_v2_largemaps_showcase.png}
-  \caption{Mở rộng quy mô lớn ($128\times 128 \to 1024\times 1024$ 2.5D DEM và 49 mê cung OMB $512\times 512$): [1--4] Quỹ đạo của \textbf{HMCTD-A*\_v2} (xanh lá) và vết bám của \textbf{Kinodynamic Riccati-RTI} (chấm đỏ) vòng tránh hoàn hảo các lòng hồ tích thủy sâu $\tau = 8$ (viền xanh lơ, $0$ ô vi phạm) và bám tới sát đích $100\%$ (sai số cuối $< 0.08$ ô trên hành trình dài $> 1,350$ m); (e--h) Biểu đồ thời gian giải, tỷ lệ duyệt nút ($8.7\%$ ở $1024^2$), thống kê 49 mê cung OMB và sai số bám quỹ đạo.}
-  \label{fig:largemaps_showcase}
+  \includegraphics[width=0.99\textwidth]{figures/hgb_fig5_hgb_vs_25d_sota_benchmark.png}
+  \caption{Đối chiếu trực diện \textbf{HGB-A* + Kinodynamic Riccati-RTI} (đo trực tiếp CPU-only) với các mô hình \textbf{2.5D SOTA} (số liệu công bố): (A) Độ trễ tầng quy hoạch (thang log); (B) Thời gian giải tầng điều khiển (thang log); (C) Biểu đồ Radar 6 chiều so sánh các năng lực chính và giới hạn kỹ thuật; (D) Phân tách chi tiết năng lượng và góc dốc cực đại trên 4 tập thực địa và 549 bản đồ.}
+  \label{fig:hgb_vs_sota}
 \end{figure}
 
 % ============================================================
 \section{Tích hợp Hệ thống trên Hệ điều hành Robot ROS 2}
 % ============================================================
-Toàn bộ mã nguồn của hai nghiên cứu mới đã được chuẩn hóa trong thư mục \texttt{3. code/} và sẵn sàng đóng gói thành các node thực thi thời gian thực trên ROS 2 (Humble / Jazzy):
+Toàn bộ mã nguồn đã được đặt tên chuẩn hóa trong thư mục \texttt{3. code/} và biên dịch sẵn để tích hợp trực tiếp vào kiến trúc ROS 2 (Humble / Jazzy):
 \begin{itemize}
-    \item \textbf{Mô-đun Quy hoạch Toàn cục (\texttt{HMCTDAStarV2Planner}):} Cài đặt tại \texttt{pp\_hmctd\_a\_star\_v2.py} và thư viện biên dịch \texttt{libhmctd\_v2.so}. Mô-đun nhận bản đồ độ cao và lớp phủ địa chất từ topic \texttt{/grid\_map}. Với thời gian thực thi trung bình chỉ \textbf{0.73 ms} trên lưới $64\times 64$ và \textbf{30.3 ms} trên lưới $512\times 512$, node quy hoạch toàn cục có thể cập nhật lại đường đi địa trắc ở tần số $10\text{--}30\ \text{Hz}$ ngay khi bản đồ LiDAR thay đổi.
-    \item \textbf{Mô-đun Điều khiển Dự báo (\texttt{KinodynamicRiccatiRTIController}):} Cài đặt tại \texttt{riccati\_rti\_controller.py}. Mô-đun nhận chuỗi waypoints từ \texttt{/global\_path}, kiến tạo quỹ đạo tham chiếu nội suy PCHIP $C^1$ và thực thi vòng lặp điều khiển \texttt{Riccati-ADMM} với chi phí tính toán chỉ \textbf{33.67 $\mu$s/bước} (chiếm chưa tới $0.34\%$ tài nguyên của một chu kỳ điều khiển $100\ \text{Hz}$ trên vi xử lý nhúng ARM Cortex-A78AE của Jetson Orin Nano).
+    \item \textbf{Node Quy hoạch Toàn cục (\texttt{HGBAStarPlanner}):} Nằm tại \texttt{3. code/pp\_hgb\_a\_star.py} liên kết thư viện \texttt{libhgb\_a\_star.so} (biên dịch từ \texttt{hgb\_a\_star\_core.cpp}). Mô-đun nhận bản đồ 2.5D từ topic \texttt{/grid\_map}. Với độ trễ \textbf{1.38 ms} ($64^2$) đến \textbf{42.60 ms} ($512^2$) và RAM độc lập \textbf{149.10 MB}, node có thể quy hoạch lại toàn cục ở tần số $10\text{--}30\ \text{Hz}$ trên máy tính nhúng không có GPU.
+    \item \textbf{Node Điều khiển Cục bộ (\texttt{KinodynamicRiccatiRTIController}):} Nằm tại \texttt{3. code/riccati\_rti\_controller.py}. Nhận quỹ đạo từ \texttt{/global\_path}, tạo tham chiếu mượt \texttt{PCHIP $C^1$} và chạy vòng lặp \texttt{Riccati-ADMM} với thời gian trung bình \textbf{72.74 $\mu$s/bước} (P99 $= 433.69\ \mu\text{s}$), chỉ chiếm $< 1\%$ ngân sách thời gian của vòng điều khiển $100\ \text{Hz}$ tiêu chuẩn.
 \end{itemize}
 
 % ============================================================
-\section{Thảo luận \& Kết luận}
+\section{Thảo luận và Kết luận}
 % ============================================================
 
-\subsection{Thảo luận về Bản chất Cơ học và Đóng góp Cắt lớp (Ablation Insights)}
-Kết quả nghiên cứu cắt lớp (Ablation Study trên Hình \ref{fig:benchmark_549}g) làm sáng tỏ đóng góp định lượng của từng thành phần toán học:
-\begin{enumerate}
-    \item Việc thay thế bộ giải nội điểm CasADi/Ipopt bằng bộ giải cấu trúc \textbf{Block-Tridiagonal Riccati-ADMM} rút ngắn chu kỳ tính toán từ $4,451.38\ \mu\text{s}$ xuống $33.09\ \mu\text{s}$ (\textbf{tăng tốc 134 lần}) mà không làm suy giảm chất lượng nghiệm tối ưu.
-    \item Việc thay thế nội suy tuyến tính $G^0$ và bảng tra cắt trần $0.40$ bằng \textbf{Nội suy PCHIP $C^1$ Hermite + \texttt{FullRangeSlipLUT} + \texttt{CausalTerrainSlipObserver}} giúp giảm sai số bám vết RMSE từ $3.12\ \text{cm}$ xuống $1.19\ \text{cm}$.
-    \item Đặc biệt, việc bổ sung \textbf{Bù tiền hồi nghịch đảo trượt bậc hai} (\ref{eq:uv_ff_solution}) và \textbf{Đạo hàm riêng cơ học đất} (\ref{eq:terramech_jacobian}) tiếp tục kéo giảm sai số RMSE từ $1.19\ \text{cm}$ xuống còn \textbf{0.227 cm} (giảm thêm $80.9\%$), chứng minh rằng sai lệch vận tốc dọc do trượt phi tuyến chính là nguồn gốc lớn nhất gây trễ pha quỹ đạo trên địa hình 2.5D.
-\end{enumerate}
+\subsection{Phân tích Ưu điểm và Giới hạn Kỹ thuật}
+Kết quả thực nghiệm và đối chiếu với các phương pháp 2.5D cho thấy rõ các đánh đổi thiết kế của hệ thống \textbf{HGB-A* + Kinodynamic Riccati-RTI NMPC}:
+\begin{itemize}
+    \item \textbf{Ưu điểm chính:} (1) Thời gian tính toán thấp trên CPU thuần ($1.38\ \text{ms}$ ở $64^2$, $209\ \text{ms}$ ở $1024^2$, $72.7\ \mu\text{s}$ cho điều khiển) với tiêu thụ RAM nhỏ ($149.1\ \text{MB}$); (2) Tích hợp vật lý xuyên suốt từ Minetti + Bekker-Wong + chống lật $\text{LTR} \le 0.735$ tới bù trượt bậc hai và Jacobian $\gamma_{\text{eff}}$ (thực nghiệm cắt lớp xác nhận nếu bỏ bù trượt bậc hai, tỷ lệ đạt giảm từ $100\%$ xuống $80\%$); (3) Loại bỏ lỗi Fallback ($0.0\%$) và đảm bảo $100\%$ an toàn chống lật.
+    \item \textbf{Giới hạn và hướng phát triển tiếp theo:} (1) \textbf{HGB-A*} tìm kiếm trên lưới $(r,c)$ của bản đồ 2.5D tĩnh rồi mới làm trơn $C^1$, nên chưa hỗ trợ trực tiếp động học lùi xe trong ngõ cụt siêu hẹp như \texttt{Nav2 Smac-Hybrid} hay tự học tránh chướng ngại động từ camera RGB-D như \texttt{WayFASTER}; (2) Bộ giải \texttt{Riccati-ADMM} hiện tối ưu hóa cho ràng buộc hộp $u \in [u_{\min}, u_{\max}]$ để giữ chu kỳ dưới $100\ \mu\text{s}$, chưa nhúng trực tiếp bất đẳng thức rào chắn trạng thái phi tuyến (\texttt{CBF}) như \texttt{FATROP} hay \texttt{Terrain-Aware CBF-MPC}; (3) Khi chịu sốc trượt bùn bất ngờ $+0.20$ kéo dài ở \texttt{goose\_000.pt}, xe vẫn giữ bám ngang tốt ($\text{RMSE} = 2.00\ \text{cm}$, $\text{Max CTE} = 9.72\ \text{cm}$) nhưng bị trễ thời gian đến đích nếu cắt cố định số bước mô phỏng ($n_{\text{steps}}$), gợi mở hướng dùng tham chiếu theo tiến độ không gian (path-parameterized MPC) trong nghiên cứu kế tiếp.
+\end{itemize}
 
 \subsection{Kết luận}
-Báo cáo đã trình bày trọn vẹn hai nghiên cứu mới của \textbf{Nhóm 2 (Động lực học \& Điều khiển)} gồm thuật toán quy hoạch phân cấp lai 4 tầng \textbf{HMCTD-A*\_v2} và bộ điều khiển dự báo nhúng \textbf{Kinodynamic Riccati-RTI NMPC}. So sánh đối chuẩn trực tiếp với các nghiên cứu tiền nhiệm trên 549 bản đồ tiêu chuẩn và 69 bản đồ quy mô lớn khẳng định hệ thống mới đạt sự nhảy vọt toàn diện: nhanh hơn \textbf{261.8 lần} ở tầng quy hoạch, nhanh hơn \textbf{132.2 lần} ở tầng điều khiển, xóa bỏ hoàn toàn lỗi Fallback ($0.0\%$), đảm bảo $100\%$ an toàn chống lật và tránh vũng ngập thủy văn, đồng thời đạt độ chính xác bám vết vòng kín \textbf{0.227 cm}.
+Báo cáo đã trình bày cơ sở toán học, mô hình vật lý, mã nguồn và kết quả đối chuẩn của hệ thống liên hợp \textbf{HGB-A*} và \textbf{Kinodynamic Riccati-RTI NMPC} cho bài toán dẫn đường robot mặt đất trên địa hình 2.5D. Hệ thống đạt độ trễ quy hoạch $1.38\ \text{ms}$ ở lưới $64^2$ ($209.15\ \text{ms}$ ở $1024^2$), chu kỳ điều khiển $72.74\ \mu\text{s}$ ($\approx 14.0\ \text{kHz}$), sai số bám vết $\text{RMSE} = 0.227\ \text{cm}$ và tỷ lệ an toàn chống lật $100\%$ hoàn toàn trên CPU phổ thông, phù hợp cho các robot dã chiến có tài nguyên tính toán hạn chế.
 
 % ============================================================
 \renewcommand{\refname}{Tài liệu tham khảo}

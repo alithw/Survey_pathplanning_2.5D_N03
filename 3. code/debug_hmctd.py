@@ -6,8 +6,9 @@ import torch
 from pp_hmctd_a_star import HMCTDAStarPlanner
 from train_system1 import System1CNN
 
-GT_DIR = "gt_dataset"
-MODEL_PATH = "system1_model.pth"
+CURR_DIR = os.path.dirname(os.path.abspath(__file__))
+GT_DIR = os.path.join(CURR_DIR, "gt_dataset")
+MODEL_PATH = os.path.join(CURR_DIR, "system1_model.pth")
 
 def main():
     gt_files = sorted(glob.glob(os.path.join(GT_DIR, "*.npz")))
@@ -28,7 +29,11 @@ def main():
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model = System1CNN().to(device)
     if os.path.exists(MODEL_PATH):
-        model.load_state_dict(torch.load(MODEL_PATH, map_location=device))
+        try:
+            state_dict = torch.load(MODEL_PATH, map_location=device, weights_only=True)
+        except TypeError:
+            state_dict = torch.load(MODEL_PATH, map_location=device)
+        model.load_state_dict(state_dict)
         model.eval()
     
     planner = HMCTDAStarPlanner(

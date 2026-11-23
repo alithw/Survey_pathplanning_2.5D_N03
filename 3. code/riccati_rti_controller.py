@@ -3,7 +3,7 @@ import time
 import ctypes
 import numpy as np
 from scipy.interpolate import PchipInterpolator
-from pp_hmctd_a_star_v2 import _V2_LIB
+from pp_hgb_a_star import _HGB_LIB as _V2_LIB
 
 
 class FullRangeSlipLUT:

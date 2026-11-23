@@ -45,9 +45,10 @@ from train_system1 import System1CNN
 # ─────────────────────────────────────────────────────────────
 # CẤU HÌNH CHUNG
 # ─────────────────────────────────────────────────────────────
-DATASET_DIR  = "dataset_omb/mazes"
-LOG_DIR      = "../4. logs"
-MODEL_PATH   = "system1_model.pth"
+CURR_DIR     = os.path.dirname(os.path.abspath(__file__))
+DATASET_DIR  = os.path.join(CURR_DIR, "dataset_omb", "mazes")
+LOG_DIR      = os.path.normpath(os.path.join(CURR_DIR, "..", "4. logs"))
+MODEL_PATH   = os.path.join(CURR_DIR, "system1_model.pth")
 NUM_PLANNING = 50    # Số map dùng cho Phần 1 (lấy đều trên toàn dataset)
 NUM_NMPC     = 15    # Số map dùng cho Phần 2  (tốn nhiều thời gian hơn)
 RANDOM_SEED  = 42
@@ -78,9 +79,14 @@ np.random.seed(RANDOM_SEED)
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 cnn_model = System1CNN().to(device)
 if os.path.exists(MODEL_PATH):
-    cnn_model.load_state_dict(torch.load(MODEL_PATH, map_location=device))
+    try:
+        state_dict = torch.load(MODEL_PATH, map_location=device, weights_only=True)
+    except TypeError:
+        state_dict = torch.load(MODEL_PATH, map_location=device)
+    cnn_model.load_state_dict(state_dict)
     cnn_model.eval()
-    print(f"-> Đã nạp System 1 CNN từ: {MODEL_PATH}")
+    if __name__ == "__main__":
+        print(f"-> Đã nạp System 1 CNN từ: {MODEL_PATH}")
 else:
     print(f"[CẢNH BÁO] Không tìm thấy {MODEL_PATH} – dự đoán hành lang bị vô hiệu hóa.")
 

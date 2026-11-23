@@ -44,7 +44,7 @@ static inline double soil_resistance_lut(int t_cls) {
         case 5: return 2.5;
         case 6: return 6.0;
         case 7: return 1.5;
-        case 8: return 45.0; // (Hydrological Sinkhole)
+        case 8: return 45.0; /* Rốn trũng thủy văn / vùng ngập nước sâu (Hydrological Sinkhole) */
         default: return 2.0;
     }
 }
@@ -173,7 +173,7 @@ static inline double segment_exact_energy(
     return total_e;
 }
 
-void hmctd_eval_metrics_kernel(
+void hgb_eval_metrics_kernel(
     const double* heights,
     const int32_t* t_classes,
     int H, int W,
@@ -258,7 +258,7 @@ struct UltraWorkspace {
 
 static thread_local UltraWorkspace g_ws;
 
-int hmctd_ultra_plan_kernel(
+int hgb_plan_kernel(
     const double* heights,
     const double* slopes_deg,
     const int32_t* t_classes,

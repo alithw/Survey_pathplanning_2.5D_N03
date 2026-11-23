@@ -36,7 +36,7 @@ from a_star_cost import AStarPlanner
 from train_system1 import System1CNN
 from pp_mctd_a_star import predict_corridor
 from pp_hmctd_a_star import HMCTDAStarPlanner
-from pp_hmctd_a_star_v2 import HMCTDAStarV2Planner
+from pp_hgb_a_star import HGBAStarPlanner as HMCTDAStarV2Planner
 from edge_hybrid_nmpc import EdgeHybridNMPCController, get_actual_slip
 from riccati_rti_controller import (
     KinodynamicRiccatiRTIController,
@@ -526,7 +526,7 @@ def generate_architecture_diagram():
     draw_arrow(62, 9.2, 65, 9.2, "u*=[u_v*, u_ω*]", color="#0284C7")
     draw_arrow(80.5, 18.3, 52.5, 21, "Phản hồi x_k, v_meas", color="#0284C7", rad=0.05)
 
-    out_path = os.path.join(FIG_DIR, "hmctd_v2_architecture.png")
+    out_path = os.path.join(FIG_DIR, "hgb_a_star_architecture.png")
     fig.savefig(out_path, bbox_inches="tight", dpi=220)
     plt.close(fig)
     print(f"[OK] Saved {out_path}")
@@ -724,7 +724,7 @@ def generate_goose_anatomy(cnn_model, ctrl_edge, ctrl_rti):
     ax.legend(loc="upper right", fontsize=8)
 
     plt.tight_layout(rect=[0, 0, 1, 0.94])
-    out_path = os.path.join(FIG_DIR, "hmctd_v2_goose_anatomy.png")
+    out_path = os.path.join(FIG_DIR, "hgb_a_star_goose_anatomy.png")
     plt.savefig(out_path, dpi=220, bbox_inches="tight")
     plt.close()
     print(f"[OK] Saved {out_path}")
@@ -900,7 +900,7 @@ def generate_4datasets_showcase(cnn_model, ctrl_edge, ctrl_rti):
     ax34.grid(True, axis="y", ls=":", alpha=0.6)
     ax34.legend(fontsize=8)
 
-    out_png = os.path.join(FIG_DIR, "hmctd_v2_4datasets_showcase.png")
+    out_png = os.path.join(FIG_DIR, "hgb_a_star_4datasets_showcase.png")
     plt.savefig(out_png, dpi=220, bbox_inches="tight")
     plt.close()
     print(f"[OK] Saved {out_png}")
@@ -1085,7 +1085,7 @@ def generate_549_benchmark_figure():
     ax.legend(loc="lower left", fontsize=7.2, framealpha=0.92)
 
     fig.tight_layout(rect=[0, 0, 1, 0.93])
-    out_path = os.path.join(FIG_DIR, "hmctd_v2_549_benchmark.png")
+    out_path = os.path.join(FIG_DIR, "hgb_a_star_549_benchmark.png")
     fig.savefig(out_path, bbox_inches="tight", dpi=200)
     plt.close(fig)
     print(f"[OK] Saved {out_path}")
@@ -1330,7 +1330,7 @@ def generate_largemaps_showcase(cnn_model, ctrl_rti):
         ax.text(b.get_x() + b.get_width() / 2, v + 0.08, f"{v:.2f}cm\n({us:.1f}µs)", ha="center", va="bottom", fontsize=7.2, fontweight="bold")
 
     fig.tight_layout(rect=[0, 0, 1, 0.93])
-    out_path = os.path.join(FIG_DIR, "hmctd_v2_largemaps_showcase.png")
+    out_path = os.path.join(FIG_DIR, "hgb_a_star_largemaps_showcase.png")
     fig.savefig(out_path, bbox_inches="tight", dpi=200)
     plt.close(fig)
     print(f"[OK] Saved {out_path}")

@@ -17,9 +17,10 @@ import torch.optim as optim
 from torch.utils.data import Dataset, DataLoader
 
 # Thiết lập thiết bị chạy
+CURR_DIR = os.path.dirname(os.path.abspath(__file__))
 DEVICE = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-MODEL_PATH = "system1_model.pth"
-GT_DIR = "gt_dataset"
+MODEL_PATH = os.path.join(CURR_DIR, "system1_model.pth")
+GT_DIR = os.path.join(CURR_DIR, "gt_dataset")
 
 # ==============================================================
 # CẤU TRÚC MẠNG NEURAL SYSTEM 1 (Lightweight Encoder-Decoder)

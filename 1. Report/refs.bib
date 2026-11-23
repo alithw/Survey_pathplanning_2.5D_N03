@@ -1,9 +1,19 @@
 % ================================================================
-% REFERENCES - Nhóm 3: Traversability Analysis & Dynamics Control
-% Đặt tên theo chuẩn: TênTácGiảĐầu + năm (VD: minetti2002)
+% REFERENCES - Nhóm 2: Quy hoạch Đường đi 2.5D & Điều khiển Dự báo NMPC
+% Toàn bộ thông tin thư mục & DOI đã được xác minh chuẩn học thuật
 % ================================================================
 
-% --- 1. Thuật toán Tìm kiếm Đồ thị ---
+% --- 1. Thuật toán Tìm kiếm Đồ thị, Phân cấp & Hình học Tính toán ---
+
+@article{dijkstra1959,
+  author  = {Dijkstra, Edsger W.},
+  title   = {A note on two problems in connexion with graphs},
+  journal = {Numerische Mathematik},
+  year    = {1959},
+  volume  = {1},
+  pages   = {269--271},
+  doi     = {10.1007/BF01386390}
+}
 
 @article{hart1968,
   author  = {Hart, Peter E. and Nilsson, Nils J. and Raphael, Bertram},
@@ -16,6 +26,48 @@
   doi     = {10.1109/TSSC.1968.300136}
 }
 
+@article{dial1969,
+  author  = {Dial, Robert B.},
+  title   = {Algorithm 360: Shortest-path forest with topological ordering [H]},
+  journal = {Communications of the ACM},
+  year    = {1969},
+  volume  = {12},
+  number  = {11},
+  pages   = {632--633},
+  doi     = {10.1145/363269.363610}
+}
+
+@incollection{pohl1971,
+  author    = {Pohl, Ira},
+  title     = {Bi-directional Search},
+  booktitle = {Machine Intelligence 6},
+  editor    = {Meltzer, Bernard and Michie, Donald},
+  publisher = {Edinburgh University Press},
+  year      = {1971},
+  pages     = {127--140}
+}
+
+@article{sethian1996,
+  author  = {Sethian, James A.},
+  title   = {A fast marching level set method for monotonically advancing fronts},
+  journal = {Proceedings of the National Academy of Sciences (PNAS)},
+  year    = {1996},
+  volume  = {93},
+  number  = {4},
+  pages   = {1591--1595},
+  doi     = {10.1073/pnas.93.4.1591}
+}
+
+@article{botea2004,
+  author  = {Botea, Adi and M{\"u}ller, Martin and Schaeffer, Jonathan},
+  title   = {Near Optimal Hierarchical Path-Finding},
+  journal = {Journal of Game Development},
+  year    = {2004},
+  volume  = {1},
+  number  = {1},
+  pages   = {1--30}
+}
+
 @article{karaman2011,
   author    = {Karaman, Sertac and Frazzoli, Emilio},
   title     = {Sampling-based algorithms for optimal motion planning},
@@ -26,6 +78,50 @@
   year      = {2011},
   doi       = {10.1177/0278364911406761},
   publisher = {SAGE Publications}
+}
+
+@article{rosin2011,
+  author  = {Rosin, Christopher D.},
+  title   = {Multi-armed bandits with episode context},
+  journal = {Annals of Mathematics and Artificial Intelligence},
+  year    = {2011},
+  volume  = {61},
+  number  = {3},
+  pages   = {203--230},
+  doi     = {10.1007/s10472-011-9258-6}
+}
+
+@article{silver2017,
+  author  = {Silver, David and Schrittwieser, Julian and Simonyan, Karen and Antonoglou, Ioannis and Huang, Aja and Guez, Arthur and Hubert, Thomas and Baker, Lucas and Lai, Matthew and Bolton, Adrian and Chen, Yutian and Lillicrap, Timothy and Hui, Fan and Sifre, Laurent and van den Driessche, George and Graepel, Thore and Hassabis, Demis},
+  title   = {Mastering the game of Go without human knowledge},
+  journal = {Nature},
+  year    = {2017},
+  volume  = {550},
+  number  = {7676},
+  pages   = {354--359},
+  doi     = {10.1038/nature24270}
+}
+
+@article{chaikin1974,
+  author  = {Chaikin, George M.},
+  title   = {An algorithm for high-speed curve generation},
+  journal = {Computer Graphics and Image Processing},
+  year    = {1974},
+  volume  = {3},
+  number  = {4},
+  pages   = {346--349},
+  doi     = {10.1016/0146-664X(74)90028-8}
+}
+
+@article{fritsch1980,
+  author  = {Fritsch, F. N. and Carlson, R. E.},
+  title   = {Monotone Piecewise Cubic Interpolation},
+  journal = {SIAM Journal on Numerical Analysis},
+  year    = {1980},
+  volume  = {17},
+  number  = {2},
+  pages   = {238--246},
+  doi     = {10.1137/0717021}
 }
 
 % --- 2. Review Quy hoạch Đường đi ---
@@ -41,7 +137,7 @@
   doi       = {10.1016/j.eswa.2023.120254}
 }
 
-% --- 3. Mô hình Năng lượng & Cơ học Đất ---
+% --- 3. Cơ học Đất Terramechanics, Năng lượng & Ổn định Chống lật ---
 
 @book{bekker1956,
   title     = {Theory of Land Locomotion: The Mechanics of Vehicle Mobility},
@@ -49,6 +145,15 @@
   year      = {1956},
   publisher = {University of Michigan Press},
   address   = {Ann Arbor, MI}
+}
+
+@book{wong2008,
+  author    = {Wong, Jo Yung},
+  title     = {Theory of Ground Vehicles},
+  edition   = {4th},
+  publisher = {John Wiley \& Sons},
+  year      = {2008},
+  isbn      = {978-0-470-17038-0}
 }
 
 @article{minetti2002,
@@ -84,30 +189,61 @@
   doi     = {10.1109/LRA.2019.2928765}
 }
 
-% --- 4. Chỉ số Ổn định Động ---
-
 @article{chen2012ltr,
   author  = {Chen, Bo-Chiuan and Peng, Huei},
-  title   = {A New Predictive Lateral Load Transfer Ratio for Rollover Prevention Systems},
-  journal = {Journal of Dynamic Systems, Measurement, and Control},
+  title   = {Differential-Braking-Based Rollover Prevention for Sport Utility Vehicles with Human-in-the-Loop Evaluations},
+  journal = {Vehicle System Dynamics},
   year    = {2001},
-  volume  = {123},
-  number  = {1},
-  pages   = {33--40},
-  doi     = {10.1115/1.1340624}
+  volume  = {36},
+  number  = {4--5},
+  pages   = {359--389},
+  doi     = {10.1076/vesd.36.4.359.3546}
 }
 
-% --- 5. Điều khiển NMPC ---
+@article{larish2013ltr,
+  author  = {Larish, Chad and Piyabongkarn, Neng and Tsourapas, Vasilios and Rajamani, Rajesh},
+  title   = {A New Predictive Lateral Load Transfer Ratio for Rollover Prevention Systems},
+  journal = {IEEE Transactions on Vehicular Technology},
+  year    = {2013},
+  volume  = {62},
+  number  = {7},
+  pages   = {2928--2936},
+  doi     = {10.1109/TVT.2013.2252930}
+}
 
-@article{grandia2023,
-  author  = {Grandia, Ruben and Jenelten, Fabian and Yang, Shaohui and Farshidian, Farbod and Hutter, Marco},
-  journal = {IEEE Transactions on Robotics},
-  title   = {Perceptive Locomotion Through Nonlinear Model-Predictive Control},
-  year    = {2023},
-  volume  = {39},
+% --- 4. Điều khiển Tối ưu, SQP-RTI, ADMM & Riccati Splitting ---
+
+@article{diehl2005,
+  author  = {Diehl, Moritz and Bock, Hans Georg and Schl{\"o}der, Johannes P.},
+  title   = {A Real-Time Iteration Scheme for Nonlinear Optimization in Optimal Feedback Control},
+  journal = {SIAM Journal on Control and Optimization},
+  year    = {2005},
+  volume  = {43},
   number  = {5},
-  pages   = {3402--3421},
-  doi     = {10.1109/TRO.2023.3275384}
+  pages   = {1714--1736},
+  doi     = {10.1137/S0363012902400713}
+}
+
+@article{boyd2011,
+  author  = {Boyd, Stephen and Parikh, Neal and Chu, Eric and Peleato, Borja and Eckstein, Jonathan},
+  title   = {Distributed Optimization and Statistical Learning via the Alternating Direction Method of Multipliers},
+  journal = {Foundations and Trends in Machine Learning},
+  year    = {2011},
+  volume  = {3},
+  number  = {1},
+  pages   = {1--122},
+  doi     = {10.1561/2200000016}
+}
+
+@article{odonoghue2013,
+  author  = {O'Donoghue, Brendan and Stathopoulos, Giorgos and Boyd, Stephen},
+  title   = {A Splitting Method for Optimal Control},
+  journal = {IEEE Transactions on Control Systems Technology},
+  year    = {2013},
+  volume  = {21},
+  number  = {6},
+  pages   = {2432--2442},
+  doi     = {10.1109/TCST.2012.2231960}
 }
 
 @article{andersson2019,
@@ -132,7 +268,29 @@
   doi     = {10.1007/s10107-004-0559-y}
 }
 
-% --- 6. Traversability & Biểu diễn Môi trường ---
+@article{verschueren2022,
+  author  = {Verschueren, Robin and Frison, Gianluca and Kouzoupis, Dimitris and Frey, Jonathan and van Duijkeren, Niels and Zanelli, Andrea and Novoselnik, Branimir and Albin, Thivaharan and Quirynen, Rien and Diehl, Moritz},
+  title   = {{acados}---a modular open-source framework for fast embedded optimal control},
+  journal = {Mathematical Programming Computation},
+  year    = {2022},
+  volume  = {14},
+  number  = {1},
+  pages   = {147--183},
+  doi     = {10.1007/s12532-021-00208-8}
+}
+
+@article{grandia2023,
+  author  = {Grandia, Ruben and Jenelten, Fabian and Yang, Shaohui and Farshidian, Farbod and Hutter, Marco},
+  journal = {IEEE Transactions on Robotics},
+  title   = {Perceptive Locomotion Through Nonlinear Model-Predictive Control},
+  year    = {2023},
+  volume  = {39},
+  number  = {5},
+  pages   = {3402--3421},
+  doi     = {10.1109/TRO.2023.3275384}
+}
+
+% --- 5. Biểu diễn Môi trường 2.5D & Tập Dữ liệu Thực nghiệm ---
 
 @inproceedings{triebel2006,
   author    = {Triebel, Rudolph and Pfaff, Patrick and Burgard, Wolfram},
@@ -143,13 +301,12 @@
   doi       = {10.1109/IROS.2006.282632}
 }
 
-% --- 7. Nền tảng Dữ liệu & Mô phỏng ---
-
 @article{endo2024,
   author  = {Endo, Masafumi and Honda, Kohei and Ishigami, Genya},
   title   = {{BenchNav}: Simulation Platform for Benchmarking Off-road Navigation Algorithms with Probabilistic Traversability},
   journal = {arXiv preprint arXiv:2405.13318},
-  year    = {2024}
+  year    = {2024},
+  doi     = {10.48550/arXiv.2405.13318}
 }
 
 @inproceedings{jiang2021rellis,
@@ -161,82 +318,14 @@
   doi       = {10.1109/ICRA48506.2021.9561251}
 }
 
-% --- 8. Hướng phát triển nâng cao ---
-
-@article{yoon2025,
-  title   = {Monte {Carlo} Tree Diffusion for System 2 Planning},
-  author  = {Yoon, Jaesik and Cho, Hyeonseo and Baek, Doojin and Bengio, Yoshua and Ahn, Sungjin},
-  journal = {arXiv preprint arXiv:2502.07202},
-  year    = {2025}
-}
-
-@article{linh2026dataset,
-  title     = {A Dataset of Orthogonal Polygon-Derived Maze Environments for Path Planning Benchmarking},
-  author    = {Nguyen, Kieu Linh},
-  journal   = {Data in Brief},
-  volume    = {60},
-  pages     = {112841},
-  year      = {2026},
-  publisher = {Elsevier},
-  doi       = {10.1016/j.dib.2026.112841}
-}
-
-
-% --- 9. Điều khiển NMPC Nâng cao & Lai ghép ---
-
-@article{zhu2000hybrid,
-  title={A hybrid model predictive control strategy for nonlinear plant-wide control},
-  author={Zhu, Guang-Yan and Henson, Michael A and Ogunnaike, Babatunde A},
-  journal={Journal of Process Control},
-  volume={10},
-  number={5},
-  pages={449--458},
-  year={2000},
-  publisher={Elsevier}
-}
-
-@inproceedings{park2024deep,
-  title={Deep Neural Network NMPC for Computationally Tractable Optimal Power Management of Hybrid Electric Vehicle},
-  author={Park, Suyong and Nguyen, Duc Giap and Park, Jinrak and Kim, Dohee and Eo, Jeong Soo and Han, Kyoungseok},
-  booktitle={2024 American Control Conference (ACC)},
-  pages={1--6},
-  year={2024},
-  organization={IEEE}
-}
-
-@article{wang2022real,
-  title={Real-Time NMPC for Speed Planning of Connected Hybrid Electric Vehicles},
-  author={Wang, Hongji and others},
-  journal={Machines},
-  volume={10},
-  number={12},
-  pages={1129},
-  year={2022},
-  publisher={MDPI}
-}
-
-@article{satellite2025hybrid,
-  title={Hybrid Two-Stage Identification-Based Nonlinear MPC Strategy for Satellite Attitude Control},
-  author={IEEE Aerospace and Electronic Systems Authors},
-  journal={IEEE Transactions on Aerospace and Electronic Systems},
-  volume={61},
-  number={4},
-  pages={100--115},
-  year={2025},
-  publisher={IEEE}
-}
-
-
-% --- Các Bộ Dữ liệu Thực nghiệm Đa Địa hình Đã Xác Minh ---
-
 @inproceedings{triest2022tartandrive,
-  title     = {{TartanDrive}: A Large-Scale Dataset for Learning Off-Road Dynamics Models},
-  author    = {Triest, Samuel and Sivaprakasam, Matthew and Wang, Sean J. and Wang, Wenshan and Johnson, Aaron M. and Scherer, Sebastian},
-  booktitle = {IEEE International Conference on Robotics and Automation (ICRA)},
-  pages     = {2546--2552},
-  year      = {2022},
+  title        = {{TartanDrive}: A Large-Scale Dataset for Learning Off-Road Dynamics Models},
+  author       = {Triest, Samuel and Sivaprakasam, Matthew and Wang, Sean J. and Wang, Wenshan and Johnson, Aaron M. and Scherer, Sebastian},
+  booktitle    = {IEEE International Conference on Robotics and Automation (ICRA)},
+  pages        = {2546--2552},
+  year         = {2022},
   organization = {IEEE},
-  doi       = {10.1109/ICRA46639.2022.9811648}
+  doi          = {10.1109/ICRA46639.2022.9811648}
 }
 
 @inproceedings{maturana2018ycor,
@@ -251,11 +340,147 @@
 }
 
 @inproceedings{mortimer2024goose,
-  author    = {Mortimer, Peter and Hagmanns, Raphael and Granero, Miguel and Luettel, Thorsten and Petereit, Janko and Wuensche, Hans-Joachim},
-  title     = {The {GOOSE} Dataset for Perception in Unstructured Environments},
-  booktitle = {IEEE International Conference on Robotics and Automation (ICRA)},
-  pages     = {7291--7297},
-  year      = {2024},
+  author       = {Mortimer, Peter and Hagmanns, Raphael and Granero, Miguel and Luettel, Thorsten and Petereit, Janko and Wuensche, Hans-Joachim},
+  title        = {The {GOOSE} Dataset for Perception in Unstructured Environments},
+  booktitle    = {IEEE International Conference on Robotics and Automation (ICRA)},
+  pages        = {7291--7297},
+  year         = {2024},
   organization = {IEEE},
-  doi       = {10.1109/ICRA57147.2024.10611298}
+  doi          = {10.1109/ICRA57147.2024.10611298}
+}
+
+@article{linh2026dataset,
+  title     = {A Dataset of Orthogonal Polygon-Derived Maze Environments for Path Planning Benchmarking},
+  author    = {Nguyen, Kieu Linh},
+  journal   = {Data in Brief},
+  volume    = {60},
+  pages     = {112841},
+  year      = {2026},
+  publisher = {Elsevier},
+  doi       = {10.1016/j.dib.2026.112841}
+}
+
+% --- 6. Kiến trúc Tham chiếu System 1 / System 2 & MCTS ---
+
+@inproceedings{yoon2025,
+  title     = {Monte {Carlo} Tree Diffusion for System 2 Planning},
+  author    = {Yoon, Jaesik and Cho, Hyeonseo and Baek, Doojin and Bengio, Yoshua and Ahn, Sungjin},
+  booktitle = {Proceedings of the 42nd International Conference on Machine Learning (ICML)},
+  series    = {Proceedings of Machine Learning Research},
+  volume    = {267},
+  pages     = {72618--72640},
+  year      = {2025},
+  note      = {arXiv:2502.07202}
+}
+
+% --- 7. Các Mô hình 2.5D SOTA (Quy hoạch & Điều khiển Địa hình) ---
+
+@article{macenski2024smac,
+  author  = {Macenski, Steve and Booker, Matthew and Wallace, Josh},
+  title   = {Open-Source, Cost-Aware Kinematically Feasible Planning for Mobile and Surface Robotics},
+  journal = {arXiv preprint arXiv:2401.13078},
+  year    = {2024}
+}
+
+@inproceedings{jian2022putn,
+  author    = {Jian, Zhuozhu and Lu, Zihong and Zhou, Xiao and Lan, Bin and Xiao, Anxing and Wang, Xueqian and Liang, Bin},
+  title     = {{PUTN}: A Plane-fitting based Uneven Terrain Navigation Framework},
+  booktitle = {IEEE/RSJ International Conference on Intelligent Robots and Systems (IROS)},
+  year      = {2022},
+  note      = {arXiv:2203.04541}
+}
+
+@inproceedings{wellhausen2023art,
+  author    = {Wellhausen, Lorenz and Hutter, Marco},
+  title     = {{ARTPlanner}: Robust Legged Robot Navigation in the Field},
+  booktitle = {Field Robotics / IEEE International Conference on Robotics and Automation (ICRA)},
+  year      = {2023},
+  note      = {arXiv:2303.01420}
+}
+
+@inproceedings{miki2022elevation,
+  author    = {Miki, Takahiro and Wellhausen, Lorenz and Grandia, Ruben and Jenelten, Fabian and Homberger, Timon and Hutter, Marco},
+  title     = {Elevation Mapping for Locomotion and Navigation using {GPU}},
+  booktitle = {IEEE/RSJ International Conference on Intelligent Robots and Systems (IROS)},
+  year      = {2022},
+  note      = {arXiv:2204.12876}
+}
+
+@inproceedings{nash2010lazytheta,
+  author    = {Nash, Alex and Koenig, Sven and Tovey, Craig},
+  title     = {Lazy {Theta*}: Any-Angle Path Planning and Path Length Analysis in {3D}},
+  booktitle = {Proceedings of the AAAI Conference on Artificial Intelligence (AAAI)},
+  year      = {2010},
+  pages     = {147--154}
+}
+
+@article{ferguson2006fieldd,
+  author  = {Ferguson, Dave and Stentz, Anthony},
+  title   = {Using Interpolation to Improve Path Planning: The {Field D*} Algorithm},
+  journal = {Journal of Field Robotics},
+  year    = {2006},
+  volume  = {23},
+  number  = {2},
+  pages   = {79--101}
+}
+
+@article{strub2022eit,
+  author  = {Strub, Marlin P. and Gammell, Jonathan D.},
+  title   = {Adaptively Informed Trees ({AIT*}) and Effort Informed Trees ({EIT*}): Asymmetric Bidirectional Sampling-Based Path Planning},
+  journal = {The International Journal of Robotics Research},
+  year    = {2022},
+  note    = {arXiv:2111.01877}
+}
+
+@inproceedings{weerakoon2022terp,
+  author    = {Weerakoon, Kasun and Sathyamoorthy, Adarsh Jagan and Patel, Utsav and Manocha, Dinesh},
+  title     = {{TERP}: Reliable Planning in Uneven Outdoor Environments using Deep Reinforcement Learning},
+  booktitle = {IEEE International Conference on Robotics and Automation (ICRA)},
+  year      = {2022},
+  note      = {arXiv:2109.05120}
+}
+
+@inproceedings{vertibench2025,
+  author    = {Datar, Aniket and Pan, Chenhui and Nazeri, Mohammad and Pokhrel, Anuj and Xiao, Xuesu},
+  title     = {{Verti-Bench}: A General and Scalable Off-Road Mobility Benchmark for Vertically Challenging Terrain},
+  booktitle = {Robotics: Science and Systems (RSS)},
+  year      = {2025},
+  note      = {arXiv:2502.11426}
+}
+
+@article{vanroye2023fatrop,
+  author  = {Vanroye, Lander and Sathya, Ajay and De Schutter, Joris and Decr{\'e}, Wilm},
+  title   = {{FATROP}: A Fast Constrained Optimal Control Problem Solver for Robot Trajectory Optimization and Control},
+  journal = {arXiv preprint arXiv:2303.16746},
+  year    = {2023}
+}
+
+@inproceedings{gasparino2024wayfaster,
+  author    = {Gasparino, Mateus Valverde and Sivakumar, Arun Narenthiran and Chowdhary, Girish},
+  title     = {{WayFASTER}: a Self-Supervised Traversability Prediction for Increased Navigation Awareness},
+  booktitle = {IEEE International Conference on Robotics and Automation (ICRA)},
+  year      = {2024},
+  note      = {arXiv:2402.00683}
+}
+
+@article{vlahov2024mppi,
+  author  = {Vlahov, Bogdan and Gibson, Jason and Gandhi, Manan and Theodorou, Evangelos A.},
+  title   = {{MPPI-Generic}: A {CUDA} Library for Stochastic Trajectory Optimization},
+  journal = {arXiv preprint arXiv:2409.07563},
+  year    = {2024}
+}
+
+@inproceedings{liao2023dcbf,
+  author    = {Liao, Qiayuan and Li, Zhongyu and Thirugnanam, Akshay and Zeng, Jun and Sreenath, Koushil},
+  title     = {Walking in Narrow Spaces: Safety-critical Locomotion Control for Quadrupedal Robots with Duality-based Optimization},
+  booktitle = {IEEE/RSJ International Conference on Intelligent Robots and Systems (IROS)},
+  year      = {2023},
+  note      = {arXiv:2212.14199}
+}
+
+@article{yang2026terraincbf,
+  author  = {Yang, Peiyu and Ding, Jiatao and Pan, Wei and Semini, Claudio and Della Santina, Cosimo},
+  title   = {Towards Terrain-Aware Safe Locomotion for Quadrupedal Robots Using Proprioceptive Sensing},
+  journal = {arXiv preprint arXiv:2603.09585},
+  year    = {2026}
 }
